@@ -1,0 +1,4 @@
+interface:
+  display_name: "课件串讲与知识图"
+  short_description: "逐页讲解 PPT 与 PDF 的教学主线，建立可回溯原页的离线交互知识图"
+  default_prompt: "使用 $slide-study 将这份课件生成完整的中文逐页讲义和知识图，交付本地离线学习网页。"

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; script-src 'self' file:; style-src 'self' file: 'unsafe-inline'; font-src 'self' file: data:; img-src 'self' file: data:; base-uri 'none'; form-action 'none'">
+  <meta name="description" content="逐页理解课件，探索知识之间的联系。">
+  <title>__TITLE__</title>
+  <link rel="stylesheet" href="assets/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+  <script defer src="assets/vendor/katex/katex.min.js"></script>
+  <script defer src="assets/vendor/katex/contrib/auto-render.min.js"></script>
+  <script defer src="assets/app.js"></script>
+</head>
+<body>
+  <a href="#main" class="skip-link">跳到正文</a>
+  <header class="topbar">
+    <button id="home-btn" class="brand" aria-label="返回课程总览"><span class="brand-mark" aria-hidden="true">↗</span><span>课件学习<span class="brand-small">SLIDE STUDY</span></span></button>
+    <p id="course-name" class="course-name"></p>
+    <nav class="view-switch" aria-label="学习视图">
+      <button id="reading-tab" type="button" aria-pressed="false">按页学习</button>
+      <button id="graph-tab" type="button" aria-pressed="false">知识图</button>
+    </nav>
+  </header>
+  <div class="workspace">
+    <aside class="sidebar" aria-label="课程导航">
+      <div class="sidebar-top"><span class="eyebrow">学习路线</span><button id="sidebar-toggle" class="text-button mobile-only" aria-expanded="false" aria-controls="sidebar-body">展开目录</button></div>
+      <div id="sidebar-body">
+        <button id="overview-btn" class="overview-button" type="button"><span>课程总览</span><span aria-hidden="true">↗</span></button>
+        <label for="page-search" class="sr-only">搜索课件讲义</label>
+        <div class="search-wrap"><span aria-hidden="true">⌕</span><input id="page-search" type="search" placeholder="搜索页面、概念或内容" autocomplete="off"></div>
+        <p id="search-count" class="small muted" role="status" aria-live="polite"></p>
+        <nav id="page-list" aria-label="按原页序浏览"></nav>
+      </div>
+      <div class="sidebar-footer"><span class="offline-dot" aria-hidden="true"></span><span>本地离线 · 原页可追溯</span><p id="source-name"></p></div>
+    </aside>
+    <main id="main" tabindex="-1">
+      <div id="fatal-error" class="warning-box" role="alert" hidden></div>
+      <section id="overview-view" aria-labelledby="overview-title"></section>
+      <section id="reading-view" aria-labelledby="page-title" hidden>
+        <div class="reading-top">
+          <div><p id="page-section" class="eyebrow"></p><h1 id="page-title"></h1></div>
+          <div class="page-controls"><button id="prev-page" type="button" class="icon-button" aria-label="上一页">←</button><form id="page-jump-form"><label for="page-jump" class="sr-only">跳转到原文件页码</label><input id="page-jump" type="number" min="1" inputmode="numeric"><span id="page-total"></span><button type="submit" class="sr-only">跳转</button></form><button id="next-page" type="button" class="icon-button" aria-label="下一页">→</button></div>
+        </div>
+        <div class="reading-layout">
+          <div class="source-column">
+            <div class="source-card"><div class="source-caption"><span id="source-page-label"></span><span>点击放大 ↗</span></div><button id="zoom-slide" class="slide-button" type="button" aria-label="放大原课件页"><img id="slide-image" loading="lazy" decoding="async" alt=""></button></div>
+            <div id="source-warnings"></div>
+            <details id="speaker-notes" hidden><summary>课件讲者备注</summary><div id="speaker-notes-text" class="prose"></div></details>
+            <section id="page-concepts" class="page-concepts" aria-label="本页知识点"></section>
+            <div class="provenance-legend"><span class="eyebrow">阅读标记</span><p><span class="provenance source">课件内容</span>忠于原页或讲者备注</p><p><span class="provenance supplement">补充解释</span>帮助理解的背景与例子</p><p><span class="provenance inference">教学推断</span>重建的作用、衔接与关联</p></div>
+          </div>
+          <article id="page-explanation" class="explanation" aria-label="逐页讲解"></article>
+        </div>
+        <nav class="bottom-navigation" aria-label="继续学习"><button id="bottom-prev" class="secondary-button" type="button">← 上一页</button><span id="reading-progress" class="small muted"></span><button id="bottom-next" class="primary-button" type="button">下一页 →</button></nav>
+      </section>
+      <section id="graph-view" aria-labelledby="graph-title" hidden>
+        <div class="graph-heading"><div><p class="eyebrow">从页序到知识结构</p><h1 id="graph-title">把知识连起来</h1><p class="muted">选择一个知识点，查看它与其他概念的联系，再回到原页。</p></div><span id="graph-count" class="count-label"></span></div>
+        <div class="graph-toolbar"><label class="graph-search-label"><span class="sr-only">搜索知识点</span><input id="concept-search" type="search" placeholder="搜索知识点" autocomplete="off"></label><label class="check-label"><input id="neighbors-only" type="checkbox">仅看相邻知识点</label><div class="zoom-controls"><button id="graph-zoom-out" class="icon-button" aria-label="缩小知识图" type="button">−</button><button id="graph-fit" class="text-button" type="button">可读视图</button><button id="graph-overview" class="text-button" type="button" aria-label="缩小查看完整图结构">全图</button><button id="graph-zoom-in" class="icon-button" aria-label="放大知识图" type="button">＋</button></div></div>
+        <div class="graph-layout"><div class="graph-canvas-wrap"><div class="graph-canvas"><svg id="knowledge-graph" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="知识点关系图；也可使用下方知识点列表浏览"><defs><marker id="edge-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 Z" fill="context-stroke"></path></marker></defs><g id="graph-world"></g></svg></div><div class="graph-caption"><span>拖动查看其余知识点 · 滚轮缩放 · 选择节点自动定位</span><span>箭头表示关系方向，对比关系无箭头</span></div><div id="graph-legend" class="graph-legend" aria-label="主题分组"></div></div><aside id="graph-detail" class="graph-detail" aria-live="polite"></aside></div>
+        <details class="concept-directory" open><summary>知识点列表<span class="small muted"> · 支持键盘浏览</span></summary><div id="concept-list"></div></details>
+      </section>
+      <footer class="main-footer"><span>先理解每一页，再看见整个体系。</span><a href="lesson.json" download>下载可编辑课程数据 ↓</a></footer>
+    </main>
+  </div>
+  <dialog id="slide-dialog" aria-labelledby="dialog-title"><div class="dialog-toolbar"><strong id="dialog-title">原课件页</strong><div><button id="image-size-toggle" class="secondary-button" type="button">原始比例</button><button id="close-dialog" class="icon-button" aria-label="关闭原页预览" type="button">×</button></div></div><div id="dialog-image-area"><img id="dialog-image" alt=""></div></dialog>
+  <div id="live-status" class="sr-only" role="status" aria-live="polite"></div>
+  <script id="lesson-data" type="application/json">__LESSON_JSON__</script>
+  <script id="source-data" type="application/json">__SOURCE_JSON__</script>
+</body>
+</html>

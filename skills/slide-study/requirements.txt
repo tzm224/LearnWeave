@@ -1,0 +1,3 @@
+# Python 3.10+; versions used during validation.
+pypdf==6.10.0
+Pillow==12.3.0

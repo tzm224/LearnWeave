@@ -1,0 +1,11 @@
+# Local Python / editor files
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+.env
+.env.*
+
+# Generated study sites and working material
+/output/
+/work/
