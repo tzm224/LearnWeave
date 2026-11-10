@@ -1,21 +1,27 @@
-# Slide Study · 课件串讲与知识图
+<p align="center">
+  <img src="assets/learnweave-logo.png" alt="LearnWeave 标志" width="840">
+</p>
+
+# LearnWeave · 从知识材料到理解体系
 
 **中文** | [English](README.md)
+
+**LearnWeave 将知识材料转化为适合人学习与理解的体系。** 它把课件、论文和技术博客等材料，转化为有讲解、有学习主线、可回溯来源的知识结构。
 
 本仓库包含两套可以分别安装的技能：
 
 - [slide-study](skills/slide-study/SKILL.md)：按课件原页序串讲，生成离线学习网页。
 - [architecture-first-reader](skills/architecture-first-reader/SKILL.md)：面向论文、博客及课件，从核心 Idea、架构与设计推理建立知识主线和分层图谱，交付 Markdown、JSON 与 Mermaid。
 
-**第一版下载：** [slide-study 初版 ZIP](https://github.com/tzm224/slide-study/archive/be044cc7270dcbec32566afee762e729d26bbca2.zip) 对应固定提交 `be044cc`；解压后取 `skills/slide-study/` 即可。这个链接始终指向该提交的快照。本次新增技能保留原 `skills/slide-study/` 文件。
+**第一版下载：** [slide-study v1.0.0 ZIP](https://github.com/tzm224/LearnWeave/archive/refs/tags/v1.0.0.zip) 对应 `v1.0.0` 标签和固定提交 `be044cc`；解压后取 `skills/slide-study/` 即可。这个链接始终指向该版本的快照。本次新增技能保留原 `skills/slide-study/` 文件。
 
 ## architecture-first-reader 快速开始
 
 克隆本仓库后，在仓库根目录运行以下命令安装新技能。已有同名安装时保留它，由你决定如何更新：
 
 ```bash
-git clone https://github.com/tzm224/slide-study.git
-cd slide-study
+git clone https://github.com/tzm224/LearnWeave.git
+cd LearnWeave
 
 skill_install_dir="${CODEX_HOME:-$HOME/.codex}/skills"
 mkdir -p "$skill_install_dir"
@@ -76,8 +82,8 @@ my-course.zip
 先克隆仓库，再把完整技能目录复制到本机 skills 目录。以下命令不会覆盖已有的 `slide-study`：
 
 ```bash
-git clone https://github.com/tzm224/slide-study.git
-cd slide-study
+git clone https://github.com/tzm224/LearnWeave.git
+cd LearnWeave
 
 skill_install_dir="${CODEX_HOME:-$HOME/.codex}/skills"
 mkdir -p "$skill_install_dir"

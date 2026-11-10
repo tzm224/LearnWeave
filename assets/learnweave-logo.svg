@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="400" viewBox="0 0 1440 400" role="img" aria-labelledby="title description">
+  <title id="title">LearnWeave logo</title>
+  <desc id="description">Two colorful threads weave together above an open book, beside the LearnWeave wordmark and the phrase Weaving knowledge into understanding.</desc>
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="cyanThread" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <linearGradient id="goldThread" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FDE68A"/>
+      <stop offset="1" stop-color="#FBBF24"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#312E81" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <rect x="2" y="2" width="1436" height="396" rx="48" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="4"/>
+
+  <g filter="url(#shadow)">
+    <rect x="48" y="40" width="320" height="320" rx="82" fill="url(#tile)"/>
+  </g>
+  <circle cx="118" cy="102" r="66" fill="#FFFFFF" opacity="0.06"/>
+  <circle cx="326" cy="310" r="92" fill="#FFFFFF" opacity="0.045"/>
+
+  <path d="M112 108 C112 164 237 158 237 232" fill="none" stroke="url(#cyanThread)" stroke-width="17" stroke-linecap="round"/>
+  <path d="M304 108 C304 164 179 158 179 232" fill="none" stroke="url(#goldThread)" stroke-width="17" stroke-linecap="round"/>
+  <path d="M208 94 V208" fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round" opacity="0.94"/>
+
+  <circle cx="112" cy="108" r="16" fill="#67E8F9" stroke="#FFFFFF" stroke-width="5"/>
+  <circle cx="304" cy="108" r="16" fill="#FBBF24" stroke="#FFFFFF" stroke-width="5"/>
+  <circle cx="208" cy="94" r="14" fill="#FFFFFF"/>
+
+  <path d="M102 237 C134 220 169 224 208 249 C247 224 282 220 314 237 V298 C278 282 244 286 208 310 C172 286 138 282 102 298 Z" fill="#FFFFFF" opacity="0.98"/>
+  <path d="M208 249 V310" fill="none" stroke="#6D5FDD" stroke-width="7" stroke-linecap="round"/>
+  <path d="M122 254 C149 245 169 251 190 263 M122 273 C149 264 169 270 190 282 M226 263 C247 251 267 245 294 254 M226 282 C247 270 267 264 294 273" fill="none" stroke="#A5B4FC" stroke-width="6" stroke-linecap="round"/>
+
+  <text x="432" y="207" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="116" font-weight="750" letter-spacing="-4" fill="#172033">Learn<tspan fill="#5B4BDB">Weave</tspan></text>
+  <text x="443" y="275" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="28" font-weight="600" letter-spacing="4" fill="#64748B">WEAVING KNOWLEDGE INTO UNDERSTANDING</text>
+</svg>
