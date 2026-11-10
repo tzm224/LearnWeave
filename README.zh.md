@@ -13,7 +13,7 @@
 - [slide-study](skills/slide-study/SKILL.md)：按课件原页序串讲，生成离线学习网页。
 - [architecture-first-reader](skills/architecture-first-reader/SKILL.md)：面向论文、博客及课件，从核心 Idea、架构与设计推理建立知识主线和分层图谱，交付 Markdown、JSON 与 Mermaid。
 
-**第一版下载：** [slide-study 初版 ZIP](https://github.com/tzm224/slide-study/archive/be044cc7270dcbec32566afee762e729d26bbca2.zip) 对应固定提交 `be044cc`；解压后取 `skills/slide-study/` 即可。这个链接始终指向该提交的快照。本次新增技能保留原 `skills/slide-study/` 文件。
+**第一版下载：** [slide-study v1.0.0 ZIP](https://github.com/tzm224/LearnWeave/archive/refs/tags/v1.0.0.zip) 对应 `v1.0.0` 标签和固定提交 `be044cc`；解压后取 `skills/slide-study/` 即可。这个链接始终指向该版本的快照。本次新增技能保留原 `skills/slide-study/` 文件。
 
 ## architecture-first-reader 快速开始
 

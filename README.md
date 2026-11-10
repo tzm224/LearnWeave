@@ -13,7 +13,7 @@ This repository contains two skills that can be installed separately:
 - [slide-study](skills/slide-study/SKILL.md): explains a deck in its original page order and builds an offline study website.
 - [architecture-first-reader](skills/architecture-first-reader/SKILL.md): reconstructs core ideas, architecture, and design reasoning from papers, technical articles, and slides, delivering a shared knowledge spine and layered graph as Markdown, JSON, and Mermaid.
 
-**Original version:** [Download the first slide-study ZIP](https://github.com/tzm224/slide-study/archive/be044cc7270dcbec32566afee762e729d26bbca2.zip), pinned to commit `be044cc`. Extract and use `skills/slide-study/`. The link continues to refer to that commit's snapshot. This addition preserves the existing `skills/slide-study/` files.
+**Original version:** [Download slide-study v1.0.0 ZIP](https://github.com/tzm224/LearnWeave/archive/refs/tags/v1.0.0.zip), tagged `v1.0.0` at commit `be044cc`. Extract and use `skills/slide-study/`. The link continues to refer to that release's snapshot. This addition preserves the existing `skills/slide-study/` files.
 
 ## architecture-first-reader quick start
 
