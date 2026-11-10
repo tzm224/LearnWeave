@@ -4,9 +4,9 @@
 
 ## 结构检查
 
-运行 `python3 <skill-dir>/scripts/validate.py <output-dir>`，修复返回的错误。检查覆盖声明、来源与节点引用、主线顺序、分层视图、关系方向及 Mermaid 一致性。来源 URL/路径能够重开、定位确实指向所述内容，需要另行核对；ID 存在不等于证据有效。
+构建时校验两个 JSON 和五份完整稿件的引用与主线顺序。运行 `python3 <skill-dir>/scripts/validate.py <交付目录>/index.html` 检查最终文件，再对照原文检查证据的实际支持范围。
 
-确认八份交付文件齐全，Markdown 中没有模板占位值；overview 的导航可打开，节点深入链接指向对应内容。修改 JSON 后重新生成 Mermaid。校验工具不负责判断事实、证据强度或作者意图。
+将成品单独复制到空目录，断网后用浏览器直接打开文件。沿主线打开设计讲解和证据，核对页码或章节，关闭面板应回到原阅读位置。检查 L1/L2/L3、搜索、聚焦邻居、边的依据及图谱返回正文。用窄屏和键盘检查目录与证据面板。若环境只能进行 HTTP 预览，记录实际完成的范围。原件链接需在原文件或网站仍可访问时单独核对。
 
 ## 内容检查
 
@@ -38,16 +38,16 @@
 
 ## 维护技能时的回归检查
 
-修改 Schema、绘图或校验脚本后执行：
+修改解析器、构建器、图谱或数据契约后，运行回归测试，重新生成两份示例阅读页：
 
 ```text
 python3 -B -m unittest discover -s <skill-dir>/scripts/tests -v
-python3 -B <skill-dir>/scripts/validate.py <skill-dir>/examples/versioned-cache/expected
-python3 -B <skill-dir>/scripts/validate.py <skill-dir>/examples/mergeable-summary/expected
+python3 -B <skill-dir>/scripts/build_reader.py build <skill-dir>/examples/versioned-cache/expected --output <skill-dir>/examples/versioned-cache/reader
+python3 -B <skill-dir>/scripts/build_reader.py build <skill-dir>/examples/mergeable-summary/expected --output <skill-dir>/examples/mergeable-summary/reader
 ```
 
-这些测试覆盖不完整产物、错误引用、缺少归属、证据/模式边界字段、关系方向、包含环、累积视图、主线一致性、节点深入链接和图谱转义。测试不运行示例中的缓存协议，也不证明它有性能优势。
+这些测试覆盖不完整产物、错误引用、缺少归属、证据/模式边界字段、关系方向、包含环、累积视图、主线一致性、节点深入链接、图谱转义、旧目录转换和 HTML 恢复再生成。用浏览器核对缓存示例中的比较与回填、算法示例中的证明与浮点限制。
 
 正式 Schema 使用 Draft 2020-12；为避免运行依赖，随附检查器仅实现这些 Schema 实际用到的关键字，并对遇到的不支持关键字报错。它不是通用 JSON Schema 验证库。新增 Schema 关键字时应同步扩展检查器和测试，或显式选择环境中已有的标准验证器，不能静默忽略断言。
 
-更改教学流程时，用一份没有提供预期答案的新材料试用。验收除了能生成八文件，还需核对材料是否被准确重建；系统型与理论型材料应呈现各自真实的组织形式。独立试用不可用时如实记录，结构测试不能替代它。
+更改教学流程时，用一份没有提供预期答案的新材料试用。验收时除检查 HTML，还需核对材料是否被准确重建；系统型与理论型材料应呈现各自真实的组织形式。独立试用不可用时如实记录，结构测试不能替代它。

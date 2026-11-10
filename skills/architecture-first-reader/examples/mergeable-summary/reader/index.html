@@ -1,0 +1,1328 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>A Mergeable Summary for Shifted Exponential Sums（合成技术说明） · LearnWeave</title>
+  <style>:root {
+  color-scheme: light;
+  --paper: #fcfbf8;
+  --surface: #fff;
+  --ink: #242331;
+  --muted: #636170;
+  --accent: #5144ad;
+  --wash: #f0edf9;
+  --line: #e2dfe6;
+  --ui-font: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --reading-font: "Spectral", "Iowan Old Style", "Georgia", "Songti SC", "Noto Serif CJK SC", serif;
+  font: 16px/1.6 var(--ui-font);
+  color: var(--ink);
+  background: var(--paper);
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--accent); text-underline-offset: .22em; }
+a:hover { text-decoration-thickness: 2px; }
+button, input, select { font: inherit; }
+button, summary { cursor: pointer; }
+:focus-visible { outline: 3px solid #8275ca; outline-offset: 3px; }
+:where(section, h1, h2, h3, h4, [id]) { scroll-margin-top: 22px; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 10; transform: translateY(-160%); padding: .6em 1em; background: white; }
+.skip-link:focus { transform: none; }
+.masthead { border-bottom: 1px solid var(--line); background: #fff; }
+.masthead-inner { max-width: 1400px; margin: auto; padding: 16px clamp(20px, 4vw, 64px); display: flex; align-items: center; justify-content: space-between; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font: 750 23px/1 var(--ui-font); letter-spacing: -1.15px; text-decoration: none; }
+.wordmark b { color: var(--accent); }
+.view-nav { display: flex; align-items: center; gap: 22px; font-size: 14px; }
+.view-nav a, .toc a { text-decoration: none; color: var(--muted); }
+.view-nav a:hover, .toc a:hover { color: var(--accent); }
+.view-nav [aria-current], .toc a[aria-current] { color: var(--accent); font-weight: 650; }
+.reader-shell { max-width: 1400px; margin: auto; display: grid; grid-template-columns: clamp(198px, 20vw, 264px) minmax(0, 1fr); gap: clamp(32px, 6vw, 90px); padding: 0 clamp(20px, 4vw, 64px); }
+.rail { min-width: 0; border-right: 1px solid var(--line); }
+.toc { position: sticky; top: 0; max-height: 100dvh; overflow-y: auto; padding: 44px 22px 32px 0; font-size: 14px; }
+.toc > summary { font-weight: 680; font-size: 13px; color: var(--ink); letter-spacing: .07em; }
+.toc[open] > summary { margin-bottom: 20px; }
+.toc nav > a, .toc-secondary > a { display: block; padding: 6px 0; }
+.toc .spine-toc { list-style: none; margin: 5px 0 18px 5px; padding-left: 14px; border-left: 1px solid var(--line); }
+.spine-toc a { display: block; padding: 4px 0; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.toc-secondary { border-top: 1px solid var(--line); padding-top: 12px; }
+main { min-width: 0; padding: clamp(32px, 4vw, 68px) 0 96px; }
+#reader-article { max-width: 78ch; font-size: 17px; line-height: 1.95; overflow-wrap: break-word; }
+.reader-section { padding: 40px 0 30px; border-top: 1px solid var(--line); }
+.reader-section:first-child { padding-top: 0; border-top: 0; }
+.reader-section :is(h1,h2,h3,h4), .graph-section > h2, .panel-content h2 { text-wrap: pretty; line-height: 1.4; color: var(--ink); }
+.reader-section h1 { font: 680 clamp(32px, 3.7vw, 54px)/1.22 var(--reading-font); letter-spacing: -.035em; margin: 0 0 .58em; }
+.reader-section > .reader-topic:first-child > h2:first-child, .graph-section > h2 { font: 680 clamp(28px, 3vw, 40px)/1.3 var(--reading-font); margin: 0 0 .75em; }
+.reader-section :is(h2,h3) { font-family: var(--reading-font); margin: 1.55em 0 .5em; }
+.reader-section h2 { font-size: 1.6em; }
+.reader-section h3 { font-size: 1.35em; }
+.reader-section h4 { font-size: 1.1em; }
+.reader-section p { margin: .75em 0; }
+#overview h1 + p { font-family: var(--reading-font); font-size: clamp(19px, 1.65vw, 23px); line-height: 1.8; margin: 1.1em 0; padding-left: 1em; border-left: 3px solid #a59ad5; }
+.reader-section :where(ul,ol) { padding-left: 1.6em; }
+.reader-section blockquote, .why-next { margin: 1em 0; padding: .7em 1.1em; background: var(--wash); border-left: 2px solid #a093c8; }
+.article-links { margin: 1.2em 0; font: 500 .86em/1.85 var(--ui-font); color: #9c96aa; }
+.article-links a { white-space: nowrap; }
+.reader-step { padding-bottom: 1.25em; }
+.reader-step + .article-links { margin: 1.2em 0; font: 500 .86em/1.85 var(--ui-font); color: #9c96aa; }
+.article-links a { white-space: nowrap; }
+.reader-step { border-top: 1px solid var(--line); }
+.step-detail { border: 1px solid var(--line); border-radius: 6px; padding: .65em 1em; background: #fff; margin: .7em 0; }
+.step-detail > summary { color: var(--accent); font: 630 .88em/1.7 var(--ui-font); }
+.reader-section a.reader-ref { font-family: var(--ui-font); font-size: .73em; display: inline; padding: .05em .36em; border-radius: 3px; border: 1px solid #d9d5ea; background-color: #f5f3fb; text-decoration: none; white-space: normal; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.reader-ref:hover { background-color: var(--wash); }
+.reader-section code { padding: .1em .28em; background: #efeef2; border-radius: 3px; font: .87em/1.6 "IBM Plex Mono", ui-monospace, monospace; overflow-wrap: anywhere; }
+.reader-section pre { max-width: 100%; overflow: auto; padding: 1em 1.2em; background: #f1f0f3; border-left: 2px solid #bdb5d1; tab-size: 4; }
+.reader-section pre code { padding: 0; background: none; overflow-wrap: normal; }
+.reader-section table { border-collapse: collapse; max-width: 100%; display: block; overflow-x: auto; }
+.reader-section th, .reader-section td { border: 1px solid var(--line); padding: .4em .7em; text-align: left; }
+.reader-section th { background: var(--wash); }
+.math { overflow-x: auto; max-width: 100%; }
+div.math, .math[data-display] { display: block; margin: 1em 0; padding: .3em; }
+.math-error { color: #934620; font-family: ui-monospace, monospace; }
+.graph-section { border-top: 1px solid var(--line); padding-top: 40px; }
+#inspector { position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; width: min(470px, 100%); height: 100dvh; max-height: 100%; max-width: 100%; border: 0; border-left: 1px solid var(--line); background: var(--paper); color: var(--ink); box-shadow: -10px 0 60px #16132920; overflow: auto; overscroll-behavior: contain; }
+#inspector::backdrop { background: #25213745; }
+.panel-top { position: sticky; top: 0; background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 1; color: var(--accent); font-weight: 650; font-size: 14px; }
+.icon-button { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: white; color: var(--ink); font-size: 24px; line-height: 1; }
+.panel-content { padding: 24px; overflow-wrap: anywhere; }
+.panel-content h2 { margin: 0 0 18px; font: 650 28px/1.45 var(--reading-font); }
+.panel-content h3 { margin: 1.35em 0 .35em; font-size: 15px; }
+.panel-content :is(p, ul) { margin: .5em 0; }
+.panel-content ul { padding-left: 1.25em; }
+.panel-meta { color: var(--muted); font-size: 14px; }
+.panel-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.panel-actions button, .source-card button { border: 1px solid #cfc7e4; color: var(--accent); border-radius: 5px; background: var(--surface); padding: 5px 11px; }
+.source-card { margin: 12px 0; padding: 12px 15px; background: #fff; border: 1px solid var(--line); border-radius: 5px; }
+.source-card h4 { margin: 0 0 .3em; }
+@media (max-width: 760px) {
+  .masthead-inner { padding: 12px 16px; }
+  .wordmark { font-size: 20px; }
+  .wordmark svg { width: 27px; height: 27px; }
+  .view-nav { gap: 14px; font-size: 13px; }
+  .reader-shell { display: block; padding: 0 18px; }
+  .rail { border: 0; border-bottom: 1px solid var(--line); }
+  .toc { position: static; padding: 13px 0; max-height: 60dvh; }
+  .toc[open] > summary { margin-bottom: 10px; }
+  main { padding-top: 28px; }
+  #reader-article { font-size: 16px; }
+  .panel-content { padding: 20px; }
+}
+
+#reader-graph {
+  --rg-accent: var(--accent, #5144ad);
+  --rg-ink: var(--ink, #222237);
+  --rg-muted: var(--muted, #626373);
+  --rg-line: #d4d1dd;
+  color: var(--rg-ink);
+  min-width: 0;
+}
+#reader-graph [hidden] { display: none !important; }
+#reader-graph button,
+#reader-graph input {
+  font: inherit;
+  font-size: .875rem;
+  line-height: 1.45;
+}
+#reader-graph button {
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  padding: .4rem .7rem;
+  background: #fff;
+  color: var(--rg-ink);
+  cursor: pointer;
+}
+#reader-graph button:hover { border-color: var(--rg-accent); color: var(--rg-accent); }
+#reader-graph button[aria-pressed="true"] { background: var(--rg-accent); border-color: var(--rg-accent); color: #fff; }
+#reader-graph :is(button,input):focus-visible { outline: 2px solid var(--rg-accent); outline-offset: 2px; }
+#reader-graph .rg-toolbar,
+#reader-graph .rg-footer,
+#reader-graph .rg-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+#reader-graph .rg-toolbar { justify-content: space-between; margin-bottom: .8rem; }
+#reader-graph .rg-layers {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--rg-line);
+  border-radius: 8px;
+  background: #f2f1f6;
+}
+#reader-graph .rg-layers button { background: transparent; border-color: transparent; padding: .37rem .62rem; }
+#reader-graph .rg-layers button[aria-pressed="true"] { background: var(--rg-accent); }
+#reader-graph .rg-search { position: relative; width: 16rem; max-width: 100%; }
+#reader-graph .rg-search input {
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  box-sizing: border-box;
+  padding: .48rem .7rem;
+  width: 100%;
+  background: white;
+  color: var(--rg-ink);
+}
+#reader-graph .rg-results {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 4px);
+  width: 100%;
+  max-height: 16rem;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--rg-line);
+  border-radius: 7px;
+  box-sizing: border-box;
+  background: white;
+  box-shadow: 0 6px 16px #25233b15;
+}
+#reader-graph .rg-results button { display: block; width: 100%; text-align: start; border: 0; }
+#reader-graph .rg-results button:hover,
+#reader-graph .rg-results button:focus-visible { background: #f1eff9; }
+#reader-graph .rg-no-results { display: block; padding: .45rem; font-size: .875rem; color: var(--rg-muted); }
+#reader-graph .rg-canvas {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rg-line);
+  border-radius: 9px;
+  background-color: #f8f7f9;
+  background-image: radial-gradient(#dedce5 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+#reader-graph .rg-diagram {
+  display: block;
+  width: 100%;
+  height: clamp(20rem, 49vh, 34rem);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+#reader-graph .rg-diagram:active { cursor: grabbing; }
+#reader-graph .rg-node,
+#reader-graph .rg-edge { cursor: pointer; }
+#reader-graph .rg-card {
+  fill: #fff;
+  stroke: #bdb9cd;
+  stroke-width: 1.4px;
+}
+#reader-graph .rg-node[aria-pressed="true"] .rg-card { fill: #ece9fc; stroke: var(--rg-accent); stroke-width: 2; }
+#reader-graph .rg-node:hover .rg-card,
+#reader-graph .rg-node:focus-visible .rg-card { stroke: var(--rg-accent); stroke-width: 2.5; }
+#reader-graph .rg-node:focus-visible,
+#reader-graph .rg-edge:focus-visible { outline: none; }
+#reader-graph .rg-meta { font-size: 10px; fill: #61578a; }
+#reader-graph .rg-title { font-size: 13px; font-weight: 600; fill: var(--rg-ink); }
+#reader-graph .rg-line { fill: none; stroke: #77718e; stroke-width: 1.6; }
+#reader-graph .rg-arrow { fill: #6e6887; }
+#reader-graph .rg-inferred { stroke-dasharray: 5 4; }
+#reader-graph .rg-card.rg-inferred { stroke: #94653c; }
+#reader-graph .rg-hit { fill: none; stroke: transparent; stroke-width: 16; }
+#reader-graph .rg-edge:hover .rg-line,
+#reader-graph .rg-edge:focus-visible .rg-line { stroke: var(--rg-accent); stroke-width: 3; }
+#reader-graph .rg-edge-label {
+  font-size: 10px;
+  font-weight: 600;
+  fill: #615b74;
+  stroke: #f8f7f9;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+#reader-graph .rg-hover-label { opacity: 0; }
+#reader-graph .rg-edge:hover .rg-hover-label,
+#reader-graph .rg-edge:focus-visible .rg-hover-label { opacity: 1; }
+#reader-graph .rg-tools {
+  display: inline-flex;
+  position: absolute;
+  right: .55rem;
+  bottom: .55rem;
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  background: #fff;
+}
+#reader-graph .rg-tools button { padding: .28rem .55rem; border: 0; border-radius: 5px; min-width: 2rem; }
+#reader-graph .rg-tools button + button { border-left: 1px solid var(--rg-line); }
+#reader-graph .rg-footer { justify-content: space-between; margin: .45rem .1rem 0; font-size: .78rem; color: var(--rg-muted); }
+#reader-graph .rg-legend::before { content: ""; display: inline-block; width: 1.2rem; margin-right: .4rem; border-top: 1px dashed #94653c; vertical-align: middle; }
+#reader-graph .rg-inspector {
+  margin: .85rem 0 0;
+  padding: .85rem 1rem;
+  border-left: 3px solid var(--rg-accent);
+  background: #f3f1fa;
+  border-radius: 0 6px 6px 0;
+}
+#reader-graph .rg-detail-title { display: block; font-size: 1rem; }
+#reader-graph .rg-summary { margin: .28rem 0 .65rem; font-size: .9rem; line-height: 1.65; }
+#reader-graph .rg-actions button { padding: .28rem .62rem; font-size: .82rem; }
+@media (max-width: 620px) {
+  #reader-graph .rg-toolbar { align-items: stretch; }
+  #reader-graph .rg-search { flex: 1 1 100%; }
+  #reader-graph .rg-diagram { height: min(26rem, 56vh); }
+  #reader-graph .rg-tools button { min-height: 2.3rem; min-width: 2.3rem; }
+}
+#reader-graph .rg-pan-hint { color: var(--rg-muted); }
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#reading">跳至正文</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="wordmark" href="#overview" aria-label="LearnWeave · 返回总览">
+        <svg viewBox="48 40 320 320" width="32" height="32" aria-hidden="true">
+          <rect x="48" y="40" width="320" height="320" rx="82" fill="#5b4bdb"/>
+          <g fill="none" stroke-width="17" stroke-linecap="round"><path d="M112 108 C112 164 237 158 237 232" stroke="#67e8f9"/><path d="M304 108 C304 164 179 158 179 232" stroke="#fbbf24"/><path d="M208 94 V208" stroke="white" stroke-width="13"/></g>
+          <g fill="white"><circle cx="112" cy="108" r="13"/><circle cx="304" cy="108" r="13"/><circle cx="208" cy="94" r="14"/><path d="M102 237 C134 220 169 224 208 249 C247 224 282 220 314 237 V298 C278 282 244 286 208 310 C172 286 138 282 102 298Z"/></g>
+          <path d="M208 249V310" stroke="#5b4bdb" stroke-width="7"/>
+        </svg>
+        <span>Learn<b>Weave</b></span>
+      </a>
+      <nav class="view-nav" aria-label="阅读视图"><a href="#overview">阅读</a><a href="#graph">知识图谱 <span aria-hidden="true">↗</span></a></nav>
+    </div>
+  </header>
+  <div class="reader-shell">
+    <aside class="rail">
+      <details class="toc" open>
+        <summary>阅读目录</summary>
+        <nav aria-label="阅读目录">
+          <a href="#overview">总览</a>
+          <a href="#spine">知识主线</a>
+          <ol class="spine-toc"><li><a href="#step-problem">1. 分块指数和需要安全表示与可合并性</a></li>
+<li><a href="#step-contract">2. 非空分块与精确实数目标</a></li>
+<li><a href="#step-insight">3. 局部参考值可以在合并时重新对齐</a></li>
+<li><a href="#step-architecture">4. 局部摘要到树归约再到对数结果</a></li>
+<li><a href="#step-rescale">5. 先按共同最大值重标定再相加</a></li>
+<li><a href="#step-real_result">6. 实数模型下任意合并树得到同一结果</a></li>
+<li><a href="#step-tradeoff">7. 常数摘要带来可归约性但丢失逐项信息</a></li>
+<li><a href="#step-fp_limits">8. 浮点运行仍有误差与输入边界</a></li>
+<li><a href="#step-pattern">9. 可变参考值下保持规范摘要</a></li></ol>
+          <div class="toc-secondary">
+            <a href="#analysis">架构与设计决策</a>
+            <a href="#patterns">可迁移思想</a>
+            <a href="#sources">原文地图与证据</a>
+            <a href="#graph">知识图谱</a>
+          </div>
+        </nav>
+      </details>
+    </aside>
+    <main id="reading" tabindex="-1">
+      <article id="reader-article"><section id="overview" class="reader-section">
+
+<section class="reader-topic" id="overview-heading-可合并的指数和摘要把全局参考值的协调推迟到每次合并"><h1>可合并的指数和摘要：把全局参考值的协调推迟到每次合并</h1><p>每块保存“局部最大值＋相对该最大值的指数和”，合并时先对齐参考值再相加，就能用两标量摘要沿任意二叉树求得整体 log-sum-exp；任意树等价的保证限于精确实数算术。<a href="#analysis-node-insight" data-node="insight" class="reader-ref" title="查看节点 · 局部参考值可以在合并时重新对齐" aria-label="查看节点 · 局部参考值可以在合并时重新对齐">节点</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a></p>
+<p><strong>材料性质：</strong> 这是用于评估阅读流程的原创合成技术说明，不是已发表论文，也没有实测实现。下述结论是对所给材料的阅读重建。<a href="#sources-source-nature" data-source="nature" class="reader-ref" title="查看依据 · line 3" aria-label="查看依据 · line 3">依据 1</a> <a href="#sources-source-nature" data-source="nature">查看材料性质</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#spine">理解主线</a> · <a href="#analysis">架构与设计决策</a> · <a href="#patterns">可迁移思想</a> · <a href="#sources">原文地图与来源</a> · <a href="#graph">知识图谱</a></nav></section>
+<section class="reader-topic" id="overview-heading-为什么需要它"><h2>为什么需要它</h2><p>目标是计算 <code>log(sum(exp(x_i)))</code>。直接取指数可能溢出；统一减去全局最大值虽能避免正指数参数，但先找这个全局值需要协调所有块。本文要求已经分块的输入各自产出常数大小摘要，之后不保留原块也能合并。<a href="#analysis-node-problem" data-node="problem" class="reader-ref" title="查看节点 · 分块指数和需要安全表示与可合并性" aria-label="查看节点 · 分块指数和需要安全表示与可合并性">节点</a> <a href="#sources-source-setting" data-source="setting" class="reader-ref" title="查看依据 · section 1, line 7" aria-label="查看依据 · section 1, line 7">依据 2</a> <a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#analysis-node-contract">查看约束</a></p>
+</section>
+<section class="reader-topic" id="overview-heading-核心-idea-如何变成架构"><h2>核心 Idea 如何变成架构</h2><p>洞察是局部最大值不必从一开始就相同；只要记录参考值，后续就能转换。设计把它落实为“块内摘要 → 树内重标定合并 → 根部取对数”。例如 <code>[0]</code> 和 <code>[log(2)]</code> 分别输出 <code>(0,1)</code>、<code>(log(2),1)</code>；合并采用共同最大值 <code>log(2)</code>，得到 <code>s=1/2+1=1.5</code>，根部输出 <code>log(2)+log(1.5)=log(3)</code>。根部结果是沿原文例子的直接代数推演，非性能观测。<a href="#analysis-node-architecture" data-node="architecture" class="reader-ref" title="查看节点 · 局部摘要到树归约再到对数结果" aria-label="查看节点 · 局部摘要到树归约再到对数结果">节点</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a></p>
+<p>深入：<a href="#analysis-node-architecture">整体结构与交互</a>。</p>
+</section>
+<section class="reader-topic" id="overview-heading-为什么采用这些设计"><h2>为什么采用这些设计</h2><p>两个局部 <code>s</code> 使用不同参考值，不能直接相加。以两块最大值中的较大者作为共同参考值，既能准确换算两项，也使重标定指数非正。每次合并保持“最大值正确，乘回参考因子后仍代表原指数和”这两个条件；树归纳由此成立。<a href="#analysis-node-rescale" data-node="rescale" class="reader-ref" title="查看节点 · 先按共同最大值重标定再相加" aria-label="查看节点 · 先按共同最大值重标定再相加">节点</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a></p>
+<p>深入：<a href="#analysis-node-rescale">关键设计及替代方案</a>。</p>
+</section>
+<section class="reader-topic" id="overview-heading-得到了什么边界在哪里"><h2>得到了什么，边界在哪里</h2><p>理论证明支持精确实数模型中的正确性与结合性。每块输出两个标量，每次合并只需有界运算，但这不构成相较协调两遍方案的速度或精度比较。摘要也不能直接恢复每个 softmax 概率。浮点可能下溢、舍入，不同树形不保证逐位一致；NaN、无穷和空块被排除，空块单位元与误差界均未给出。<a href="#analysis-node-real_result" data-node="real_result" class="reader-ref" title="查看节点 · 实数模型下任意合并树得到同一结果" aria-label="查看节点 · 实数模型下任意合并树得到同一结果">节点</a> <a href="#analysis-node-tradeoff" data-node="tradeoff" class="reader-ref" title="查看节点 · 常数摘要带来可归约性但丢失逐项信息" aria-label="查看节点 · 常数摘要带来可归约性但丢失逐项信息">节点</a> <a href="#analysis-node-fp_limits" data-node="fp_limits" class="reader-ref" title="查看节点 · 浮点运行仍有误差与输入边界" aria-label="查看节点 · 浮点运行仍有误差与输入边界">节点</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a> <a href="#analysis-node-proof">查看证据与边界</a></p>
+</section>
+<section class="reader-topic" id="overview-heading-值得迁移的思想"><h2>值得迁移的思想</h2><p>分析者可从中抽象“保存参考值与相对量，在合并处对齐参考值，用不变量证明摘要闭合”。新场景必须有正确的转换规则和闭合摘要；不能顺带继承浮点一致性或性能保证。这是 AI 推断。<a href="#analysis-node-pattern" data-node="pattern" class="reader-ref" title="查看节点 · 可变参考值下保持规范摘要" aria-label="查看节点 · 可变参考值下保持规范摘要">节点</a> <a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#patterns-node-pattern">查看迁移条件</a></p>
+</section>
+<section class="reader-topic" id="overview-heading-阅读范围"><h2>阅读范围</h2><p>已读原文件第 1–31 行：标题、材料性质、四节正文与所有公式。原件无图片、附件或附录，未发现读取缺口。完整覆盖只针对这份合成说明。<a href="#sources">原文地图</a></p>
+</section>
+</section>
+<section id="spine" class="reader-section">
+
+<section class="reader-topic" id="spine-heading-a-mergeable-summary-for-shifted-exponential-sums理解主线"><h2>A Mergeable Summary for Shifted Exponential Sums：理解主线</h2><p>先明确问题和摘要契约，再理解参考值如何转换、算法如何传递摘要，最后核对证明、代价和迁移条件。这是为理解依赖重排的路径，不是对作者写作意图的猜测。默认先掌握作用与机制，完整代数推导留在 L3 证据节点。</p>
+</section>
+<section class="reader-step" id="step-problem" data-context-node="problem"><h3>1. 分块指数和需要安全表示与可合并性 <a href="#analysis-node-problem" data-node="problem" class="reader-ref" title="查看节点 · 分块指数和需要安全表示与可合并性" aria-label="查看节点 · 分块指数和需要安全表示与可合并性">节点</a></h3><p class="why-next"><strong>为什么从这里开始：</strong> 先确定需要计算什么，以及直接指数与全局移位方案面临什么限制。</p><p>目标是计算非空有限实数序列的 log(sum(exp(x_i)))。直接指数可能溢出，而先找全局最大值再求全局移位和，需要协调所有块。</p>
+<p>依据：作者陈述。<a href="#sources-source-setting" data-source="setting" class="reader-ref" title="查看依据 · section 1, line 7" aria-label="查看依据 · section 1, line 7">依据 2</a> <a href="#sources-source-setting" data-source="setting">查看来源</a></p>
+<p>学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。</p>
+<p><a href="#expand-problem-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-problem-1"><summary>展开设计与证据 · 先确定计算问题</summary><section class="reader-topic" data-context-node="problem"><h3>先确定计算问题 <a href="#analysis-node-problem" data-node="problem" class="reader-ref" title="查看节点 · 分块指数和需要安全表示与可合并性" aria-label="查看节点 · 分块指数和需要安全表示与可合并性">节点</a></h3><p>需要计算非空有限实数序列的 <code>log(sum(exp(x_i)))</code>。直接计算 <code>exp(x_i)</code> 可能溢出；全局最大值移位把指数参数变为非正，但在计算全局移位和前要协调各块找出这个值。原文因此提出摘要的可合并目标；它没有证明现有协调方案在任何硬件上一定更慢。<a href="#sources-source-setting" data-source="setting" class="reader-ref" title="查看依据 · section 1, line 7" aria-label="查看依据 · section 1, line 7">依据 2</a> <a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-setting" data-source="setting">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-contract" data-context-node="contract"><h3>2. 非空分块与精确实数目标 <a href="#analysis-node-contract" data-node="contract" class="reader-ref" title="查看节点 · 非空分块与精确实数目标" aria-label="查看节点 · 非空分块与精确实数目标">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 问题还没有限定答案的形态：接着明确非空块、常数摘要与实数算术目标。</p><p>输入已经分成非空块；摘要须为常数大小且合并阶段不保留原块，允许任意二叉树。恒等式与结合性仅针对精确实数算术，NaN、无穷及空块不在定义域。</p>
+<p>依据：作者陈述。<a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a> <a href="#sources-source-contract" data-source="contract">查看来源</a></p>
+<p>学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。</p>
+<p><a href="#expand-contract-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-contract-1"><summary>展开设计与证据 · 摘要须满足什么契约</summary><section class="reader-topic" data-context-node="contract"><h3>摘要须满足什么契约 <a href="#analysis-node-contract" data-node="contract" class="reader-ref" title="查看节点 · 非空分块与精确实数目标" aria-label="查看节点 · 非空分块与精确实数目标">节点</a></h3><p>输入已分为非空块，元素为有限实数。每块只输出常数大小摘要，后续合并不需要保留原始块；任意二叉树应在精确实数算术中给出相同结果。这里“合并元素”保留序列元素重数，不作去重集合运算。NaN、无穷及空块被排除，因此现有定义没有空块单位元。<a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></p>
+<p>“无需保留原块”描述摘要之后的合并接口；原文没有限定块内生成摘要的遍历次数或缓存实现，也没有声称完整计算只扫描每个输入一次。<a href="#sources-source-contract" data-source="contract">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-insight" data-context-node="insight"><h3>3. 局部参考值可以在合并时重新对齐 <a href="#analysis-node-insight" data-node="insight" class="reader-ref" title="查看节点 · 局部参考值可以在合并时重新对齐" aria-label="查看节点 · 局部参考值可以在合并时重新对齐">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 既然块内不能依赖最终全局最大值，就要解释如何推迟统一参考值。</p><p>局部摘要不必知道最终全局最大值：先保留局部最大值与相对指数和，每次合并把它们换到共同参考值后再相加。</p>
+<p>依据：作者陈述。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a> <a href="#sources-source-representation" data-source="representation">查看来源</a></p>
+<p>学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。</p>
+<p><a href="#expand-insight-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-insight-1"><summary>展开设计与证据 · 参考值不是不可改变的全局前置条件</summary><section class="reader-topic" data-context-node="insight"><h3>参考值不是不可改变的全局前置条件 <a href="#analysis-node-insight" data-node="insight" class="reader-ref" title="查看节点 · 局部参考值可以在合并时重新对齐" aria-label="查看节点 · 局部参考值可以在合并时重新对齐">节点</a></h3><p>局部 <code>s</code> 的数值以局部最大值为参考。把这个参考值 <code>m</code> 一同保留，就能在未来知道另一个块的最大值时换算，而不必回看原块。原文明确指出局部摘要不需要最终全局最大值；共同参考值在每次合并时更新。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a> <a href="#sources-source-rescaling" data-source="rescaling">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-architecture" data-context-node="architecture"><h3>4. 局部摘要到树归约再到对数结果 <a href="#analysis-node-architecture" data-node="architecture" class="reader-ref" title="查看节点 · 局部摘要到树归约再到对数结果" aria-label="查看节点 · 局部摘要到树归约再到对数结果">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 知道参考值可后续对齐后，需要看摘要怎样沿树传递并产生最终输出。</p><p>块内生成 (m_A,s_A)，内部树节点只接受两个摘要并返回同形摘要，根部输出 m+log(s)。这是算法数据流与不变量组织；原文没有提供 GPU 或分布式系统实现。</p>
+<p>依据：作者陈述。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a> <a href="#sources-source-representation" data-source="representation">查看来源</a></p>
+<p>学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。</p>
+<p><a href="#expand-architecture-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-architecture-1"><summary>展开设计与证据 · 摘要、合并、解码的完整路径</summary><section class="reader-topic" data-context-node="architecture"><h3>摘要、合并、解码的完整路径 <a href="#analysis-node-architecture" data-node="architecture" class="reader-ref" title="查看节点 · 局部摘要到树归约再到对数结果" aria-label="查看节点 · 局部摘要到树归约再到对数结果">节点</a></h3><p><strong>输入与输出：</strong> 输入是上述非空分块；最终输出是一个整体 log-sum-exp 标量。架构中只有算法阶段、状态接口与证明义务，没有虚构线程、网络协议或 GPU 内核。</p>
+<p><strong>执行路径：</strong> 块内先形成 <code>(m_A,s_A)</code>；每个内部节点接收两个摘要，更新共同最大值并重标定局部和，输出相同形状的 <code>(m,s)</code>；根节点只在最后求 <code>m+log(s)</code>。原始元素在合并接口中不再需要。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a></p>
+<p>沿原文的两个单元素块走一遍：</p>
+<ol>
+<li><code>[0]</code> 输出 <code>(0,1)</code>，<code>[log(2)]</code> 输出 <code>(log(2),1)</code>。</li>
+<li>合并最大值变为 <code>m=log(2)</code>；第一项换到新参考值，贡献从 <code>1</code> 变为 <code>1/2</code>，第二项保持 <code>1</code>。</li>
+<li>输出摘要 <code>(log(2),1.5)</code>。继续合并时传递的仍是这两个标量。</li>
+<li>若此处是根，则输出 <code>log(2)+log(1.5)=log(3)</code>。这一步是依据原文公式所作的直接代数推演。</li>
+</ol>
+<p><strong>接口与证明义务：</strong> <code>summarize</code> 建立规范摘要；<code>merge</code> 接受两个规范摘要并保持规范性；<code>finish</code> 把根摘要变为对数结果。层数或树形不改变实数证明，因为每个内部节点执行同一个保持不变量的变换。<a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a> <a href="#sources-source-merge" data-source="merge">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-rescale" data-context-node="rescale"><h3>5. 先按共同最大值重标定再相加 <a href="#analysis-node-rescale" data-node="rescale" class="reader-ref" title="查看节点 · 先按共同最大值重标定再相加" aria-label="查看节点 · 先按共同最大值重标定再相加">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 结构中最关键的缺口是两个不同参考值的摘要究竟怎样合并。</p><p>取 m=max(m_A,m_B)，然后 s=s_A<em>exp(m_A-m)+s_B</em>exp(m_B-m)。两项指数均非正；省略重标定而直接加 s 会在最大值不同时出错。</p>
+<p>依据：作者陈述。<a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a> <a href="#sources-source-merge" data-source="merge">查看来源</a></p>
+<p>学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。</p>
+<p><a href="#expand-rescale-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-rescale-1"><summary>展开设计与证据 · 关键选择：用共同最大值重标定</summary><section class="reader-topic" data-context-node="rescale"><h3>关键选择：用共同最大值重标定 <a href="#analysis-node-rescale" data-node="rescale" class="reader-ref" title="查看节点 · 先按共同最大值重标定再相加" aria-label="查看节点 · 先按共同最大值重标定再相加">节点</a></h3><p><strong>Problem → Constraint：</strong> 分块需要独立产出摘要，后续只能利用摘要；然而两个局部 <code>s</code> 的参考值未必相同。<a href="#analysis-node-problem" data-node="problem" class="reader-ref" title="查看节点 · 分块指数和需要安全表示与可合并性" aria-label="查看节点 · 分块指数和需要安全表示与可合并性">节点</a> <a href="#analysis-node-contract" data-node="contract" class="reader-ref" title="查看节点 · 非空分块与精确实数目标" aria-label="查看节点 · 非空分块与精确实数目标">节点</a> <a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a></p>
+<p><strong>Insight → Design Decision：</strong> 既然参考值已保留，就先对齐再相加。选择 <code>m=max(m_A,m_B)</code>，计算：</p>
+<pre><code class="language-text">s = s_A * exp(m_A-m) + s_B * exp(m_B-m)
+</code></pre>
+<p><strong>Mechanism：</strong> 两个参考值差均非正，因此重标定指数不产生正参数；乘回 <code>exp(m)</code> 时两项各自恢复原来的 <code>exp(m_A)*s_A</code> 和 <code>exp(m_B)*s_B</code>。关键收益来自换算保留了含义，而不是局部 <code>s</code> 本来可直接相加。<a href="#analysis-node-invariant" data-node="invariant" class="reader-ref" title="查看节点 · 合并保持规范摘要" aria-label="查看节点 · 合并保持规范摘要">节点</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a></p>
+<p><strong>Outcome / Trade-off：</strong> 得到同形摘要和实数模型中的正确合并，每次需执行有界的标量和指数运算。具体运行时间、误差与硬件性能仍未验证。<a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></p>
+<p><strong>作者讨论的替代方案：</strong> 先协调全局最大值、再求全局移位和能完成同一计算目标，但需要先获得全局参考值；原文没有速度对比。选最大值却直接相加两个 <code>s</code> 则是错误规则，被下面的反例否定。没有其他已报告替代方案或消融实验。</p>
+<p><strong>仍然未知：</strong> 原文未测量不同树形的性能或精度，也未比较所有可选参考值。不能把采用最大值的理由扩张为“最大值在全部实现中最优”。<a href="#sources-source-rescaling" data-source="rescaling">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-real_result" data-context-node="real_result"><h3>6. 实数模型下任意合并树得到同一结果 <a href="#analysis-node-real_result" data-node="real_result" class="reader-ref" title="查看节点 · 实数模型下任意合并树得到同一结果" aria-label="查看节点 · 实数模型下任意合并树得到同一结果">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 合并公式有了，接着问它为何能支持任意树，而不只是一个例子。</p><p>由每次合并保持规范摘要，对树归纳得到完整 log-sum-exp；结合性与树形无关只在精确实数模型中成立。</p>
+<p>依据：作者陈述。<a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-proof" data-source="proof">查看来源</a></p>
+<p>学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。</p>
+<p><a href="#expand-real_result-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-real_result-1"><summary>展开设计与证据 · 任意树结果相同究竟指什么</summary><section class="reader-topic" data-context-node="real_result"><h3>任意树结果相同究竟指什么 <a href="#analysis-node-real_result" data-node="real_result" class="reader-ref" title="查看节点 · 实数模型下任意合并树得到同一结果" aria-label="查看节点 · 实数模型下任意合并树得到同一结果">节点</a></h3><p>叶子建立规范摘要，每个内部节点保持规范摘要，因此根就是全体元素的规范摘要；取 <code>m+log(s)</code> 得到目标值。改变括号或树形不改变精确实数中的规范摘要，于是得到该模型下的结合性。它不含浮点逐位一致的承诺，也没有给空块定义单位元；不能直接将材料描述为已经完整规定了含空输入的代数结构。<a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a> <a href="#sources-source-proof" data-source="proof">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-tradeoff" data-context-node="tradeoff"><h3>7. 常数摘要带来可归约性但丢失逐项信息 <a href="#analysis-node-tradeoff" data-node="tradeoff" class="reader-ref" title="查看节点 · 常数摘要带来可归约性但丢失逐项信息" aria-label="查看节点 · 常数摘要带来可归约性但丢失逐项信息">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 正确性成立后，再确认这种组织获得什么能力、舍弃哪些逐项信息。</p><p>每块只输出两个标量，每次合并进行有界运算，可先局部计算再树形归约。摘要用于总体 log-sum-exp；若要各项 softmax 概率仍需保留或重访输入。原文未测量相较协调两遍实现的加速。</p>
+<p>依据：作者陈述。<a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a> <a href="#sources-source-costs" data-source="costs">查看来源</a></p>
+<p>学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。</p>
+<p><a href="#expand-tradeoff-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-tradeoff-1"><summary>展开设计与证据 · 可归约摘要的收益与信息边界</summary><section class="reader-topic" data-context-node="tradeoff"><h3>可归约摘要的收益与信息边界 <a href="#analysis-node-tradeoff" data-node="tradeoff" class="reader-ref" title="查看节点 · 常数摘要带来可归约性但丢失逐项信息" aria-label="查看节点 · 常数摘要带来可归约性但丢失逐项信息">节点</a></h3><p>每块两个标量，每次合并只需有界数量的标量运算和指数运算。它允许块内计算后再作树归约，并且合并阶段不必访问原输入。这是结构与运算形态的结论。<a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a></p>
+<p>代价包括合并时的重标定运算，以及摘要不能直接恢复逐项值：若要每个 softmax 概率，仍需保留或重访输入。原文没有测 GPU 内核，也没有证明相较协调两遍实现更快。总体复杂度形态不能代替具体性能测量。<a href="#sources-source-costs" data-source="costs">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-fp_limits" data-context-node="fp_limits"><h3>8. 浮点运行仍有误差与输入边界 <a href="#analysis-node-fp_limits" data-node="fp_limits" class="reader-ref" title="查看节点 · 浮点运行仍有误差与输入边界" aria-label="查看节点 · 浮点运行仍有误差与输入边界">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 常数摘要与实数证明都不能回答浮点误差，需要划清实际运行边界。</p><p>重标定可能使微小贡献下溢，舍入破坏精确结合性；顺序折叠和平衡树可能不同。没有误差界或精度优劣保证，空块也没有单位元。</p>
+<p>依据：作者陈述。<a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a> <a href="#sources-source-limits" data-source="limits">查看来源</a></p>
+<p>学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。</p>
+<p><a href="#expand-fp_limits-1">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<details class="step-detail" id="expand-fp_limits-1"><summary>展开设计与证据 · 浮点与输入范围的边界</summary><section class="reader-topic" data-context-node="fp_limits"><h3>浮点与输入范围的边界 <a href="#analysis-node-fp_limits" data-node="fp_limits" class="reader-ref" title="查看节点 · 浮点运行仍有误差与输入边界" aria-label="查看节点 · 浮点运行仍有误差与输入边界">节点</a></h3><p>非正的重标定指数避免了这一步因正参数过大而指数溢出的风险，仍可能让很小的贡献下溢。舍入会破坏精确结合性，所以平衡树和顺序折叠可能不同。材料未建立误差界，也未证明哪种实现更准确。<a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></p>
+<p>输入范围排除 NaN、无穷和空块；没有空块单位元。因此实现若要支持这些情况，需要另行规定语义与规则。以上是原文明确的边界，不是当前阅读漏掉的附录。<a href="#sources-source-limits" data-source="limits">查看来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-pattern" data-context-node="pattern"><h3>9. 可变参考值下保持规范摘要 <a href="#analysis-node-pattern" data-node="pattern" class="reader-ref" title="查看节点 · 可变参考值下保持规范摘要" aria-label="查看节点 · 可变参考值下保持规范摘要">节点</a></h3><p class="why-next"><strong>为什么接着理解它：</strong> 在能力与限制明确后，才能抽象可迁移结构而不移植未经验证的保证。</p><p>把参考值与相对量一起保存，在合并边界统一参考值，并用不变量证明摘要闭合。可复用的是这种推理结构；迁移到其他问题需要重新证明，不能继承本说明的结论。</p>
+<p>依据：AI 推断。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-representation" data-source="representation">查看来源</a></p>
+<p>学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。</p>
+<p><a href="#expand-pattern-2">展开机制或证据</a> · <a href="#graph">查看节点数据</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#overview">返回总览</a> · <a href="#graph">知识图谱</a></nav><details class="step-detail" id="expand-pattern-1"><summary>展开设计与证据 · 从机制走向可迁移结构</summary><section class="reader-topic" data-context-node="pattern"><h3>从机制走向可迁移结构 <a href="#analysis-node-pattern" data-node="pattern" class="reader-ref" title="查看节点 · 可变参考值下保持规范摘要" aria-label="查看节点 · 可变参考值下保持规范摘要">节点</a></h3><p>AI 分析可抽象出“参考值＋相对量 → 合并时对齐 → 规范摘要保持”的模式；迁移必须检查转换规则与闭合性。它不自动产生新场景的数值或性能保证。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#patterns-node-pattern">展开条件与失效边界</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#spine">回到理解主线</a> · <a href="#sources">来源地图</a> · <a href="#overview">返回总览</a></nav></section></details><details class="step-detail" id="expand-pattern-2"><summary>展开迁移条件 · 保存参考值，在合并边界统一尺度</summary><section class="reader-topic" data-context-node="pattern"><h3>保存参考值，在合并边界统一尺度 <a href="#analysis-node-pattern" data-node="pattern" class="reader-ref" title="查看节点 · 可变参考值下保持规范摘要" aria-label="查看节点 · 可变参考值下保持规范摘要">节点</a></h3><p><strong>具体来源：</strong> 每块用 <code>(m_A,s_A)</code> 表示指数和；合并先把两个 <code>s</code> 换到共同最大值，再相加，输出仍为规范摘要。<a href="#analysis-node-rescale" data-node="rescale" class="reader-ref" title="查看节点 · 先按共同最大值重标定再相加" aria-label="查看节点 · 先按共同最大值重标定再相加">节点</a> <a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-merge" data-source="merge">查看原文</a></p>
+<p><strong>抽象结构：</strong> 把数值依赖的参考值显式放入摘要，让局部计算可用局部参考；将尺度转换集中到合并边界。证明需要覆盖“摘要表示什么”“转换是否保持表示”“合并后是否仍是同一种规范摘要”。收益来自合并只需摘要，且全局参考值不再是每个局部块开始计算的前置条件。</p>
+<p><strong>适用条件：</strong> 每块目标量能用常数大小摘要表示；参考值之间存在可计算且正确的变换；合并结果在同一表示中闭合。还必须明确算术模型与合法输入，不能只证明实数关系就许诺浮点位级一致。</p>
+<p><strong>迁移方向（未经验证的分析）：</strong> 对带正权重的指数总和，可尝试把局部量改为 <code>s_A=sum(w_i*exp(x_i-m_A))</code>，保留参考值并在合并时换算。这只是候选映射；需要另行证明加权表示不变量、规定权重范围并检查数值行为，原文没有讨论或验证这一场景。</p>
+<p><strong>代价与失效条件：</strong> 摘要必须保存参考值，合并增加重标定运算；若丢弃参考值、摘要不闭合，或目标要求从摘要恢复逐项信息，该模式便不能满足原目标。若要求浮点逐位一致，单有实数结合性证明也不够。迁移后的性能须重新测量。</p>
+<p>归属：AI 推断。可信程度：medium；具体结构与原文高度对应，但新场景没有原文证明或测量。这里的可信度描述抽象把握，不是模式普遍成功的概率。</p>
+<p><a href="#analysis-node-rescale">回到具体架构</a> · <a href="#overview">返回总览</a></p>
+</section></details></section>
+</section>
+<section id="analysis" class="reader-section">
+
+<section class="reader-topic" id="analysis-heading-可合并指数和摘要架构与设计推理"><h2>可合并指数和摘要：架构与设计推理</h2><p>本文描述算法与证明，不描述一个已实现的硬件或分布式系统。Insight 是“参考值可在之后转换”；Idea 是“先产生局部摘要，合并时对齐参考值”；Design 才是具体的两标量表示、合并公式与根部输出。以下按稳定节点链接展开，来源均为合成说明。<a href="#sources-source-nature" data-source="nature" class="reader-ref" title="查看依据 · line 3" aria-label="查看依据 · line 3">依据 1</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-problem" data-context-node="problem"><h3>先确定计算问题 <a href="#analysis-node-problem" data-node="problem" class="reader-ref" title="查看节点 · 分块指数和需要安全表示与可合并性" aria-label="查看节点 · 分块指数和需要安全表示与可合并性">节点</a></h3><p>需要计算非空有限实数序列的 <code>log(sum(exp(x_i)))</code>。直接计算 <code>exp(x_i)</code> 可能溢出；全局最大值移位把指数参数变为非正，但在计算全局移位和前要协调各块找出这个值。原文因此提出摘要的可合并目标；它没有证明现有协调方案在任何硬件上一定更慢。<a href="#sources-source-setting" data-source="setting" class="reader-ref" title="查看依据 · section 1, line 7" aria-label="查看依据 · section 1, line 7">依据 2</a> <a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-setting" data-source="setting">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-contract" data-context-node="contract"><h3>摘要须满足什么契约 <a href="#analysis-node-contract" data-node="contract" class="reader-ref" title="查看节点 · 非空分块与精确实数目标" aria-label="查看节点 · 非空分块与精确实数目标">节点</a></h3><p>输入已分为非空块，元素为有限实数。每块只输出常数大小摘要，后续合并不需要保留原始块；任意二叉树应在精确实数算术中给出相同结果。这里“合并元素”保留序列元素重数，不作去重集合运算。NaN、无穷及空块被排除，因此现有定义没有空块单位元。<a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></p>
+<p>“无需保留原块”描述摘要之后的合并接口；原文没有限定块内生成摘要的遍历次数或缓存实现，也没有声称完整计算只扫描每个输入一次。<a href="#sources-source-contract" data-source="contract">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-insight" data-context-node="insight"><h3>参考值不是不可改变的全局前置条件 <a href="#analysis-node-insight" data-node="insight" class="reader-ref" title="查看节点 · 局部参考值可以在合并时重新对齐" aria-label="查看节点 · 局部参考值可以在合并时重新对齐">节点</a></h3><p>局部 <code>s</code> 的数值以局部最大值为参考。把这个参考值 <code>m</code> 一同保留，就能在未来知道另一个块的最大值时换算，而不必回看原块。原文明确指出局部摘要不需要最终全局最大值；共同参考值在每次合并时更新。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a> <a href="#sources-source-rescaling" data-source="rescaling">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-architecture" data-context-node="architecture"><h3>摘要、合并、解码的完整路径 <a href="#analysis-node-architecture" data-node="architecture" class="reader-ref" title="查看节点 · 局部摘要到树归约再到对数结果" aria-label="查看节点 · 局部摘要到树归约再到对数结果">节点</a></h3><p><strong>输入与输出：</strong> 输入是上述非空分块；最终输出是一个整体 log-sum-exp 标量。架构中只有算法阶段、状态接口与证明义务，没有虚构线程、网络协议或 GPU 内核。</p>
+<p><strong>执行路径：</strong> 块内先形成 <code>(m_A,s_A)</code>；每个内部节点接收两个摘要，更新共同最大值并重标定局部和，输出相同形状的 <code>(m,s)</code>；根节点只在最后求 <code>m+log(s)</code>。原始元素在合并接口中不再需要。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a></p>
+<p>沿原文的两个单元素块走一遍：</p>
+<ol>
+<li><code>[0]</code> 输出 <code>(0,1)</code>，<code>[log(2)]</code> 输出 <code>(log(2),1)</code>。</li>
+<li>合并最大值变为 <code>m=log(2)</code>；第一项换到新参考值，贡献从 <code>1</code> 变为 <code>1/2</code>，第二项保持 <code>1</code>。</li>
+<li>输出摘要 <code>(log(2),1.5)</code>。继续合并时传递的仍是这两个标量。</li>
+<li>若此处是根，则输出 <code>log(2)+log(1.5)=log(3)</code>。这一步是依据原文公式所作的直接代数推演。</li>
+</ol>
+<p><strong>接口与证明义务：</strong> <code>summarize</code> 建立规范摘要；<code>merge</code> 接受两个规范摘要并保持规范性；<code>finish</code> 把根摘要变为对数结果。层数或树形不改变实数证明，因为每个内部节点执行同一个保持不变量的变换。<a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a> <a href="#sources-source-merge" data-source="merge">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-summary" data-context-node="summary"><h3>为什么携带两个标量 <a href="#analysis-node-summary" data-node="summary" class="reader-ref" title="查看节点 · 两个标量保留数值和参考值" aria-label="查看节点 · 两个标量保留数值和参考值">节点</a></h3><p>定义 <code>m_A=max(A)</code>，<code>s_A=sum(exp(x_i-m_A))</code>。其含义是 <code>exp(m_A)*s_A</code> 表示该块的原指数和。参考值说明相对量的尺度，<code>s_A</code> 保存该尺度下的聚合值。实现无需真正构造 <code>exp(m_A)*s_A</code>，因为那个乘积本身可能溢出；它首先是证明表示正确性的数学量。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-representation" data-source="representation">查看来源</a></p>
+<p>原文明确给出这两个量，没有提供“两个标量是所有方案的最小信息量”之类的下界证明，也没有排除所有其他表示。</p>
+</section>
+<section class="reader-topic" id="analysis-node-rescale" data-context-node="rescale"><h3>关键选择：用共同最大值重标定 <a href="#analysis-node-rescale" data-node="rescale" class="reader-ref" title="查看节点 · 先按共同最大值重标定再相加" aria-label="查看节点 · 先按共同最大值重标定再相加">节点</a></h3><p><strong>Problem → Constraint：</strong> 分块需要独立产出摘要，后续只能利用摘要；然而两个局部 <code>s</code> 的参考值未必相同。<a href="#analysis-node-problem" data-node="problem" class="reader-ref" title="查看节点 · 分块指数和需要安全表示与可合并性" aria-label="查看节点 · 分块指数和需要安全表示与可合并性">节点</a> <a href="#analysis-node-contract" data-node="contract" class="reader-ref" title="查看节点 · 非空分块与精确实数目标" aria-label="查看节点 · 非空分块与精确实数目标">节点</a> <a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a> <a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a></p>
+<p><strong>Insight → Design Decision：</strong> 既然参考值已保留，就先对齐再相加。选择 <code>m=max(m_A,m_B)</code>，计算：</p>
+<pre><code class="language-text">s = s_A * exp(m_A-m) + s_B * exp(m_B-m)
+</code></pre>
+<p><strong>Mechanism：</strong> 两个参考值差均非正，因此重标定指数不产生正参数；乘回 <code>exp(m)</code> 时两项各自恢复原来的 <code>exp(m_A)*s_A</code> 和 <code>exp(m_B)*s_B</code>。关键收益来自换算保留了含义，而不是局部 <code>s</code> 本来可直接相加。<a href="#analysis-node-invariant" data-node="invariant" class="reader-ref" title="查看节点 · 合并保持规范摘要" aria-label="查看节点 · 合并保持规范摘要">节点</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a></p>
+<p><strong>Outcome / Trade-off：</strong> 得到同形摘要和实数模型中的正确合并，每次需执行有界的标量和指数运算。具体运行时间、误差与硬件性能仍未验证。<a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></p>
+<p><strong>作者讨论的替代方案：</strong> 先协调全局最大值、再求全局移位和能完成同一计算目标，但需要先获得全局参考值；原文没有速度对比。选最大值却直接相加两个 <code>s</code> 则是错误规则，被下面的反例否定。没有其他已报告替代方案或消融实验。</p>
+<p><strong>仍然未知：</strong> 原文未测量不同树形的性能或精度，也未比较所有可选参考值。不能把采用最大值的理由扩张为“最大值在全部实现中最优”。<a href="#sources-source-rescaling" data-source="rescaling">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-invariant" data-context-node="invariant"><h3>保持规范摘要的机制 <a href="#analysis-node-invariant" data-node="invariant" class="reader-ref" title="查看节点 · 合并保持规范摘要" aria-label="查看节点 · 合并保持规范摘要">节点</a></h3><p>正确摘要同时满足两个条件：<code>m</code> 是所汇集元素的最大值，<code>exp(m)*s</code> 是这些元素的指数和。仅保存总和相等却忽略最大值条件，不足以完成这里“输出就是规范摘要”的证明。合并公式保证这两个条件同时保持；下一层因此可以直接使用同一规则。<a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-proof" data-source="proof">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-real_result" data-context-node="real_result"><h3>任意树结果相同究竟指什么 <a href="#analysis-node-real_result" data-node="real_result" class="reader-ref" title="查看节点 · 实数模型下任意合并树得到同一结果" aria-label="查看节点 · 实数模型下任意合并树得到同一结果">节点</a></h3><p>叶子建立规范摘要，每个内部节点保持规范摘要，因此根就是全体元素的规范摘要；取 <code>m+log(s)</code> 得到目标值。改变括号或树形不改变精确实数中的规范摘要，于是得到该模型下的结合性。它不含浮点逐位一致的承诺，也没有给空块定义单位元；不能直接将材料描述为已经完整规定了含空输入的代数结构。<a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a> <a href="#sources-source-proof" data-source="proof">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-proof" data-context-node="proof"><h3>L3：代数证明与树归纳 <a href="#analysis-node-proof" data-node="proof" class="reader-ref" title="查看节点 · 乘回参考值并作树归纳" aria-label="查看节点 · 乘回参考值并作树归纳">节点</a></h3><p>这是理论证据，支持实数恒等式与规范摘要保持，不支持速度、浮点误差界或不同树形的位级一致性。<a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></p>
+<p>对两个正确摘要，定义 <code>m=max(m_A,m_B)</code> 与上面的 <code>s</code>：</p>
+<pre><code class="language-text">exp(m)*s
+= exp(m)*s_A*exp(m_A-m) + exp(m)*s_B*exp(m_B-m)
+= exp(m_A)*s_A + exp(m_B)*s_B
+= sum over A of exp(x_i) + sum over B of exp(x_i).
+</code></pre>
+<p>同时 <code>m</code> 是两块合并后的最大值，所以合并结果就是整体的规范对 <code>(m,s)</code>。对非空块，<code>s&gt;0</code>，最终 <code>m+log(s)=log(exp(m)*s)</code>。对树作归纳即可扩展至全体块；重复值照其出现次数参与求和。<a href="#sources-source-proof" data-source="proof">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-counterexample" data-context-node="counterexample"><h3>L3：反例定位错误机制 <a href="#analysis-node-counterexample" data-node="counterexample" class="reader-ref" title="查看节点 · 不同参考值不能直接加局部和" aria-label="查看节点 · 不同参考值不能直接加局部和">节点</a></h3><p><code>[0]</code> 和 <code>[log(2)]</code> 的局部 <code>s</code> 都是 <code>1</code>，但其单位不同。取共同参考值 <code>log(2)</code> 后，正确摘要是 <code>(log(2),1.5)</code>；直接相加会得到 <code>(log(2),2)</code>，表示的总和为 <code>4</code> 而不是 <code>3</code>。最后一项总和对比是对原文例子的直接推演。<a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a></p>
+<p>该反例足以否定“直接加局部 s”的普遍规则；它独自不能证明正确公式适用于所有输入，一般性来自上面的代数证明。<a href="#sources-source-rescaling" data-source="rescaling">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-tradeoff" data-context-node="tradeoff"><h3>可归约摘要的收益与信息边界 <a href="#analysis-node-tradeoff" data-node="tradeoff" class="reader-ref" title="查看节点 · 常数摘要带来可归约性但丢失逐项信息" aria-label="查看节点 · 常数摘要带来可归约性但丢失逐项信息">节点</a></h3><p>每块两个标量，每次合并只需有界数量的标量运算和指数运算。它允许块内计算后再作树归约，并且合并阶段不必访问原输入。这是结构与运算形态的结论。<a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a></p>
+<p>代价包括合并时的重标定运算，以及摘要不能直接恢复逐项值：若要每个 softmax 概率，仍需保留或重访输入。原文没有测 GPU 内核，也没有证明相较协调两遍实现更快。总体复杂度形态不能代替具体性能测量。<a href="#sources-source-costs" data-source="costs">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-fp_limits" data-context-node="fp_limits"><h3>浮点与输入范围的边界 <a href="#analysis-node-fp_limits" data-node="fp_limits" class="reader-ref" title="查看节点 · 浮点运行仍有误差与输入边界" aria-label="查看节点 · 浮点运行仍有误差与输入边界">节点</a></h3><p>非正的重标定指数避免了这一步因正参数过大而指数溢出的风险，仍可能让很小的贡献下溢。舍入会破坏精确结合性，所以平衡树和顺序折叠可能不同。材料未建立误差界，也未证明哪种实现更准确。<a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></p>
+<p>输入范围排除 NaN、无穷和空块；没有空块单位元。因此实现若要支持这些情况，需要另行规定语义与规则。以上是原文明确的边界，不是当前阅读漏掉的附录。<a href="#sources-source-limits" data-source="limits">查看来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-pattern" data-context-node="pattern"><h3>从机制走向可迁移结构 <a href="#analysis-node-pattern" data-node="pattern" class="reader-ref" title="查看节点 · 可变参考值下保持规范摘要" aria-label="查看节点 · 可变参考值下保持规范摘要">节点</a></h3><p>AI 分析可抽象出“参考值＋相对量 → 合并时对齐 → 规范摘要保持”的模式；迁移必须检查转换规则与闭合性。它不自动产生新场景的数值或性能保证。<a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#patterns-node-pattern">展开条件与失效边界</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#spine">回到理解主线</a> · <a href="#sources">来源地图</a> · <a href="#overview">返回总览</a></nav></section>
+</section>
+<section id="patterns" class="reader-section">
+
+<section class="reader-topic" id="patterns-heading-可合并指数和摘要可迁移的设计思想"><h2>可合并指数和摘要：可迁移的设计思想</h2><p>以下抽象由 AI 分析提出，依据是材料的表示、重标定和不变量证明。它不是作者报告的新领域验证结果；原始材料本身也是合成技术说明。<a href="#sources-source-nature" data-source="nature" class="reader-ref" title="查看依据 · line 3" aria-label="查看依据 · line 3">依据 1</a></p>
+</section>
+<section class="reader-topic" id="patterns-node-pattern" data-context-node="pattern"><h3>保存参考值，在合并边界统一尺度 <a href="#analysis-node-pattern" data-node="pattern" class="reader-ref" title="查看节点 · 可变参考值下保持规范摘要" aria-label="查看节点 · 可变参考值下保持规范摘要">节点</a></h3><p><strong>具体来源：</strong> 每块用 <code>(m_A,s_A)</code> 表示指数和；合并先把两个 <code>s</code> 换到共同最大值，再相加，输出仍为规范摘要。<a href="#analysis-node-rescale" data-node="rescale" class="reader-ref" title="查看节点 · 先按共同最大值重标定再相加" aria-label="查看节点 · 先按共同最大值重标定再相加">节点</a> <a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a> <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a> <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a> <a href="#sources-source-merge" data-source="merge">查看原文</a></p>
+<p><strong>抽象结构：</strong> 把数值依赖的参考值显式放入摘要，让局部计算可用局部参考；将尺度转换集中到合并边界。证明需要覆盖“摘要表示什么”“转换是否保持表示”“合并后是否仍是同一种规范摘要”。收益来自合并只需摘要，且全局参考值不再是每个局部块开始计算的前置条件。</p>
+<p><strong>适用条件：</strong> 每块目标量能用常数大小摘要表示；参考值之间存在可计算且正确的变换；合并结果在同一表示中闭合。还必须明确算术模型与合法输入，不能只证明实数关系就许诺浮点位级一致。</p>
+<p><strong>迁移方向（未经验证的分析）：</strong> 对带正权重的指数总和，可尝试把局部量改为 <code>s_A=sum(w_i*exp(x_i-m_A))</code>，保留参考值并在合并时换算。这只是候选映射；需要另行证明加权表示不变量、规定权重范围并检查数值行为，原文没有讨论或验证这一场景。</p>
+<p><strong>代价与失效条件：</strong> 摘要必须保存参考值，合并增加重标定运算；若丢弃参考值、摘要不闭合，或目标要求从摘要恢复逐项信息，该模式便不能满足原目标。若要求浮点逐位一致，单有实数结合性证明也不够。迁移后的性能须重新测量。</p>
+<p>归属：AI 推断。可信程度：medium；具体结构与原文高度对应，但新场景没有原文证明或测量。这里的可信度描述抽象把握，不是模式普遍成功的概率。</p>
+<p><a href="#analysis-node-rescale">回到具体架构</a> · <a href="#overview">返回总览</a></p>
+</section>
+</section>
+<section id="sources" class="reader-section">
+
+<section class="reader-topic" id="sources-heading-a-mergeable-summary-for-shifted-exponential-sums原文地图与证据索引"><h2>A Mergeable Summary for Shifted Exponential Sums：原文地图与证据索引</h2><p>原件：<a href="../source.md" target="_blank" rel="noopener noreferrer">所给合成技术说明</a>。此路径就是本次实际提供的原始材料快照；未改写原件。文件未声明作者、版本号或发布日期，本次按所给全文分析。材料类型为 Markdown，且明确声明是阅读流程评估用的原创合成说明，不是发表论文或实测实现。<a href="#sources-source-nature" data-source="nature" class="reader-ref" title="查看依据 · line 3" aria-label="查看依据 · line 3">依据 1</a></p>
+</section>
+<section class="reader-topic" id="sources-heading-原始组织及论证作用"><h3>原始组织及论证作用</h3><ul>
+<li>标题及性质声明（第 1–3 行）：界定主题与证据来源性质。</li>
+<li>第 1 节 Setting and aim（第 5–9 行）：给出计算目标、全局最大值协调问题与摘要契约。</li>
+<li>第 2 节 Representation（第 11–19 行）：定义局部表示、合并操作与最终解码。</li>
+<li>第 3 节 Why merge preserves the representation（第 21–25 行）：用代数恒等式解释为何合并保持规范摘要，再用反例说明为何需要重标定。</li>
+<li>第 4 节 Costs and limitations（第 27–31 行）：明确存储与运算形态，并收束性能、逐项输出及浮点结论范围。</li>
+</ul>
+</section>
+<section class="reader-topic" id="sources-heading-实际阅读范围"><h3>实际阅读范围</h3><p>原文件 lines 1-31：标题、材料性质、第 1-4 节全部正文与公式；没有图片、附件或附录。已检查每一节及数学关系，与结构化文件中的 complete 覆盖声明一致。</p>
+</section>
+<section class="reader-topic" id="sources-heading-未读取或无法确认的内容"><h3>未读取或无法确认的内容</h3><p>无读取缺口。材料没有性能实验、实现代码、误差界或空块规则；这些属于材料没有提出或验证的内容，不是遗漏读取的章节。没有使用外部资料，所有 source_refs 都指向所给 primary 材料。</p>
+</section>
+<section class="reader-topic" id="sources-heading-来源索引"><h3>来源索引</h3></section>
+<section class="reader-topic" id="sources-source-nature"><h4>原创合成技术说明，用于阅读流程评估；非已发表论文或实测实现。 <a href="#sources-source-nature" data-source="nature" class="reader-ref" title="查看依据 · line 3" aria-label="查看依据 · line 3">依据 1</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="nature">打开原件</a> — line 3。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-setting"><h4>目标、直接求指数的溢出问题及全局最大值协调。 <a href="#sources-source-setting" data-source="setting" class="reader-ref" title="查看依据 · section 1, line 7" aria-label="查看依据 · section 1, line 7">依据 2</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="setting">打开原件</a> — section 1, line 7。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-contract"><h4>非空块、常数大小摘要、任意二叉合并树和实数算术目标。 <a href="#sources-source-contract" data-source="contract" class="reader-ref" title="查看依据 · section 1, line 9" aria-label="查看依据 · section 1, line 9">依据 3</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="contract">打开原件</a> — section 1, line 9。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-representation"><h4>局部最大值、移位和及其表示不变量。 <a href="#sources-source-representation" data-source="representation" class="reader-ref" title="查看依据 · section 2, line 13" aria-label="查看依据 · section 2, line 13">依据 4</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="representation">打开原件</a> — section 2, line 13。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-merge"><h4>合并规则与根部输出。 <a href="#sources-source-merge" data-source="merge" class="reader-ref" title="查看依据 · section 2, lines 15-19" aria-label="查看依据 · section 2, lines 15-19">依据 5</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="merge">打开原件</a> — section 2, lines 15-19。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-proof"><h4>规范摘要保持与树归纳证明。 <a href="#sources-source-proof" data-source="proof" class="reader-ref" title="查看依据 · section 3, line 23" aria-label="查看依据 · section 3, line 23">依据 6</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="proof">打开原件</a> — section 3, line 23。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-rescaling"><h4>非正指数、共同参考值与错误合并反例。 <a href="#sources-source-rescaling" data-source="rescaling" class="reader-ref" title="查看依据 · section 3, line 25" aria-label="查看依据 · section 3, line 25">依据 7</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="rescaling">打开原件</a> — section 3, line 25。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-costs"><h4>两标量、常数次合并、无性能测量及无法直接输出 softmax 概率。 <a href="#sources-source-costs" data-source="costs" class="reader-ref" title="查看依据 · section 4, line 29" aria-label="查看依据 · section 4, line 29">依据 8</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="costs">打开原件</a> — section 4, line 29。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+</section>
+<section class="reader-topic" id="sources-source-limits"><h4>浮点误差、输入排除和未建立的保证。 <a href="#sources-source-limits" data-source="limits" class="reader-ref" title="查看依据 · section 4, line 31" aria-label="查看依据 · section 4, line 31">依据 9</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="limits">打开原件</a> — section 4, line 31。</p>
+<p>来源性质：primary。位置为原始 Markdown 文件的源码行号。</p>
+<p><a href="#overview">返回总览</a></p>
+</section>
+</section></article>
+      <section class="graph-section" id="graph" aria-labelledby="graph-heading">
+        <h2 id="graph-heading">知识图谱</h2>
+        <div id="reader-graph"></div>
+      </section>
+    </main>
+  </div>
+  <dialog id="inspector" aria-labelledby="inspector-title">
+    <div class="panel-top"><span id="inspector-kind"></span><button type="button" class="icon-button" id="close-inspector" aria-label="关闭详情">×</button></div>
+    <div class="panel-content"><h2 id="inspector-title"></h2><div id="inspector-body"></div></div>
+  </dialog>
+  <script type="application/json" id="reader-data">{"format_version":1,"documents":{"overview.md":"# 可合并的指数和摘要：把全局参考值的协调推迟到每次合并\n\n每块保存“局部最大值＋相对该最大值的指数和”，合并时先对齐参考值再相加，就能用两标量摘要沿任意二叉树求得整体 log-sum-exp；任意树等价的保证限于精确实数算术。[n:insight] [s:rescaling]\n\n**材料性质：** 这是用于评估阅读流程的原创合成技术说明，不是已发表论文，也没有实测实现。下述结论是对所给材料的阅读重建。[s:nature] [查看材料性质](document_map.md#source-nature)\n\n阅读入口：[理解主线](knowledge_spine.md) · [架构与设计决策](architecture_analysis.md) · [可迁移思想](design_patterns.md) · [原文地图与来源](document_map.md) · [宏观知识图](knowledge_graph.mmd) · [节点数据](knowledge_nodes.json) · [关系数据](knowledge_graph.json)\n\n## 为什么需要它\n\n目标是计算 `log(sum(exp(x_i)))`。直接取指数可能溢出；统一减去全局最大值虽能避免正指数参数，但先找这个全局值需要协调所有块。本文要求已经分块的输入各自产出常数大小摘要，之后不保留原块也能合并。[n:problem] [s:setting] [s:contract] [查看约束](architecture_analysis.md#node-contract)\n\n## 核心 Idea 如何变成架构\n\n洞察是局部最大值不必从一开始就相同；只要记录参考值，后续就能转换。设计把它落实为“块内摘要 → 树内重标定合并 → 根部取对数”。例如 `[0]` 和 `[log(2)]` 分别输出 `(0,1)`、`(log(2),1)`；合并采用共同最大值 `log(2)`，得到 `s=1/2+1=1.5`，根部输出 `log(2)+log(1.5)=log(3)`。根部结果是沿原文例子的直接代数推演，非性能观测。[n:architecture] [s:merge] [s:rescaling]\n\n深入：[整体结构与交互](architecture_analysis.md#node-architecture)。\n\n## 为什么采用这些设计\n\n两个局部 `s` 使用不同参考值，不能直接相加。以两块最大值中的较大者作为共同参考值，既能准确换算两项，也使重标定指数非正。每次合并保持“最大值正确，乘回参考因子后仍代表原指数和”这两个条件；树归纳由此成立。[n:rescale] [s:proof] [s:rescaling]\n\n深入：[关键设计及替代方案](architecture_analysis.md#node-rescale)。\n\n## 得到了什么，边界在哪里\n\n理论证明支持精确实数模型中的正确性与结合性。每块输出两个标量，每次合并只需有界运算，但这不构成相较协调两遍方案的速度或精度比较。摘要也不能直接恢复每个 softmax 概率。浮点可能下溢、舍入，不同树形不保证逐位一致；NaN、无穷和空块被排除，空块单位元与误差界均未给出。[n:real_result] [n:tradeoff] [n:fp_limits] [s:proof] [s:costs] [s:limits] [查看证据与边界](architecture_analysis.md#node-proof)\n\n## 值得迁移的思想\n\n分析者可从中抽象“保存参考值与相对量，在合并处对齐参考值，用不变量证明摘要闭合”。新场景必须有正确的转换规则和闭合摘要；不能顺带继承浮点一致性或性能保证。这是 AI 推断。[n:pattern] [s:representation] [s:proof] [查看迁移条件](design_patterns.md#node-pattern)\n\n## 阅读范围\n\n已读原文件第 1–31 行：标题、材料性质、四节正文与所有公式。原件无图片、附件或附录，未发现读取缺口。完整覆盖只针对这份合成说明。[原文地图](document_map.md)\n","document_map.md":"# A Mergeable Summary for Shifted Exponential Sums：原文地图与证据索引\n\n原件：[所给合成技术说明](../source.md)。此路径就是本次实际提供的原始材料快照；未改写原件。文件未声明作者、版本号或发布日期，本次按所给全文分析。材料类型为 Markdown，且明确声明是阅读流程评估用的原创合成说明，不是发表论文或实测实现。[s:nature]\n\n## 原始组织及论证作用\n\n- 标题及性质声明（第 1–3 行）：界定主题与证据来源性质。\n- 第 1 节 Setting and aim（第 5–9 行）：给出计算目标、全局最大值协调问题与摘要契约。\n- 第 2 节 Representation（第 11–19 行）：定义局部表示、合并操作与最终解码。\n- 第 3 节 Why merge preserves the representation（第 21–25 行）：用代数恒等式解释为何合并保持规范摘要，再用反例说明为何需要重标定。\n- 第 4 节 Costs and limitations（第 27–31 行）：明确存储与运算形态，并收束性能、逐项输出及浮点结论范围。\n\n## 实际阅读范围\n\n原文件 lines 1-31：标题、材料性质、第 1-4 节全部正文与公式；没有图片、附件或附录。已检查每一节及数学关系，与结构化文件中的 complete 覆盖声明一致。\n\n## 未读取或无法确认的内容\n\n无读取缺口。材料没有性能实验、实现代码、误差界或空块规则；这些属于材料没有提出或验证的内容，不是遗漏读取的章节。没有使用外部资料，所有 source_refs 都指向所给 primary 材料。\n\n## 来源索引\n\n\u003ca id=\"source-nature\"\u003e\u003c/a\u003e\n\n### 原创合成技术说明，用于阅读流程评估；非已发表论文或实测实现。 [s:nature]\n\n[打开原件](../source.md) — line 3。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-setting\"\u003e\u003c/a\u003e\n\n### 目标、直接求指数的溢出问题及全局最大值协调。 [s:setting]\n\n[打开原件](../source.md) — section 1, line 7。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-contract\"\u003e\u003c/a\u003e\n\n### 非空块、常数大小摘要、任意二叉合并树和实数算术目标。 [s:contract]\n\n[打开原件](../source.md) — section 1, line 9。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-representation\"\u003e\u003c/a\u003e\n\n### 局部最大值、移位和及其表示不变量。 [s:representation]\n\n[打开原件](../source.md) — section 2, line 13。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-merge\"\u003e\u003c/a\u003e\n\n### 合并规则与根部输出。 [s:merge]\n\n[打开原件](../source.md) — section 2, lines 15-19。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-proof\"\u003e\u003c/a\u003e\n\n### 规范摘要保持与树归纳证明。 [s:proof]\n\n[打开原件](../source.md) — section 3, line 23。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-rescaling\"\u003e\u003c/a\u003e\n\n### 非正指数、共同参考值与错误合并反例。 [s:rescaling]\n\n[打开原件](../source.md) — section 3, line 25。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-costs\"\u003e\u003c/a\u003e\n\n### 两标量、常数次合并、无性能测量及无法直接输出 softmax 概率。 [s:costs]\n\n[打开原件](../source.md) — section 4, line 29。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n\u003ca id=\"source-limits\"\u003e\u003c/a\u003e\n\n### 浮点误差、输入排除和未建立的保证。 [s:limits]\n\n[打开原件](../source.md) — section 4, line 31。\n\n来源性质：primary。位置为原始 Markdown 文件的源码行号。\n\n[返回总览](overview.md)\n","knowledge_spine.md":"# A Mergeable Summary for Shifted Exponential Sums：理解主线\n\n先明确问题和摘要契约，再理解参考值如何转换、算法如何传递摘要，最后核对证明、代价和迁移条件。这是为理解依赖重排的路径，不是对作者写作意图的猜测。默认先掌握作用与机制，完整代数推导留在 L3 证据节点。\n\n## 1. 分块指数和需要安全表示与可合并性 [n:problem]\n\n**为什么从这里开始：** 先确定需要计算什么，以及直接指数与全局移位方案面临什么限制。\n\n目标是计算非空有限实数序列的 log(sum(exp(x_i)))。直接指数可能溢出，而先找全局最大值再求全局移位和，需要协调所有块。\n\n依据：作者陈述。[s:setting] [查看来源](document_map.md#source-setting)\n\n学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。\n\n[展开机制或证据](architecture_analysis.md#node-problem) · [查看节点数据](knowledge_nodes.json)\n\n## 2. 非空分块与精确实数目标 [n:contract]\n\n**为什么接着理解它：** 问题还没有限定答案的形态：接着明确非空块、常数摘要与实数算术目标。\n\n输入已经分成非空块；摘要须为常数大小且合并阶段不保留原块，允许任意二叉树。恒等式与结合性仅针对精确实数算术，NaN、无穷及空块不在定义域。\n\n依据：作者陈述。[s:contract] [s:limits] [查看来源](document_map.md#source-contract)\n\n学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。\n\n[展开机制或证据](architecture_analysis.md#node-contract) · [查看节点数据](knowledge_nodes.json)\n\n## 3. 局部参考值可以在合并时重新对齐 [n:insight]\n\n**为什么接着理解它：** 既然块内不能依赖最终全局最大值，就要解释如何推迟统一参考值。\n\n局部摘要不必知道最终全局最大值：先保留局部最大值与相对指数和，每次合并把它们换到共同参考值后再相加。\n\n依据：作者陈述。[s:representation] [s:rescaling] [查看来源](document_map.md#source-representation)\n\n学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。\n\n[展开机制或证据](architecture_analysis.md#node-insight) · [查看节点数据](knowledge_nodes.json)\n\n## 4. 局部摘要到树归约再到对数结果 [n:architecture]\n\n**为什么接着理解它：** 知道参考值可后续对齐后，需要看摘要怎样沿树传递并产生最终输出。\n\n块内生成 (m_A,s_A)，内部树节点只接受两个摘要并返回同形摘要，根部输出 m+log(s)。这是算法数据流与不变量组织；原文没有提供 GPU 或分布式系统实现。\n\n依据：作者陈述。[s:representation] [s:merge] [s:costs] [查看来源](document_map.md#source-representation)\n\n学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。\n\n[展开机制或证据](architecture_analysis.md#node-architecture) · [查看节点数据](knowledge_nodes.json)\n\n## 5. 先按共同最大值重标定再相加 [n:rescale]\n\n**为什么接着理解它：** 结构中最关键的缺口是两个不同参考值的摘要究竟怎样合并。\n\n取 m=max(m_A,m_B)，然后 s=s_A*exp(m_A-m)+s_B*exp(m_B-m)。两项指数均非正；省略重标定而直接加 s 会在最大值不同时出错。\n\n依据：作者陈述。[s:merge] [s:rescaling] [查看来源](document_map.md#source-merge)\n\n学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。\n\n[展开机制或证据](architecture_analysis.md#node-rescale) · [查看节点数据](knowledge_nodes.json)\n\n## 6. 实数模型下任意合并树得到同一结果 [n:real_result]\n\n**为什么接着理解它：** 合并公式有了，接着问它为何能支持任意树，而不只是一个例子。\n\n由每次合并保持规范摘要，对树归纳得到完整 log-sum-exp；结合性与树形无关只在精确实数模型中成立。\n\n依据：作者陈述。[s:proof] [s:contract] [查看来源](document_map.md#source-proof)\n\n学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。\n\n[展开机制或证据](architecture_analysis.md#node-real_result) · [查看节点数据](knowledge_nodes.json)\n\n## 7. 常数摘要带来可归约性但丢失逐项信息 [n:tradeoff]\n\n**为什么接着理解它：** 正确性成立后，再确认这种组织获得什么能力、舍弃哪些逐项信息。\n\n每块只输出两个标量，每次合并进行有界运算，可先局部计算再树形归约。摘要用于总体 log-sum-exp；若要各项 softmax 概率仍需保留或重访输入。原文未测量相较协调两遍实现的加速。\n\n依据：作者陈述。[s:costs] [查看来源](document_map.md#source-costs)\n\n学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。\n\n[展开机制或证据](architecture_analysis.md#node-tradeoff) · [查看节点数据](knowledge_nodes.json)\n\n## 8. 浮点运行仍有误差与输入边界 [n:fp_limits]\n\n**为什么接着理解它：** 常数摘要与实数证明都不能回答浮点误差，需要划清实际运行边界。\n\n重标定可能使微小贡献下溢，舍入破坏精确结合性；顺序折叠和平衡树可能不同。没有误差界或精度优劣保证，空块也没有单位元。\n\n依据：作者陈述。[s:limits] [查看来源](document_map.md#source-limits)\n\n学习建议：先能用自己的话说清它解决或限制什么，不必展开全部公式。\n\n[展开机制或证据](architecture_analysis.md#node-fp_limits) · [查看节点数据](knowledge_nodes.json)\n\n## 9. 可变参考值下保持规范摘要 [n:pattern]\n\n**为什么接着理解它：** 在能力与限制明确后，才能抽象可迁移结构而不移植未经验证的保证。\n\n把参考值与相对量一起保存，在合并边界统一参考值，并用不变量证明摘要闭合。可复用的是这种推理结构；迁移到其他问题需要重新证明，不能继承本说明的结论。\n\n依据：AI 推断。[s:representation] [s:merge] [s:proof] [查看来源](document_map.md#source-representation)\n\n学习建议：需要能沿一次摘要或合并解释数据含义、前提与状态变化。\n\n[展开机制或证据](design_patterns.md#node-pattern) · [查看节点数据](knowledge_nodes.json)\n\n[返回总览](overview.md) · [查看宏观知识图](knowledge_graph.mmd)\n","architecture_analysis.md":"# 可合并指数和摘要：架构与设计推理\n\n本文描述算法与证明，不描述一个已实现的硬件或分布式系统。Insight 是“参考值可在之后转换”；Idea 是“先产生局部摘要，合并时对齐参考值”；Design 才是具体的两标量表示、合并公式与根部输出。以下按稳定节点链接展开，来源均为合成说明。[s:nature]\n\n\u003ca id=\"node-problem\"\u003e\u003c/a\u003e\n\n## 先确定计算问题 [n:problem]\n\n需要计算非空有限实数序列的 `log(sum(exp(x_i)))`。直接计算 `exp(x_i)` 可能溢出；全局最大值移位把指数参数变为非正，但在计算全局移位和前要协调各块找出这个值。原文因此提出摘要的可合并目标；它没有证明现有协调方案在任何硬件上一定更慢。[s:setting] [s:contract] [查看来源](document_map.md#source-setting)\n\n\u003ca id=\"node-contract\"\u003e\u003c/a\u003e\n\n## 摘要须满足什么契约 [n:contract]\n\n输入已分为非空块，元素为有限实数。每块只输出常数大小摘要，后续合并不需要保留原始块；任意二叉树应在精确实数算术中给出相同结果。这里“合并元素”保留序列元素重数，不作去重集合运算。NaN、无穷及空块被排除，因此现有定义没有空块单位元。[s:contract] [s:limits]\n\n“无需保留原块”描述摘要之后的合并接口；原文没有限定块内生成摘要的遍历次数或缓存实现，也没有声称完整计算只扫描每个输入一次。[查看来源](document_map.md#source-contract)\n\n\u003ca id=\"node-insight\"\u003e\u003c/a\u003e\n\n## 参考值不是不可改变的全局前置条件 [n:insight]\n\n局部 `s` 的数值以局部最大值为参考。把这个参考值 `m` 一同保留，就能在未来知道另一个块的最大值时换算，而不必回看原块。原文明确指出局部摘要不需要最终全局最大值；共同参考值在每次合并时更新。[s:representation] [s:rescaling] [查看来源](document_map.md#source-rescaling)\n\n\u003ca id=\"node-architecture\"\u003e\u003c/a\u003e\n\n## 摘要、合并、解码的完整路径 [n:architecture]\n\n**输入与输出：** 输入是上述非空分块；最终输出是一个整体 log-sum-exp 标量。架构中只有算法阶段、状态接口与证明义务，没有虚构线程、网络协议或 GPU 内核。\n\n**执行路径：** 块内先形成 `(m_A,s_A)`；每个内部节点接收两个摘要，更新共同最大值并重标定局部和，输出相同形状的 `(m,s)`；根节点只在最后求 `m+log(s)`。原始元素在合并接口中不再需要。[s:representation] [s:merge]\n\n沿原文的两个单元素块走一遍：\n\n1. `[0]` 输出 `(0,1)`，`[log(2)]` 输出 `(log(2),1)`。\n2. 合并最大值变为 `m=log(2)`；第一项换到新参考值，贡献从 `1` 变为 `1/2`，第二项保持 `1`。\n3. 输出摘要 `(log(2),1.5)`。继续合并时传递的仍是这两个标量。\n4. 若此处是根，则输出 `log(2)+log(1.5)=log(3)`。这一步是依据原文公式所作的直接代数推演。\n\n**接口与证明义务：** `summarize` 建立规范摘要；`merge` 接受两个规范摘要并保持规范性；`finish` 把根摘要变为对数结果。层数或树形不改变实数证明，因为每个内部节点执行同一个保持不变量的变换。[s:proof] [s:rescaling] [查看来源](document_map.md#source-merge)\n\n\u003ca id=\"node-summary\"\u003e\u003c/a\u003e\n\n## 为什么携带两个标量 [n:summary]\n\n定义 `m_A=max(A)`，`s_A=sum(exp(x_i-m_A))`。其含义是 `exp(m_A)*s_A` 表示该块的原指数和。参考值说明相对量的尺度，`s_A` 保存该尺度下的聚合值。实现无需真正构造 `exp(m_A)*s_A`，因为那个乘积本身可能溢出；它首先是证明表示正确性的数学量。[s:representation] [查看来源](document_map.md#source-representation)\n\n原文明确给出这两个量，没有提供“两个标量是所有方案的最小信息量”之类的下界证明，也没有排除所有其他表示。\n\n\u003ca id=\"node-rescale\"\u003e\u003c/a\u003e\n\n## 关键选择：用共同最大值重标定 [n:rescale]\n\n**Problem → Constraint：** 分块需要独立产出摘要，后续只能利用摘要；然而两个局部 `s` 的参考值未必相同。[n:problem] [n:contract] [s:contract] [s:representation]\n\n**Insight → Design Decision：** 既然参考值已保留，就先对齐再相加。选择 `m=max(m_A,m_B)`，计算：\n\n```text\ns = s_A * exp(m_A-m) + s_B * exp(m_B-m)\n```\n\n**Mechanism：** 两个参考值差均非正，因此重标定指数不产生正参数；乘回 `exp(m)` 时两项各自恢复原来的 `exp(m_A)*s_A` 和 `exp(m_B)*s_B`。关键收益来自换算保留了含义，而不是局部 `s` 本来可直接相加。[n:invariant] [s:merge] [s:proof] [s:rescaling]\n\n**Outcome / Trade-off：** 得到同形摘要和实数模型中的正确合并，每次需执行有界的标量和指数运算。具体运行时间、误差与硬件性能仍未验证。[s:costs] [s:limits]\n\n**作者讨论的替代方案：** 先协调全局最大值、再求全局移位和能完成同一计算目标，但需要先获得全局参考值；原文没有速度对比。选最大值却直接相加两个 `s` 则是错误规则，被下面的反例否定。没有其他已报告替代方案或消融实验。\n\n**仍然未知：** 原文未测量不同树形的性能或精度，也未比较所有可选参考值。不能把采用最大值的理由扩张为“最大值在全部实现中最优”。[查看来源](document_map.md#source-rescaling)\n\n\u003ca id=\"node-invariant\"\u003e\u003c/a\u003e\n\n## 保持规范摘要的机制 [n:invariant]\n\n正确摘要同时满足两个条件：`m` 是所汇集元素的最大值，`exp(m)*s` 是这些元素的指数和。仅保存总和相等却忽略最大值条件，不足以完成这里“输出就是规范摘要”的证明。合并公式保证这两个条件同时保持；下一层因此可以直接使用同一规则。[s:proof] [查看来源](document_map.md#source-proof)\n\n\u003ca id=\"node-real_result\"\u003e\u003c/a\u003e\n\n## 任意树结果相同究竟指什么 [n:real_result]\n\n叶子建立规范摘要，每个内部节点保持规范摘要，因此根就是全体元素的规范摘要；取 `m+log(s)` 得到目标值。改变括号或树形不改变精确实数中的规范摘要，于是得到该模型下的结合性。它不含浮点逐位一致的承诺，也没有给空块定义单位元；不能直接将材料描述为已经完整规定了含空输入的代数结构。[s:proof] [s:limits] [查看来源](document_map.md#source-proof)\n\n\u003ca id=\"node-proof\"\u003e\u003c/a\u003e\n\n## L3：代数证明与树归纳 [n:proof]\n\n这是理论证据，支持实数恒等式与规范摘要保持，不支持速度、浮点误差界或不同树形的位级一致性。[s:proof] [s:limits]\n\n对两个正确摘要，定义 `m=max(m_A,m_B)` 与上面的 `s`：\n\n```text\nexp(m)*s\n= exp(m)*s_A*exp(m_A-m) + exp(m)*s_B*exp(m_B-m)\n= exp(m_A)*s_A + exp(m_B)*s_B\n= sum over A of exp(x_i) + sum over B of exp(x_i).\n```\n\n同时 `m` 是两块合并后的最大值，所以合并结果就是整体的规范对 `(m,s)`。对非空块，`s\u003e0`，最终 `m+log(s)=log(exp(m)*s)`。对树作归纳即可扩展至全体块；重复值照其出现次数参与求和。[查看来源](document_map.md#source-proof)\n\n\u003ca id=\"node-counterexample\"\u003e\u003c/a\u003e\n\n## L3：反例定位错误机制 [n:counterexample]\n\n`[0]` 和 `[log(2)]` 的局部 `s` 都是 `1`，但其单位不同。取共同参考值 `log(2)` 后，正确摘要是 `(log(2),1.5)`；直接相加会得到 `(log(2),2)`，表示的总和为 `4` 而不是 `3`。最后一项总和对比是对原文例子的直接推演。[s:rescaling]\n\n该反例足以否定“直接加局部 s”的普遍规则；它独自不能证明正确公式适用于所有输入，一般性来自上面的代数证明。[查看来源](document_map.md#source-rescaling)\n\n\u003ca id=\"node-tradeoff\"\u003e\u003c/a\u003e\n\n## 可归约摘要的收益与信息边界 [n:tradeoff]\n\n每块两个标量，每次合并只需有界数量的标量运算和指数运算。它允许块内计算后再作树归约，并且合并阶段不必访问原输入。这是结构与运算形态的结论。[s:costs]\n\n代价包括合并时的重标定运算，以及摘要不能直接恢复逐项值：若要每个 softmax 概率，仍需保留或重访输入。原文没有测 GPU 内核，也没有证明相较协调两遍实现更快。总体复杂度形态不能代替具体性能测量。[查看来源](document_map.md#source-costs)\n\n\u003ca id=\"node-fp_limits\"\u003e\u003c/a\u003e\n\n## 浮点与输入范围的边界 [n:fp_limits]\n\n非正的重标定指数避免了这一步因正参数过大而指数溢出的风险，仍可能让很小的贡献下溢。舍入会破坏精确结合性，所以平衡树和顺序折叠可能不同。材料未建立误差界，也未证明哪种实现更准确。[s:limits]\n\n输入范围排除 NaN、无穷和空块；没有空块单位元。因此实现若要支持这些情况，需要另行规定语义与规则。以上是原文明确的边界，不是当前阅读漏掉的附录。[查看来源](document_map.md#source-limits)\n\n\u003ca id=\"node-pattern\"\u003e\u003c/a\u003e\n\n## 从机制走向可迁移结构 [n:pattern]\n\nAI 分析可抽象出“参考值＋相对量 → 合并时对齐 → 规范摘要保持”的模式；迁移必须检查转换规则与闭合性。它不自动产生新场景的数值或性能保证。[s:representation] [s:merge] [s:proof] [展开条件与失效边界](design_patterns.md#node-pattern)\n\n[回到理解主线](knowledge_spine.md) · [来源地图](document_map.md) · [返回总览](overview.md)\n","design_patterns.md":"# 可合并指数和摘要：可迁移的设计思想\n\n以下抽象由 AI 分析提出，依据是材料的表示、重标定和不变量证明。它不是作者报告的新领域验证结果；原始材料本身也是合成技术说明。[s:nature]\n\n\u003ca id=\"node-pattern\"\u003e\u003c/a\u003e\n\n## 保存参考值，在合并边界统一尺度 [n:pattern]\n\n**具体来源：** 每块用 `(m_A,s_A)` 表示指数和；合并先把两个 `s` 换到共同最大值，再相加，输出仍为规范摘要。[n:rescale] [s:representation] [s:merge] [s:proof] [查看原文](document_map.md#source-merge)\n\n**抽象结构：** 把数值依赖的参考值显式放入摘要，让局部计算可用局部参考；将尺度转换集中到合并边界。证明需要覆盖“摘要表示什么”“转换是否保持表示”“合并后是否仍是同一种规范摘要”。收益来自合并只需摘要，且全局参考值不再是每个局部块开始计算的前置条件。\n\n**适用条件：** 每块目标量能用常数大小摘要表示；参考值之间存在可计算且正确的变换；合并结果在同一表示中闭合。还必须明确算术模型与合法输入，不能只证明实数关系就许诺浮点位级一致。\n\n**迁移方向（未经验证的分析）：** 对带正权重的指数总和，可尝试把局部量改为 `s_A=sum(w_i*exp(x_i-m_A))`，保留参考值并在合并时换算。这只是候选映射；需要另行证明加权表示不变量、规定权重范围并检查数值行为，原文没有讨论或验证这一场景。\n\n**代价与失效条件：** 摘要必须保存参考值，合并增加重标定运算；若丢弃参考值、摘要不闭合，或目标要求从摘要恢复逐项信息，该模式便不能满足原目标。若要求浮点逐位一致，单有实数结合性证明也不够。迁移后的性能须重新测量。\n\n归属：AI 推断。可信程度：medium；具体结构与原文高度对应，但新场景没有原文证明或测量。这里的可信度描述抽象把握，不是模式普遍成功的概率。\n\n[回到具体架构](architecture_analysis.md#node-rescale) · [返回总览](overview.md)\n"},"nodes":{"schema_version":"1.0","document":{"id":"shifted_exp_summary","title":"A Mergeable Summary for Shifted Exponential Sums（合成技术说明）","source_type":"markdown","uri":"examples/mergeable-summary/source.md","coverage":{"status":"complete","inspected_units":["原文件 lines 1-31：标题、材料性质、第 1-4 节全部正文与公式；没有图片、附件或附录。"],"gaps":[]}},"source_refs":[{"id":"nature","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"line 3","note":"原创合成技术说明，用于阅读流程评估；非已发表论文或实测实现。 URI 相对技能根目录。"},{"id":"setting","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 1, line 7","note":"目标、直接求指数的溢出问题及全局最大值协调。 URI 相对技能根目录。"},{"id":"contract","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 1, line 9","note":"非空块、常数大小摘要、任意二叉合并树和实数算术目标。 URI 相对技能根目录。"},{"id":"representation","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 2, line 13","note":"局部最大值、移位和及其表示不变量。 URI 相对技能根目录。"},{"id":"merge","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 2, lines 15-19","note":"合并规则与根部输出。 URI 相对技能根目录。"},{"id":"proof","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 3, line 23","note":"规范摘要保持与树归纳证明。 URI 相对技能根目录。"},{"id":"rescaling","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 3, line 25","note":"非正指数、共同参考值与错误合并反例。 URI 相对技能根目录。"},{"id":"costs","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 4, line 29","note":"两标量、常数次合并、无性能测量及无法直接输出 softmax 概率。 URI 相对技能根目录。"},{"id":"limits","origin":"primary","uri":"examples/mergeable-summary/source.md","kind":"lines","locator":"section 4, line 31","note":"浮点误差、输入排除和未建立的保证。 URI 相对技能根目录。"}],"nodes":[{"id":"problem","type":"problem","title":"分块指数和需要安全表示与可合并性","summary":"目标是计算非空有限实数序列的 log(sum(exp(x_i)))。直接指数可能溢出，而先找全局最大值再求全局移位和，需要协调所有块。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["setting"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"}},{"id":"contract","type":"constraint","title":"非空分块与精确实数目标","summary":"输入已经分成非空块；摘要须为常数大小且合并阶段不保留原块，允许任意二叉树。恒等式与结合性仅针对精确实数算术，NaN、无穷及空块不在定义域。","importance":"core","learning_depth":"working","level":"L2","source_refs":["contract","limits"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"},"details":{"assumptions":["非空有限序列，元素为有限实数。","原始分块不重复计算元素；合并保留元素重数。","正确性证明采用精确实数算术。","未为空块规定单位元。"]}},{"id":"insight","type":"insight","title":"局部参考值可以在合并时重新对齐","summary":"局部摘要不必知道最终全局最大值：先保留局部最大值与相对指数和，每次合并把它们换到共同参考值后再相加。","importance":"core","learning_depth":"working","level":"L1","source_refs":["representation","rescaling"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"}},{"id":"architecture","type":"architecture","title":"局部摘要到树归约再到对数结果","summary":"块内生成 (m_A,s_A)，内部树节点只接受两个摘要并返回同形摘要，根部输出 m+log(s)。这是算法数据流与不变量组织；原文没有提供 GPU 或分布式系统实现。","importance":"core","learning_depth":"working","level":"L1","source_refs":["representation","merge","costs"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"},"details":{"interfaces":["summarize(A) -\u003e (max(A), sum(exp(x-max(A))))","merge((m_A,s_A),(m_B,s_B)) -\u003e (m,s)","finish((m,s)) -\u003e m+log(s)"],"state_change":"每次合并更新最大值并重标定两个局部和，摘要大小始终为两个标量。"}},{"id":"summary","type":"component","title":"两个标量保留数值和参考值","summary":"m_A=max(A)，s_A=sum(exp(x_i-m_A))；exp(m_A)*s_A 表示该块的原指数和，但实现不必真正计算这个可能溢出的乘积。","importance":"core","learning_depth":"working","level":"L2","source_refs":["representation"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"}},{"id":"rescale","type":"design_decision","title":"先按共同最大值重标定再相加","summary":"取 m=max(m_A,m_B)，然后 s=s_A*exp(m_A-m)+s_B*exp(m_B-m)。两项指数均非正；省略重标定而直接加 s 会在最大值不同时出错。","importance":"core","learning_depth":"working","level":"L2","source_refs":["merge","rescaling"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"},"details":{"alternatives":["原文讨论：先协调全局最大值再求全局移位和。","原文否定：选取最大值但直接相加两个局部 s。"],"tradeoff":"需要每次合并执行有界的标量和指数运算；没有测量相较全局两遍方案的运行时间。"}},{"id":"invariant","type":"mechanism","title":"合并保持规范摘要","summary":"合并后的 m 是两块整体最大值，且 exp(m)*s 等于两块原指数和之和，因此结果等于直接为合并后的元素计算的规范摘要。这里合并保留重复元素的重数。","importance":"core","learning_depth":"working","level":"L2","source_refs":["proof"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"原文给出代数恒等式与最大值性质，能直接核对。"}},{"id":"real_result","type":"outcome","title":"实数模型下任意合并树得到同一结果","summary":"由每次合并保持规范摘要，对树归纳得到完整 log-sum-exp；结合性与树形无关只在精确实数模型中成立。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["proof","contract"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"}},{"id":"proof","type":"evidence","title":"乘回参考值并作树归纳","summary":"exp(m)*s=exp(m_A)*s_A+exp(m_B)*s_B；配合最大值性质，证明合并得到规范摘要，再由树归纳得到最终结果。","importance":"core","learning_depth":"detailed","level":"L3","source_refs":["proof"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"原文包含可逐步核对的代数证明和归纳论证。"},"details":{"evidence_kind":"theoretical","scope":"非空有限实数分块，精确实数算术；合并保留元素重数。","result":"规范摘要在合并中保持，从而根结果正确且合并在该模型下具有结合性。","limitations":["不是浮点舍入误差分析。","不证明任意树形得到相同浮点位模式。","不提供性能结果。"]}},{"id":"counterexample","type":"evidence","title":"不同参考值不能直接加局部和","summary":"[0] 与 [log(2)] 的局部 s 都为 1；共同最大值为 log(2) 时正确 s 为 1/2+1=1.5，直接相加所得 2 错误。","importance":"supporting","learning_depth":"detailed","level":"L3","source_refs":["rescaling"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"原文显式给出这个输入及正确和错误的摘要。"},"details":{"evidence_kind":"worked_example","scope":"两个单元素块；精确实数算术。","result":"该输入否定直接相加局部 s 的规则，说明必须处理参考值差异。","limitations":["一个反例足以否定直接相加规则，但自身不是正确合并公式的一般证明。","不衡量浮点精度或执行速度。"]}},{"id":"tradeoff","type":"tradeoff","title":"常数摘要带来可归约性但丢失逐项信息","summary":"每块只输出两个标量，每次合并进行有界运算，可先局部计算再树形归约。摘要用于总体 log-sum-exp；若要各项 softmax 概率仍需保留或重访输入。原文未测量相较协调两遍实现的加速。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["costs"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"}},{"id":"fp_limits","type":"constraint","title":"浮点运行仍有误差与输入边界","summary":"重标定可能使微小贡献下溢，舍入破坏精确结合性；顺序折叠和平衡树可能不同。没有误差界或精度优劣保证，空块也没有单位元。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["limits"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所列位置明确给出此定义、目标或限制。"}},{"id":"pattern","type":"pattern","title":"可变参考值下保持规范摘要","summary":"把参考值与相对量一起保存，在合并边界统一参考值，并用不变量证明摘要闭合。可复用的是这种推理结构；迁移到其他问题需要重新证明，不能继承本说明的结论。","importance":"supporting","learning_depth":"working","level":"L1","source_refs":["representation","merge","proof"],"attribution":"ai_inference","confidence":{"level":"medium","rationale":"抽象直接对应材料的表示、重标定与不变量证明；候选新场景并未在原文验证。"},"details":{"applicability":["每块目标量可由常数大小摘要表示。","参考值转换有可计算且正确的变换规则。","合并后仍落在同一规范摘要表示中。"],"failure_modes":["仅保存相对量而丢弃参考值，无法正确对齐。","新问题的摘要不闭合或需要恢复逐项数据。","要求浮点逐位一致，却只证明了实数结合性。"],"candidate_transfer":"分析者候选：计算带正权重的指数总和时，尝试令 s_A=sum(w_i*exp(x_i-m_A))；须另行证明加权不变量、规定权重范围并检查数值行为。"}}]},"graph":{"schema_version":"1.0","document_id":"shifted_exp_summary","nodes_file":"knowledge_nodes.json","spine":[{"node_id":"problem","why_next":"先确定需要计算什么，以及直接指数与全局移位方案面临什么限制。"},{"node_id":"contract","why_next":"问题还没有限定答案的形态：接着明确非空块、常数摘要与实数算术目标。"},{"node_id":"insight","why_next":"既然块内不能依赖最终全局最大值，就要解释如何推迟统一参考值。"},{"node_id":"architecture","why_next":"知道参考值可后续对齐后，需要看摘要怎样沿树传递并产生最终输出。"},{"node_id":"rescale","why_next":"结构中最关键的缺口是两个不同参考值的摘要究竟怎样合并。"},{"node_id":"real_result","why_next":"合并公式有了，接着问它为何能支持任意树，而不只是一个例子。"},{"node_id":"tradeoff","why_next":"正确性成立后，再确认这种组织获得什么能力、舍弃哪些逐项信息。"},{"node_id":"fp_limits","why_next":"常数摘要与实数证明都不能回答浮点误差，需要划清实际运行边界。"},{"node_id":"pattern","why_next":"在能力与限制明确后，才能抽象可迁移结构而不移植未经验证的保证。"}],"views":{"L1":["problem","insight","architecture","real_result","tradeoff","fp_limits","pattern"],"L2":["problem","contract","insight","architecture","summary","rescale","invariant","real_result","tradeoff","fp_limits","pattern"],"L3":["problem","contract","insight","architecture","summary","rescale","invariant","real_result","proof","counterexample","tradeoff","fp_limits","pattern"]},"edges":[{"id":"e_problem_idea","source_id":"problem","target_id":"insight","relation":"motivates","rationale":"全局最大值协调问题引出先局部摘要、后统一参考值的方向。","evidence_refs":["setting","rescaling"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_constraint_idea","source_id":"contract","target_id":"insight","relation":"motivates","rationale":"常数摘要、无需保留原块且可任意二叉合并的目标要求局部信息足够转换参考值。","evidence_refs":["contract","representation","rescaling"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_idea_problem","source_id":"insight","target_id":"problem","relation":"addresses","rationale":"局部摘要不需预知全局最大值；非正指数参数缓解直接正指数的溢出问题，仍有其他浮点风险。","evidence_refs":["representation","rescaling","limits"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_arch_idea","source_id":"architecture","target_id":"insight","relation":"implements","rationale":"树内每次合并把不同局部参考值转换到共同参考值。","evidence_refs":["merge","rescaling"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_arch_contract","source_id":"architecture","target_id":"contract","relation":"depends_on","rationale":"所定义的每个摘要与树合并均以非空有限实数块为前提。","evidence_refs":["contract","limits"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_summary_arch","source_id":"summary","target_id":"architecture","relation":"part_of","rationale":"两标量摘要是块内输出与合并接口。","evidence_refs":["representation","merge"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_rescale_arch","source_id":"rescale","target_id":"architecture","relation":"part_of","rationale":"内部树节点执行这一合并步骤并返回同形摘要。","evidence_refs":["merge"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_rescale_idea","source_id":"rescale","target_id":"insight","relation":"implements","rationale":"按最大值差乘指数具体实现参考值对齐。","evidence_refs":["merge","rescaling"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_rescale_invariant","source_id":"rescale","target_id":"invariant","relation":"enables","rationale":"重标定乘回共同 exp(m) 后恢复两块原指数和。","evidence_refs":["merge","proof"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"关系直接对应所列证明或反例的支持范围。"}},{"id":"e_invariant_result","source_id":"invariant","target_id":"real_result","relation":"enables","rationale":"规范摘要在每层保持，因此树归纳给出根的正确性及实数结合性。","evidence_refs":["proof"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"关系直接对应所列证明或反例的支持范围。"}},{"id":"e_proof_result","source_id":"proof","target_id":"real_result","relation":"supports","rationale":"代数等式和树归纳支持精确实数结果，不支持浮点逐位一致。","evidence_refs":["proof","limits"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"关系直接对应所列证明或反例的支持范围。"}},{"id":"e_proof_invariant","source_id":"proof","target_id":"invariant","relation":"supports","rationale":"证明同时核对最大值和指数和两项规范摘要性质。","evidence_refs":["proof"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"关系直接对应所列证明或反例的支持范围。"}},{"id":"e_counter_rescale","source_id":"counterexample","target_id":"rescale","relation":"supports","rationale":"反例否定省略参考值转换的直接加法；一般合并正确性仍依靠独立代数证明。","evidence_refs":["rescaling"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"关系直接对应所列证明或反例的支持范围。"}},{"id":"e_result_contract","source_id":"real_result","target_id":"contract","relation":"depends_on","rationale":"任意树等价结论仅针对非空有限实数输入和精确实数算术。","evidence_refs":["contract","proof","limits"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_arch_result","source_id":"architecture","target_id":"real_result","relation":"enables","rationale":"局部摘要、保持规范表示的合并与根部对数解码组成完整计算路径；该联系有树归纳依据。","evidence_refs":["merge","proof"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"关系直接对应所列证明或反例的支持范围。"}},{"id":"e_arch_tradeoff","source_id":"architecture","target_id":"tradeoff","relation":"trades_off","rationale":"两标量接口获得局部归约能力，却不能直接产出每个输入对应的 softmax 概率。","evidence_refs":["costs"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文明确描述该联系。"}},{"id":"e_rescale_pattern","source_id":"rescale","target_id":"pattern","relation":"generalizes_to","rationale":"把具体重标定步骤抽象为在合并边界对齐参考值并保持摘要不变量。","evidence_refs":["representation","merge","proof"],"attribution":"ai_inference","confidence":{"level":"medium","rationale":"这是依据所列机制形成的分析抽象，原文未验证迁移结论。"}}]},"source_base":"../expected","source_links":{"nature":"../source.md","setting":"../source.md","contract":"../source.md","representation":"../source.md","merge":"../source.md","proof":"../source.md","rescaling":"../source.md","costs":"../source.md","limits":"../source.md"}}</script>
+  <script>(() => {
+  'use strict';
+
+  const types = {
+    problem: '问题', constraint: '约束', insight: '洞察', architecture: '架构',
+    design_decision: '设计决策', component: '组件', mechanism: '机制', tradeoff: '权衡',
+    evidence: '证据', concept: '概念', pattern: '可迁移模式', outcome: '结果'
+  };
+  const relations = {
+    motivates: '促使', addresses: '应对', implements: '落实', depends_on: '依赖',
+    enables: '使得', part_of: '属于', supports: '支持', contrasts_with: '对比',
+    generalizes_to: '可归纳为', trades_off: '带来权衡'
+  };
+  const levelNames = {L1: '宏观', L2: '设计机制', L3: '细节'};
+  const card = {width: 156, height: 74};
+
+  function element(tag, className, text) {
+    const result = document.createElement(tag);
+    if (className) result.className = className;
+    if (text !== undefined) result.textContent = text;
+    return result;
+  }
+
+  function svg(tag, properties, text) {
+    const result = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [key, value] of Object.entries(properties)) result.setAttribute(key, value);
+    if (text !== undefined) result.textContent = text;
+    return result;
+  }
+
+  function button(label, action, className) {
+    const result = element('button', className, label);
+    result.type = 'button';
+    result.addEventListener('click', () => action(result));
+    return result;
+  }
+
+  // Every actual edge connects vertices in the same or adjacent BFS columns.
+  // Disconnected components are laid out separately, without artificial edges.
+  function layout(ids, edges, vertical) {
+    const adjacency = new Map(ids.map(id => [id, new Set()]));
+    for (const edge of edges) {
+      adjacency.get(edge.source_id).add(edge.target_id);
+      adjacency.get(edge.target_id).add(edge.source_id);
+    }
+    const positions = new Map();
+    const visited = new Set();
+    const isolated = [];
+    let bottom = 0;
+    const columnGap = vertical ? card.height + 64 : card.width + 94;
+    const rowGap = vertical ? card.width + 34 : card.height + 36;
+    const position = (depth, offset) => vertical ? {x: offset, y: depth} : {x: depth, y: offset};
+    for (const start of ids) {
+      if (visited.has(start)) continue;
+      if (!adjacency.get(start).size) {
+        isolated.push(start);
+        continue;
+      }
+      let front = [start];
+      const columns = [];
+      visited.add(start);
+      while (front.length) {
+        columns.push(front);
+        const next = [];
+        for (const id of front) {
+          for (const other of adjacency.get(id)) {
+            if (!visited.has(other)) {
+              visited.add(other);
+              next.push(other);
+            }
+          }
+        }
+        front = next;
+      }
+      const rows = columns.reduce((height, column) => Math.max(height, column.length), 0);
+      columns.forEach((column, x) => column.forEach((id, y) => positions.set(id,
+        position(x * columnGap, bottom + (y + (rows - column.length) / 2) * rowGap))));
+      bottom += rows * rowGap + 12;
+    }
+    const count = Math.max(1, Math.ceil(Math.sqrt(isolated.length)));
+    isolated.forEach((id, index) => positions.set(id,
+      position(index % count * columnGap, bottom + Math.floor(index / count) * rowGap)));
+    return positions;
+  }
+
+  // Offset coinciding edges, including relations whose endpoints are reversed.
+  function edgeGeometry(start, end, lane, vertical) {
+    // Compute along the layout's depth axis, then transpose back to screen space.
+    const half = (vertical ? card.height : card.width) / 2;
+    if (vertical) {
+      start = {x: start.y, y: start.x};
+      end = {x: end.y, y: end.x};
+    }
+    const direction = Math.sign(end.x - start.x);
+    let ax, ay, bx, by, cx, cy, dx, dy;
+    if (direction) {
+      ax = start.x + direction * (half + 2);
+      bx = end.x - direction * (half + 3);
+      ay = start.y + lane;
+      by = end.y + lane;
+      cx = dx = (ax + bx) / 2;
+      cy = ay; dy = by;
+    } else {
+      ax = bx = start.x + half + 2;
+      ay = start.y + lane;
+      by = end.y + lane;
+      cx = dx = ax + 40 + Math.abs(end.y - start.y) * 0.07 + lane;
+      cy = ay; dy = by;
+    }
+    if (vertical) {
+      [ax, ay, bx, by, cx, cy, dx, dy] = [ay, ax, by, bx, cy, cx, dy, dx];
+    }
+    return {
+      path: 'M ' + ax + ' ' + ay + ' C ' + cx + ' ' + cy + ', ' + dx + ' ' + dy + ', ' + bx + ' ' + by,
+      x: (ax + 3 * cx + 3 * dx + bx) / 8,
+      y: (ay + 3 * cy + 3 * dy + by) / 8
+    };
+  }
+
+  function titleLines(title) {
+    const lines = [''];
+    let units = 0;
+    for (const ch of title.replace(/\s+/g, ' ').trim()) {
+      const width = ch.codePointAt(0) < 256 ? 0.56 : 1;
+      if (units + width > 10.0) {
+        if (lines.length === 2) {
+          lines[1] = lines[1].trimEnd() + '…';
+          break;
+        }
+        lines.push('');
+        units = 0;
+      }
+      lines[lines.length - 1] += ch;
+      units += width;
+    }
+    return lines;
+  }
+
+  window.initReaderGraph = function ({root, nodes, graph, openNode, openEdge, goToNarrative}) {
+    const byId = new Map(nodes.nodes.map(node => [node.id, node]));
+    let level = 'L1';
+    let vertical = root.getBoundingClientRect().width < 560;
+    let selected = null;
+    let neighborsOnly = false;
+    let box = {x: 0, y: 0, width: 1, height: 1};
+    let view = {...box};
+    let positions = new Map();
+    const nodeShapes = new Map();
+
+    const toolbar = element('div', 'rg-toolbar');
+    const layers = element('div', 'rg-layers');
+    layers.setAttribute('role', 'group');
+    layers.setAttribute('aria-label', '图谱层级');
+    const layerButtons = new Map();
+    for (const [code, name] of Object.entries(levelNames)) {
+      const control = button(code + ' ' + name, () => {
+        if (level === code) return;
+        level = code;
+        if (!graph.views[level].includes(selected)) {
+          selected = null;
+          neighborsOnly = false;
+        }
+        render();
+      });
+      layerButtons.set(code, control);
+      layers.append(control);
+    }
+    const searchBox = element('div', 'rg-search');
+    const search = element('input');
+    search.type = 'search';
+    search.placeholder = '搜索全部节点';
+    search.setAttribute('aria-label', '搜索全部层级的节点');
+    const results = element('div', 'rg-results');
+    results.hidden = true;
+    searchBox.append(search, results);
+    toolbar.append(layers, searchBox);
+
+    const canvas = element('div', 'rg-canvas');
+    const diagram = svg('svg', {class: 'rg-diagram', role: 'group', 'aria-label': '知识图谱，节点和关系可用键盘选择'});
+    const defs = svg('defs', {});
+    const marker = svg('marker', {id: 'reader-graph-arrow', viewBox: '0 0 8 8', markerWidth: 7,
+      markerHeight: 7, refX: 7.5, refY: 4, orient: 'auto', markerUnits: 'userSpaceOnUse'});
+    marker.append(svg('path', {d: 'M0 0 L8 4 L0 8 z', class: 'rg-arrow'}));
+    defs.append(marker);
+    const world = svg('g', {});
+    diagram.append(defs, world);
+
+    const tools = element('div', 'rg-tools');
+    const zoomOut = button('−', () => zoom(1.3));
+    const zoomIn = button('+', () => zoom(1 / 1.3));
+    zoomOut.setAttribute('aria-label', '缩小图谱');
+    zoomIn.setAttribute('aria-label', '放大图谱');
+    tools.append(zoomOut, zoomIn, button('适应画布', fit));
+    canvas.append(diagram, tools);
+
+    const footer = element('div', 'rg-footer');
+    const stats = element('span', 'rg-count');
+    stats.setAttribute('aria-live', 'polite');
+    const hint = element('span', 'rg-pan-hint', '拖动平移，点击节点阅读');
+    footer.append(stats, hint, element('span', 'rg-legend', '虚线表示 AI 推断'));
+    const inspector = element('div', 'rg-inspector');
+    root.replaceChildren(toolbar, canvas, footer, inspector);
+
+    function updateView() {
+      diagram.setAttribute('viewBox', [view.x, view.y, view.width, view.height].join(' '));
+    }
+
+    function fit(readable = false) {
+      const rect = diagram.getBoundingClientRect();
+      const ratio = (rect.width || 800) / (rect.height || 420);
+      const width = Math.max(box.width, box.height * ratio);
+      const height = width / ratio;
+      view = {x: box.x + (box.width - width) / 2, y: box.y + (box.height - height) / 2, width, height};
+      if (readable === true && rect.width && width > rect.width * 1.22) {
+        // Keep labels legible at first open. The Fit button still shows the full map.
+        const near = positions.get(selected) || positions.values().next().value;
+        view.width = rect.width * 1.22;
+        view.height = rect.height * 1.22;
+        view.x = near.x - view.width / 2;
+        view.y = near.y - view.height / 2;
+        if (vertical) view.y = near.y - card.height / 2 - 18;
+      }
+      updateView();
+    }
+
+    function svgPoint(clientX, clientY) {
+      const matrix = diagram.getScreenCTM();
+      if (!matrix) return {x: view.x + view.width / 2, y: view.y + view.height / 2};
+      return new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+    }
+
+    function zoom(factor, anchor = {x: view.x + view.width / 2, y: view.y + view.height / 2}) {
+      const current = view.width / (diagram.getBoundingClientRect().width || 800);
+      const next = Math.max(0.2, Math.min(Math.max(12, box.width / 150), current * factor));
+      factor = next / current;
+      view = {x: anchor.x + (view.x - anchor.x) * factor, y: anchor.y + (view.y - anchor.y) * factor,
+        width: view.width * factor, height: view.height * factor};
+      updateView();
+    }
+
+    function relationLabel(edge) {
+      return byId.get(edge.source_id).title + ' · ' + relations[edge.relation] + ' · ' + byId.get(edge.target_id).title;
+    }
+
+    function drawEdge(edge, lane, withLabel) {
+      const {path, x, y} = edgeGeometry(positions.get(edge.source_id), positions.get(edge.target_id), lane, vertical);
+      const inferred = edge.attribution === 'ai_inference';
+      const label = relationLabel(edge) + (inferred ? '（AI 推断）' : '');
+      const group = svg('g', {class: 'rg-edge', tabindex: 0, role: 'button', 'data-edge-id': edge.id,
+        'aria-label': label + '，查看关系和依据'});
+      const line = svg('path', {d: path, class: 'rg-line' + (inferred ? ' rg-inferred' : '')});
+      if (edge.relation !== 'contrasts_with') line.setAttribute('marker-end', 'url(#reader-graph-arrow)');
+      group.append(svg('title', {}, label), svg('path', {d: path, class: 'rg-hit'}), line);
+      const text = svg('text', {x, y: y - 4, class: 'rg-edge-label' + (withLabel ? '' : ' rg-hover-label'),
+        'text-anchor': 'middle'}, relations[edge.relation]);
+      group.append(text);
+      return group;
+    }
+
+    function drawNode(id) {
+      const node = byId.get(id);
+      const {x, y} = positions.get(id);
+      const group = svg('g', {class: 'rg-node', transform: 'translate(' + x + ',' + y + ')', tabindex: 0,
+        role: 'button', 'data-node-id': id, 'aria-label': node.title + '，' + types[node.type] + '，' + node.level,
+        'aria-pressed': String(id === selected)});
+      const inferred = node.attribution === 'ai_inference';
+      group.append(svg('title', {}, node.title), svg('rect', {x: -card.width / 2, y: -card.height / 2,
+        width: card.width, height: card.height, rx: 7, class: 'rg-card' + (inferred ? ' rg-inferred' : '')}));
+      const left = -card.width / 2 + 12;
+      const meta = types[node.type] + ' · ' + node.level + (inferred ? ' · 推断' : '');
+      group.append(svg('text', {x: left, y: -16, class: 'rg-meta'}, meta));
+      const lines = titleLines(node.title);
+      lines.forEach((line, index) => group.append(svg('text', {x: left, y: 5 + index * 17, class: 'rg-title'}, line)));
+      return group;
+    }
+
+    function showInspector() {
+      inspector.replaceChildren();
+      inspector.hidden = !selected;
+      if (!selected) return;
+      const node = byId.get(selected);
+      const title = element('strong', 'rg-detail-title', node.title);
+      const summary = element('p', 'rg-summary', node.summary);
+      const actions = element('div', 'rg-actions');
+      const neighborButton = button(neighborsOnly ? '退出相邻视图' : '只看相邻', () => {
+        neighborsOnly = !neighborsOnly;
+        render();
+        inspector.querySelector('.rg-neighbors').focus({preventScroll: true});
+      }, 'rg-neighbors');
+      neighborButton.setAttribute('aria-pressed', String(neighborsOnly));
+      actions.append(button('阅读讲解', trigger => goToNarrative(node.id, trigger)),
+        button('查看依据', trigger => openNode(node.id, trigger)), neighborButton);
+      inspector.append(title, summary, actions);
+    }
+
+    function select(id) {
+      const previous = selected;
+      selected = id;
+      if (neighborsOnly) {
+        render();
+      } else {
+        nodeShapes.get(previous)?.setAttribute('aria-pressed', 'false');
+        nodeShapes.get(id)?.setAttribute('aria-pressed', 'true');
+        showInspector();
+      }
+    }
+
+    function render() {
+      for (const [code, control] of layerButtons) control.setAttribute('aria-pressed', String(level === code));
+      const inLevel = new Set(graph.views[level]);
+      const levelEdges = graph.edges.filter(e => inLevel.has(e.source_id) && inLevel.has(e.target_id));
+      let ids = graph.views[level];
+      if (neighborsOnly && selected) {
+        const near = new Set([selected]);
+        for (const edge of levelEdges) {
+          if (edge.source_id === selected) near.add(edge.target_id);
+          if (edge.target_id === selected) near.add(edge.source_id);
+        }
+        ids = ids.filter(id => near.has(id));
+      }
+      const visible = new Set(ids);
+      const edges = levelEdges.filter(e => visible.has(e.source_id) && visible.has(e.target_id));
+      positions = layout(ids, edges, vertical);
+      const pairs = new Map();
+      for (const edge of edges) {
+        const key = [edge.source_id, edge.target_id].sort().join(' ');
+        if (!pairs.has(key)) pairs.set(key, []);
+        pairs.get(key).push(edge);
+      }
+      world.replaceChildren();
+      for (const siblings of pairs.values()) {
+        const gap = Math.min(20, (card.height - 16) / siblings.length);
+        siblings.forEach((edge, n) => world.append(drawEdge(edge, (n - (siblings.length - 1) / 2) * gap, edges.length < 14)));
+      }
+      nodeShapes.clear();
+      for (const id of ids) {
+        const shape = drawNode(id);
+        nodeShapes.set(id, shape);
+        world.append(shape);
+      }
+      stats.textContent = level + (neighborsOnly ? ' 相邻视图' : '') + ' · ' + ids.length + ' 个节点 · ' + edges.length + ' 条关系';
+      showInspector();
+      const bounds = world.getBBox();
+      box = {x: bounds.x - 18, y: bounds.y - 18, width: Math.max(1, bounds.width) + 36, height: Math.max(1, bounds.height) + 36};
+      fit(true);
+    }
+
+    function focusNode(id) {
+      if (!byId.has(id)) return;
+      if (!graph.views[level].includes(id)) level = byId.get(id).level;
+      selected = id;
+      neighborsOnly = false;
+      render();
+      const point = positions.get(id);
+      const rect = diagram.getBoundingClientRect();
+      const targetWidth = Math.min(view.width, (rect.width || 800) * 1.2);
+      const targetHeight = view.height * targetWidth / view.width;
+      view = {x: point.x - targetWidth / 2, y: point.y - targetHeight / 2, width: targetWidth, height: targetHeight};
+      updateView();
+      nodeShapes.get(id).focus({preventScroll: true});
+    }
+
+    function showResults() {
+      const query = search.value.trim().toLocaleLowerCase();
+      results.replaceChildren();
+      results.hidden = !query;
+      if (!query) return;
+      const matches = nodes.nodes.filter(node => (node.title + ' ' + node.id + ' ' + types[node.type]).toLocaleLowerCase().includes(query));
+      for (const node of matches) {
+        results.append(button(node.title + ' · ' + node.level, () => {
+          results.hidden = true;
+          search.value = '';
+          focusNode(node.id);
+        }));
+      }
+      if (!matches.length) results.append(element('span', 'rg-no-results', '没有匹配的节点'));
+    }
+
+    search.addEventListener('input', showResults);
+    search.addEventListener('focus', showResults);
+    search.addEventListener('keydown', event => {
+      if ((event.key === 'Enter' || event.key === 'ArrowDown') && !results.hidden) {
+        event.preventDefault();
+        const first = results.querySelector('button');
+        if (event.key === 'Enter') first?.click();
+        else first?.focus();
+      }
+    });
+    searchBox.addEventListener('focusout', event => {
+      if (!searchBox.contains(event.relatedTarget)) results.hidden = true;
+    });
+    searchBox.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        search.focus();
+        results.hidden = true;
+      }
+    });
+
+    function activate(target) {
+      const shape = target.closest('[data-node-id],[data-edge-id]');
+      if (!shape) return;
+      if (shape.hasAttribute('data-node-id')) select(shape.dataset.nodeId);
+      else openEdge(shape.dataset.edgeId, shape);
+    }
+    diagram.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activate(event.target);
+        if (event.target.closest('[data-node-id]')) inspector.querySelector('button')?.focus();
+      }
+    });
+
+    let drag = null;
+    let ignoreClick = false;
+    diagram.addEventListener('pointerdown', event => {
+      if (!event.isPrimary || event.button !== 0) return;
+      ignoreClick = false;
+      drag = {id: event.pointerId, x: event.clientX, y: event.clientY, view: {...view}};
+    });
+    diagram.addEventListener('pointermove', event => {
+      if (!drag || drag.id !== event.pointerId) return;
+      const dx = event.clientX - drag.x;
+      const dy = event.clientY - drag.y;
+      if (!ignoreClick && Math.hypot(dx, dy) < 5) return;
+      ignoreClick = true;
+      diagram.setPointerCapture(event.pointerId);
+      const scale = diagram.getScreenCTM()?.a || 1;
+      view.x = drag.view.x - dx / scale;
+      view.y = drag.view.y - dy / scale;
+      updateView();
+    });
+    const endDrag = () => { drag = null; };
+    diagram.addEventListener('pointerup', endDrag);
+    diagram.addEventListener('pointercancel', endDrag);
+    diagram.addEventListener('pointerleave', () => { if (!ignoreClick) endDrag(); });
+    diagram.addEventListener('click', event => { if (!ignoreClick) activate(event.target); });
+    diagram.addEventListener('wheel', event => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      zoom(event.deltaY < 0 ? 1 / 1.18 : 1.18, svgPoint(event.clientX, event.clientY));
+    }, {passive: false});
+
+    render();
+    new ResizeObserver(entries => {
+      const width = entries[0].contentRect.width;
+      if (!width || drag) return;
+      if (vertical !== (width < 560)) {
+        vertical = width < 560;
+        render();
+      } else {
+        fit(true);
+      }
+    }).observe(diagram);
+    return {focusNode};
+  };
+})();
+
+(() => {
+  'use strict';
+
+  const byId = id => document.getElementById(id);
+  const bundle = JSON.parse(byId('reader-data').textContent);
+  const nodes = new Map(bundle.nodes.nodes.map(node => [node.id, node]));
+  const sources = new Map(bundle.nodes.source_refs.map(source => [source.id, source]));
+  const edges = new Map(bundle.graph.edges.map(edge => [edge.id, edge]));
+  const origins = {
+    author_claim: '作者主张', direct_evidence: '直接证据',
+    ai_inference: 'AI 推断', external_background: '外部背景'
+  };
+  const confidence = {high: '高', medium: '中', low: '低'};
+  const labels = {
+    scope: '支持范围', result: '证据结论', limitations: '局限',
+    assumptions: '前提', alternatives: '替代设计', interfaces: '接口',
+    applicability: '适用条件', failure_modes: '失效条件', boundaries: '边界',
+    evidence_kind: '证据类型'
+  };
+  const evidenceKinds = {empirical: '实验', theoretical: '理论论证', worked_example: '例题推演', observation: '观察'};
+  const dialog = byId('inspector');
+  const body = byId('inspector-body');
+  let returnPoint = null;
+
+  function element(tag, text, className) {
+    const el = document.createElement(tag);
+    if (text !== undefined) el.textContent = text;
+    if (className) el.className = className;
+    return el;
+  }
+
+  function action(label, callback) {
+    const button = element('button', label);
+    button.type = 'button';
+    button.addEventListener('click', callback);
+    return button;
+  }
+
+  function present(kind, title, trigger) {
+    if (!dialog.open) {
+      returnPoint = {trigger: trigger || document.activeElement, x: window.scrollX, y: window.scrollY};
+    }
+    byId('inspector-kind').textContent = kind;
+    byId('inspector-title').textContent = title;
+    body.replaceChildren();
+    if (!dialog.open) dialog.showModal();
+    dialog.scrollTop = 0;
+    byId('close-inspector').focus({preventScroll: true});
+  }
+
+  byId('close-inspector').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    if (event.clientX < box.left || event.clientX > box.right ||
+        event.clientY < box.top || event.clientY > box.bottom) dialog.close();
+  });
+  dialog.addEventListener('close', () => {
+    if (!returnPoint || dialog.open) return;
+    returnPoint.trigger?.focus({preventScroll: true});
+    window.scrollTo(returnPoint.x, returnPoint.y);
+    returnPoint = null;
+  });
+
+  function navigate(id) {
+    const target = byId(id);
+    if (!target) return;
+    if (dialog.open) {
+      returnPoint = null;
+      dialog.close();
+    }
+    for (let parent = target.parentElement; parent; parent = parent.parentElement) {
+      if (parent.tagName === 'DETAILS') parent.open = true;
+    }
+    const hash = '#' + encodeURIComponent(id);
+    if (location.hash !== hash) location.hash = hash;
+    target.scrollIntoView();
+    if (!target.hasAttribute('tabindex')) target.tabIndex = -1;
+    target.focus({preventScroll: true});
+  }
+
+  function narrativeTarget(id) {
+    const target = ['step-', 'analysis-node-', 'patterns-node-'].map(prefix => prefix + id).find(key => byId(key));
+    if (target) return target;
+    const mention = byId('reader-article').querySelector('[data-node="' + id + '"]');
+    return mention?.closest('section[id]')?.id;
+  }
+
+  function goToNarrative(id, trigger) {
+    const target = narrativeTarget(id);
+    if (target) navigate(target);
+    else openNode(id, trigger);
+  }
+
+  function trustedOriginal(id) {
+    const href = document.querySelector('a[data-original-source="' + id + '"]')?.getAttribute('href') ||
+      bundle.source_links?.[id];
+    if (!href) return null;
+    try {
+      const url = new URL(href, location.href);
+      if (['file:', 'http:', 'https:'].includes(url.protocol)) return url.href;
+    } catch { /* A locator remains readable when its link cannot be opened. */ }
+    return null;
+  }
+
+  function sourceCard(source, showLocator = true) {
+    const card = element('section', undefined, 'source-card');
+    if (showLocator) card.append(element('h4', source.locator));
+    card.append(element('p', source.origin === 'primary' ? '主材料' : '外部材料', 'panel-meta'));
+    if (source.note) card.append(element('p', source.note));
+    const topic = byId('sources-source-' + source.id);
+    // Authored source descriptions can explain evidence beyond the JSON note.
+    if (topic) {
+      for (const p of topic.querySelectorAll('p')) {
+        const text = p.cloneNode(true);
+        text.querySelectorAll('a[data-original-source]').forEach(link => link.remove());
+        let description = text.textContent.trim().replace(/^[—–·\s]+/, '');
+        if (description.startsWith(source.locator)) {
+          description = description.slice(source.locator.length).replace(/^[。.,，：:;；—–\s]+/, '');
+        }
+        if (description && description !== source.note && !card.textContent.includes(description)) {
+          card.append(element('p', description));
+        }
+      }
+    }
+    const original = trustedOriginal(source.id);
+    if (original) {
+      const link = element('a', '打开原件 ↗');
+      link.href = original;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      card.append(link);
+    } else {
+      card.append(element('p', source.uri, 'panel-meta'));
+    }
+    return card;
+  }
+
+  function addSources(ids) {
+    body.append(element('h3', '来源与定位'));
+    for (const id of ids) body.append(sourceCard(sources.get(id)));
+  }
+
+  function provenance(record) {
+    body.append(element('p', origins[record.attribution] + ' · 提取把握' + confidence[record.confidence.level], 'panel-meta'));
+    body.append(element('p', record.confidence.rationale));
+  }
+
+  function valueContent(value) {
+    if (Array.isArray(value)) {
+      const list = element('ul');
+      for (const item of value) {
+        const li = element('li');
+        li.append(valueContent(item));
+        list.append(li);
+      }
+      return list;
+    }
+    if (value && typeof value === 'object') {
+      const list = element('dl');
+      for (const [key, detail] of Object.entries(value)) {
+        const dd = element('dd');
+        dd.append(valueContent(detail));
+        list.append(element('dt', labels[key] || key), dd);
+      }
+      return list;
+    }
+    return document.createTextNode(String(value ?? ''));
+  }
+
+  function evidenceDetails(record) {
+    for (const [key, value] of Object.entries(record.details || {})) {
+      if (Array.isArray(value) && !value.length) continue;
+      body.append(element('h3', labels[key] || key));
+      body.append(valueContent(key === 'evidence_kind' ? (evidenceKinds[value] || value) : value));
+    }
+  }
+
+  function openNode(id, trigger) {
+    const node = nodes.get(id);
+    if (!node) return;
+    present('节点与依据', node.title, trigger);
+    body.append(element('p', node.summary));
+    provenance(node);
+    evidenceDetails(node);
+    const support = bundle.graph.edges.filter(edge => edge.relation === 'supports' && edge.target_id === id);
+    if (support.length) {
+      body.append(element('h3', '支持这个结论的证据'));
+      for (const edge of support) {
+        const card = element('div', undefined, 'source-card');
+        card.append(element('p', edge.rationale), action(nodes.get(edge.source_id).title, () => openNode(edge.source_id)));
+        body.append(card);
+      }
+    }
+    addSources(node.source_refs);
+    const actions = element('div', undefined, 'panel-actions');
+    if (narrativeTarget(id)) actions.append(action('阅读讲解', () => goToNarrative(id)));
+    actions.append(action('在图中定位', () => { navigate('graph'); graphUI.focusNode(id); }));
+    body.append(actions);
+  }
+
+  function openEdge(id, trigger) {
+    const edge = edges.get(id);
+    if (!edge) return;
+    const arrow = edge.relation === 'contrasts_with' ? ' ↔ ' : ' → ';
+    present('关系与依据', nodes.get(edge.source_id).title + arrow + nodes.get(edge.target_id).title, trigger);
+    body.append(element('h3', '为什么相连'), element('p', edge.rationale));
+    provenance(edge);
+    if (edge.relation === 'supports') {
+      const evidence = nodes.get(edge.source_id);
+      evidenceDetails(evidence);
+    }
+    addSources(edge.evidence_refs);
+  }
+
+  function openSource(id, trigger) {
+    const source = sources.get(id);
+    if (!source) return;
+    present('来源与依据', source.locator, trigger);
+    // A section or paragraph may reference more than one claim. Keep provenance attached to its claim.
+    const local = trigger.closest('p, li, h2, h3, h4');
+    const context = trigger.closest('[data-context-node]')?.dataset.contextNode;
+    const candidates = new Set([context, ...Array.from(local?.querySelectorAll('[data-node]') || [], el => el.dataset.node)]);
+    const claims = [...candidates].map(key => nodes.get(key)).filter(node => node?.source_refs.includes(id));
+    for (const claim of claims) {
+      body.append(element('h3', claim.title), element('p', claim.summary));
+      provenance(claim);
+      if (claim.type === 'evidence') evidenceDetails(claim);
+    }
+    body.append(sourceCard(source, false));
+    if (!claims.length) {
+      const related = [...nodes.values()].filter(node => node.source_refs.includes(id));
+      if (related.length) {
+        body.append(element('h3', '引用此处的节点'));
+        const actions = element('div', undefined, 'panel-actions');
+        for (const node of related) actions.append(action(node.title + ' · ' + origins[node.attribution], () => openNode(node.id)));
+        body.append(actions);
+      }
+    }
+  }
+
+  const graphUI = window.initReaderGraph({root: byId('reader-graph'), nodes: bundle.nodes, graph: bundle.graph,
+    openNode, openEdge, goToNarrative});
+
+  byId('reader-article').addEventListener('click', event => {
+    const link = event.target.closest('a');
+    if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    if (link.dataset.source && sources.has(link.dataset.source)) {
+      event.preventDefault();
+      openSource(link.dataset.source, link);
+    } else if (link.dataset.node && nodes.has(link.dataset.node)) {
+      event.preventDefault();
+      openNode(link.dataset.node, link);
+    }
+  });
+
+  for (const math of document.querySelectorAll('#reader-article .math')) {
+    const raw = math.textContent.trim();
+    const displayMode = math.dataset.display === 'true' || math.tagName === 'DIV';
+    // The article renderer normalizes both inline and display delimiters to two characters per side.
+    const tex = raw.slice(2, -2).trim();
+    try {
+      window.katex.render(tex, math, {output: 'mathml', displayMode, trust: false, throwOnError: true});
+    } catch {
+      math.textContent = raw;
+      math.classList.add('math-error');
+      math.title = '公式未能排版，显示原式';
+    }
+  }
+
+  function revealHashTarget() {
+    const target = byId(location.hash.slice(1));
+    if (!target) return;
+    let detail = target.closest('details');
+    let opened = false;
+    while (detail) {
+      if (!detail.open) { detail.open = true; opened = true; }
+      detail = detail.parentElement?.closest('details');
+    }
+    if (opened) target.scrollIntoView();
+  }
+  window.addEventListener('hashchange', revealHashTarget);
+  byId('reader-article').addEventListener('click', event => {
+    const hash = event.target.closest('a')?.hash;
+    if (!event.defaultPrevented && hash && hash === location.hash) revealHashTarget();
+  });
+  revealHashTarget();
+
+  const toc = document.querySelector('.toc');
+  const mobile = window.matchMedia('(max-width: 760px)');
+  function adjustToc() { toc.open = !mobile.matches; }
+  adjustToc();
+  mobile.addEventListener('change', adjustToc);
+  toc.addEventListener('click', event => {
+    if (mobile.matches && event.target.closest('a[href^="#"]')) toc.open = false;
+  });
+
+  const tocLinks = [...toc.querySelectorAll('a[href^="#"]')];
+  const sections = tocLinks.map(link => byId(link.hash.slice(1)));
+  const viewLinks = [...document.querySelectorAll('.view-nav a')];
+  let scheduled = false;
+  function markCurrent() {
+    scheduled = false;
+    let active = 0;
+    sections.forEach((section, index) => {
+      if (section && section.getBoundingClientRect().top <= Math.min(180, innerHeight * .22)) active = index;
+    });
+    tocLinks.forEach((link, index) => {
+      if (index === active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+    const graphActive = tocLinks[active].hash === '#graph';
+    viewLinks.forEach(link => {
+      if ((link.hash === '#graph') === graphActive) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  function onScroll() {
+    if (!scheduled) { scheduled = true; requestAnimationFrame(markCurrent); }
+  }
+  window.addEventListener('scroll', onScroll, {passive: true});
+  window.addEventListener('resize', onScroll);
+  markCurrent();
+})();
+</script>
+</body>
+</html>

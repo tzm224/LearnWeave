@@ -1,0 +1,6 @@
+Mistune 3.4.0 — https://github.com/lepture/mistune
+Runtime modules used by the architecture-first-reader HTML builder.
+Local change: in core.py, use typing.TypeVar for the Self annotation on Python 3.10.
+Source: mistune-3.4.0-py3-none-any.whl (PyPI)
+SHA-256: d03cec4c8620f21517a996d82d14f3b59c30d79bda2cc6c56bd32b839f18ce6b
+License: BSD-3-Clause, see LICENSE.

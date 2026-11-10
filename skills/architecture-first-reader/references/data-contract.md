@@ -1,6 +1,6 @@
 # 数据契约 v1.0
 
-正式结构见 `../schemas/knowledge-nodes.schema.json`、`../schemas/knowledge-graph.schema.json`；本文件解释字段语义。两个 JSON 是唯一结构化事实源，Markdown 和 Mermaid 是它们的可读投影。修改节点后重新生成 Mermaid，并同步主线和正文引用。
+正式结构见 `../schemas/knowledge-nodes.schema.json`、`../schemas/knowledge-graph.schema.json`；本文件解释字段语义。两个 JSON 保存节点、主线、图谱和来源；五份 Markdown 保存叙事与设计推演。HTML 内嵌七份稿件，修订后重建。
 
 ## knowledge_nodes.json
 
@@ -33,7 +33,7 @@
 
 `spine` 是 `{node_id, why_next}` 的有序数组，引用现有节点，至少一项，不重复节点。首项解释为何从这里开始，其后解释承接的具体问题；不要求覆盖所有节点，也不等同于章节顺序。
 
-`views` 包含三个非空 ID 列表：`L1` 恰好包含 level=L1 的节点；`L2` 包含 L1 与 L2；`L3` 包含全部节点。这是逐层展开，节点本身不复制。L1 建议 5–15 个节点，材料简单时允许更少；过多时重组宏观视图，不能删证据。默认 Mermaid 只绘 L1；可生成 L2/L3 或以某节点为中心的邻居图。
+`views` 包含三个非空 ID 列表：`L1` 恰好包含 level=L1 的节点；`L2` 包含 L1 与 L2；`L3` 包含全部节点。这是逐层展开，节点本身不复制。L1 建议 5–15 个节点，材料简单时允许更少；过多时重组宏观视图，不能删证据。网页初始展示 L1，读者可切换 L2/L3 或聚焦所选节点与邻居。
 
 每条边包含 `id`、`source_id`、`target_id`、`relation`、`rationale`、非空 `evidence_refs`、`attribution`、`confidence`。归属与可信度规则同节点。允许 `edges: []`，不能造边补齐画面。关系方向固定如下：
 
@@ -44,7 +44,7 @@
 - `enables`：机制/设计 → 得以实现的能力或结果。
 - `part_of`：组成部分 → 整体；不允许包含环。
 - `supports`：证据节点 → 受支持的主张；rationale 写清支持范围，不能拿汇总实验证明每个模块的独立作用。
-- `contrasts_with`：对称关系，Mermaid 不画箭头；交换端点也视为同一关系。
+- `contrasts_with`：对称关系，图中不画箭头；交换端点也视为同一关系。
 - `generalizes_to`：具体设计/机制 → pattern 节点。
 - `trades_off`：设计 → tradeoff 节点；权衡节点同时写出获得与付出。
 
@@ -52,8 +52,8 @@
 
 ## 可读输出与定位
 
-八个交付文件：`overview.md`、`document_map.md`、`knowledge_spine.md`、`architecture_analysis.md`、`design_patterns.md`、`knowledge_nodes.json`、`knowledge_graph.json`、`knowledge_graph.mmd`。
+在工作目录编写 `overview.md`、`document_map.md`、`knowledge_spine.md`、`architecture_analysis.md`、`design_patterns.md`、`knowledge_nodes.json` 和 `knowledge_graph.json`。HTML 将五篇正文连成可导航的阅读页，内嵌带格式版本的全部稿件。已有目录中的 `knowledge_graph.mmd` 可以按旧约定校验，网页图谱直接使用节点与关系数据。
 
-Markdown 用 `[n:node_id]` 标记节点，用 `[s:source_id]` 标记来源；自动校验检查这些标记是否存在于 JSON。主线文件按 spine 顺序写节点；各主线步骤使用 `## 1. 标题 [n:node_id]` 格式，正文可引用其他节点。document_map 中为来源 ID 提供可点击的原件/URL 链接及具体位置。overview 链接到其余文件，architecture_analysis 使用 `## 标题 [n:node_id]` 作为按需深入的定位点。必要的背景节点可以来自 external 来源；一个文件默认分析一个主材料，外部核对不改变这个范围。
+Markdown 用 `[n:node_id]` 标记节点，用 `[s:source_id]` 标记来源；自动校验检查这些标记是否存在于 JSON。主线文件按 spine 顺序写节点；各主线步骤使用 `## 1. 标题 [n:node_id]` 格式，正文可引用其他节点。document_map 中为来源 ID 提供可点击的原件/URL 链接及具体位置。总览可链接到更详细的讲解，architecture_analysis 使用 `## 标题 [n:node_id]` 作为按需深入的定位点。必要的背景节点可以来自 external 来源；一个文件默认分析一个主材料，外部核对不改变这个范围。
 
 缺失证据、未报告的替代方案或尚未验证的权衡写成正文中的明确限制，不制造 evidence 节点填空。已有方案若材料未提及，写“原文未讨论”；分析者提出的替代设计必须标明推断并说明比较条件。

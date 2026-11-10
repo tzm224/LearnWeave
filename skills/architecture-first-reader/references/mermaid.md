@@ -1,4 +1,6 @@
-# Mermaid 图谱生成规范
+# 可选的 Mermaid 导出与旧版兼容
+
+HTML 阅读页内置交互式 SVG。以下流程适用于维护旧版八文件工作目录或单独需要 Mermaid 源文件的任务。
 
 `knowledge_nodes.json` 与 `knowledge_graph.json` 是事实源，`.mmd` 只是投影。不要从标题关键词推测关系，不把 Spine 的先后顺序自动转成 Graph 的因果边。
 

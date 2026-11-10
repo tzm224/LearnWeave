@@ -1,19 +1,21 @@
 ---
 name: architecture-first-reader
-description: 从技术论文、博客、Markdown、PDF 与 PPT 中重建问题、核心 Idea、整体架构和设计决策的解释链，交付共享节点的知识主线与分层语义图谱。用于理解为什么这样设计、权衡与可迁移思想；默认宏观优先、细节按需，不代替逐页串讲或通用摘要。
+description: 从技术论文、博客、Markdown、PDF 与 PPT 中重建问题、核心 Idea、整体架构和设计决策的解释链，生成单个离线 HTML，沿知识主线阅读、展开设计与证据、探索分层图谱。用于理解为什么这样设计、权衡与可迁移思想；默认宏观优先、细节按需，不代替逐页串讲或通用摘要。
 ---
 
 # Architecture-First Reader
 
 重建具有解释力的设计逻辑，让读者先理解材料为什么存在、核心 Idea 是什么、如何落实为结构，以及为什么这些设计可能有效。默认中文、一次分析一个主材料；用户指定的范围、基础、深度与语言优先。
 
-最终交付八个文件：`overview.md`、`document_map.md`、`knowledge_spine.md`、`architecture_analysis.md`、`design_patterns.md`、`knowledge_nodes.json`、`knowledge_graph.json`、`knowledge_graph.mmd`。默认目录为工作区 `output/architecture-first-reader/<材料名>/`，已有产物使用新的目录，除非用户要求更新。
+每份材料交付一个可独立打开的 `output/architecture-first-reader/<材料名>/index.html`。首页先读总览，再沿主线连续阅读；节点讲解、证据定位、L1/L2/L3 图谱和可恢复的分析稿件都保存在同一文件。首次分析使用独立的工作目录和交付目录，已有产物使用新目录，除非用户要求更新。
 
 ## 工作方式
 
-先读 [执行流程](references/workflow.md)。以下七个阶段是推理过程，不要求把七份中间草稿另行交付。脚本只校验和转绘结构化内容；阅读、解释与设计模式抽象由 Agent 完成。
+默认由一个 agent 完成全篇分析。通览后，若方法、实验或附录各自有可独立回答并定位证据的问题，可委派 subagent 分块阅读。前后紧密相依的证明由同一 agent 连贯阅读，即使篇幅很长。若关键结论依赖跨章推理，或容易误判证据的支持范围，可在形成初稿后单独委派复核，包括由一个 agent 完成阅读的情况。职责与交接见[执行流程中的分工说明](references/workflow.md#subagent-分工与交接)。
 
-1. **Global Understanding — 先覆盖材料。** 按 [材料适配](references/reading-strategies.md) 选择当前可用的读取工具，浏览全部可访问正文、关键图表和附录，记录标题、论证路径与缺口，建立 Document Map。长文可按节委派阅读，综合前核对覆盖和跨节联系。无法读取的部分具体标出，不能把仅阅读摘要或抽取文本称为完整分析。
+先读[执行流程](references/workflow.md)，再按以下七个阶段分析材料。Agent 负责解释与设计模式抽象，脚本负责校验和构建网页。
+
+1. **Global Understanding — 先覆盖材料。** 按 [材料适配](references/reading-strategies.md) 选择当前可用的读取工具，浏览全部可访问正文、关键图表和附录，记录标题、论证路径与缺口，建立 Document Map。综合前核对覆盖和跨节联系。无法读取的部分具体标出，不能把仅阅读摘要或抽取文本称为完整分析。
 2. **Problem & Motivation — 还原动机链。** 从材料中区分问题、已有方案、已有方案的局限、约束及目标。区分“作者认为需要改善”与“证据已经证明存在问题”。原文未讨论的基线或约束明确记为未报告。
 3. **Core Idea & Architecture — 从洞察到结构。** 先用一句话解释改变了什么思路，再描述整体结构、模块职责、接口与信息/控制流。用一个具体输入走过系统或算法，指出状态怎样变化、约束在哪里生效。理论材料使用假设、关键构造、引理依赖和证明路径；不能硬套工程模块。
 4. **Design Reasoning & Abstraction — 解释选择。** 对核心决策重建 `Problem → Constraint → Insight → Design Decision → Mechanism → Outcome / Trade-off`。链中缺乏证据的环节标明缺口，不能补造因果。对照作者讨论过的替代方案；分析者另提的方案明确标为推断。分开写设计的预期收益、材料观察到的结果和尚未验证的解释。提炼可迁移模式时同时给出适用条件与失效情境，允许没有可靠模式。
@@ -27,30 +29,29 @@ description: 从技术论文、博客、Markdown、PDF 与 PPT 中重建问题�
 - `confidence` 表示提取或推断的把握，不是作者结论正确的概率。无法确认的动机写成可能解释，不能代作者讲述思考过程。
 - 实验只支持其条件下的结论；整体结果不能自动证明某模块的独立贡献。收益与代价写清比较对象、约束、实验范围与缺失的消融。
 - L1 回答问题、Idea、结构和结论；L2 解释决策、依赖和机制；L3 收纳公式、算法步骤、实验与实现。默认不展开所有微观教学；用户追问节点时沿现有 ID 深入，必要时交给环境中可用的 Teach Skill，并传递背景、前置、来源与待解问题。没有 Teach Skill 也能针对该节点解释，不阻塞当前交付。
-- 用户随后追问时，先读取已有 JSON、对应原文和相关段落，再更新受影响节点与关系，保留未变化 ID，重新校验；不要每次生成另一套不兼容知识图。
+- 用户随后追问时，从已有工作稿或 HTML 恢复稿件，重读相关原文，修改受影响的正文、节点与关系，保留未变化 ID，再构建 HTML。
 
-## 校验、图谱与交付
+## 构建与继续编辑
 
-正式结构：
+在工作目录编写五份完整 Markdown 及 [节点 JSON](schemas/knowledge-nodes.schema.json) 和 [关系 JSON](schemas/knowledge-graph.schema.json)。正文承载走读、证明、反例与迁移条件；使用模板中的节点标记、来源标记和锚点，把深入讲解关联到具体主线步骤。原文地图为每条来源写明证据支持了什么、具体定位及原件链接。优先写可从稿件目录解析的相对链接，或稳定的原始 URL。
 
-- [Knowledge Nodes JSON Schema](schemas/knowledge-nodes.schema.json)
-- [Knowledge Graph JSON Schema](schemas/knowledge-graph.schema.json)
+用 Python 3.10+ 构建并检查成品。技能自带网页资源及解析器，构建器也接受旧版八文件目录。
 
-两个 Schema 分别定义节点和边的正式结构；跨文件引用与语义不变量由校验器补充检查。JSON 不包含分析模板占位符。
-
-在写完两个 JSON 和五个 Markdown 文件后，用本机 Python 3.10+ 执行，无需安装分析框架或模型 SDK：
-
-```text
-python3 <skill-dir>/scripts/render_mermaid.py <output-dir> --output <output-dir>/knowledge_graph.mmd
-python3 <skill-dir>/scripts/validate.py <output-dir>
+```bash
+python3 <skill-dir>/scripts/build_reader.py build <稿件目录> --output <交付目录>
+python3 <skill-dir>/scripts/validate.py <交付目录>/index.html
 ```
 
-图谱的方向、过滤与转义要求见 [Mermaid 规范](references/mermaid.md)。可按需生成 L2/L3 或节点邻居图；默认交付仍为 L1，不把新推断塞进绘图脚本。
+完成 [内容与离线验收](references/quality-review.md) 后，交付 `index.html` 的链接，说明核心发现及实际影响阅读的缺口。页内证据说明、定位和图谱随文件保存，打开原件需要对应路径或网址可访问。
 
-修复结构错误，再按 [质量评审](references/quality-review.md) 对照原文检查核心 Idea、架构交互、决策理由、证据作用和迁移边界。机器校验通过不代表教学正确或材料已完整读完。部分材料无法读取时仍交付可分析范围，显著说明缺口，不宣称达到完整验收。
+后续只有 HTML 时，先将内嵌稿件恢复到独立工作目录，再按上面的命令构建。修订后的分析继续沿用原节点 ID。
 
-交付时链接 `overview.md` 与输出目录，简述核心发现和影响理解的限制。无需默认制作网页、安装工具链、发布线上或展开所有公式。按需深入由 Markdown 导航、分层图谱及后续节点追问共同完成。
+```bash
+python3 <skill-dir>/scripts/build_reader.py extract <已有的index.html> --output <稿件目录>
+```
+
+HTML 单独移动后，原先的相对路径可能失效。若原件仍可访问，重建时用 `--source-base <原稿件的链接基准目录>` 重新定位相对原件链接。
 
 ## 参考示例
 
-需要学习输出粒度时，查看 [缓存协议材料](examples/versioned-cache/source.md) 与 [预期总览](examples/versioned-cache/expected/overview.md)。理论/算法材料另有 [可合并摘要说明](examples/mergeable-summary/source.md) 与 [独立试用产物](examples/mergeable-summary/expected/overview.md)，演示以不变量和证明依赖解释结构。两份均明确标注为原创合成材料，演示来源定位、设计推理、证据限制和模式边界，不作为真实系统性能依据。
+[缓存协议阅读页](examples/versioned-cache/reader/index.html) 可对照 [缓存原文](examples/versioned-cache/source.md) 检查一次竞态中的状态变化。[指数和摘要阅读页](examples/mergeable-summary/reader/index.html) 可对照 [算法原文](examples/mergeable-summary/source.md) 检查不变量、证明与浮点适用边界。两份均为原创合成材料。

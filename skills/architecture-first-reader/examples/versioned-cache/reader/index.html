@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>EpochGate：检查回填资格的进程内缓存方案（虚构教学材料） · LearnWeave</title>
+  <style>:root {
+  color-scheme: light;
+  --paper: #fcfbf8;
+  --surface: #fff;
+  --ink: #242331;
+  --muted: #636170;
+  --accent: #5144ad;
+  --wash: #f0edf9;
+  --line: #e2dfe6;
+  --ui-font: "Inter", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --reading-font: "Spectral", "Iowan Old Style", "Georgia", "Songti SC", "Noto Serif CJK SC", serif;
+  font: 16px/1.6 var(--ui-font);
+  color: var(--ink);
+  background: var(--paper);
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--accent); text-underline-offset: .22em; }
+a:hover { text-decoration-thickness: 2px; }
+button, input, select { font: inherit; }
+button, summary { cursor: pointer; }
+:focus-visible { outline: 3px solid #8275ca; outline-offset: 3px; }
+:where(section, h1, h2, h3, h4, [id]) { scroll-margin-top: 22px; }
+.skip-link { position: fixed; top: 8px; left: 8px; z-index: 10; transform: translateY(-160%); padding: .6em 1em; background: white; }
+.skip-link:focus { transform: none; }
+.masthead { border-bottom: 1px solid var(--line); background: #fff; }
+.masthead-inner { max-width: 1400px; margin: auto; padding: 16px clamp(20px, 4vw, 64px); display: flex; align-items: center; justify-content: space-between; }
+.wordmark { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font: 750 23px/1 var(--ui-font); letter-spacing: -1.15px; text-decoration: none; }
+.wordmark b { color: var(--accent); }
+.view-nav { display: flex; align-items: center; gap: 22px; font-size: 14px; }
+.view-nav a, .toc a { text-decoration: none; color: var(--muted); }
+.view-nav a:hover, .toc a:hover { color: var(--accent); }
+.view-nav [aria-current], .toc a[aria-current] { color: var(--accent); font-weight: 650; }
+.reader-shell { max-width: 1400px; margin: auto; display: grid; grid-template-columns: clamp(198px, 20vw, 264px) minmax(0, 1fr); gap: clamp(32px, 6vw, 90px); padding: 0 clamp(20px, 4vw, 64px); }
+.rail { min-width: 0; border-right: 1px solid var(--line); }
+.toc { position: sticky; top: 0; max-height: 100dvh; overflow-y: auto; padding: 44px 22px 32px 0; font-size: 14px; }
+.toc > summary { font-weight: 680; font-size: 13px; color: var(--ink); letter-spacing: .07em; }
+.toc[open] > summary { margin-bottom: 20px; }
+.toc nav > a, .toc-secondary > a { display: block; padding: 6px 0; }
+.toc .spine-toc { list-style: none; margin: 5px 0 18px 5px; padding-left: 14px; border-left: 1px solid var(--line); }
+.spine-toc a { display: block; padding: 4px 0; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.toc-secondary { border-top: 1px solid var(--line); padding-top: 12px; }
+main { min-width: 0; padding: clamp(32px, 4vw, 68px) 0 96px; }
+#reader-article { max-width: 78ch; font-size: 17px; line-height: 1.95; overflow-wrap: break-word; }
+.reader-section { padding: 40px 0 30px; border-top: 1px solid var(--line); }
+.reader-section:first-child { padding-top: 0; border-top: 0; }
+.reader-section :is(h1,h2,h3,h4), .graph-section > h2, .panel-content h2 { text-wrap: pretty; line-height: 1.4; color: var(--ink); }
+.reader-section h1 { font: 680 clamp(32px, 3.7vw, 54px)/1.22 var(--reading-font); letter-spacing: -.035em; margin: 0 0 .58em; }
+.reader-section > .reader-topic:first-child > h2:first-child, .graph-section > h2 { font: 680 clamp(28px, 3vw, 40px)/1.3 var(--reading-font); margin: 0 0 .75em; }
+.reader-section :is(h2,h3) { font-family: var(--reading-font); margin: 1.55em 0 .5em; }
+.reader-section h2 { font-size: 1.6em; }
+.reader-section h3 { font-size: 1.35em; }
+.reader-section h4 { font-size: 1.1em; }
+.reader-section p { margin: .75em 0; }
+#overview h1 + p { font-family: var(--reading-font); font-size: clamp(19px, 1.65vw, 23px); line-height: 1.8; margin: 1.1em 0; padding-left: 1em; border-left: 3px solid #a59ad5; }
+.reader-section :where(ul,ol) { padding-left: 1.6em; }
+.reader-section blockquote, .why-next { margin: 1em 0; padding: .7em 1.1em; background: var(--wash); border-left: 2px solid #a093c8; }
+.article-links { margin: 1.2em 0; font: 500 .86em/1.85 var(--ui-font); color: #9c96aa; }
+.article-links a { white-space: nowrap; }
+.reader-step { padding-bottom: 1.25em; }
+.reader-step + .article-links { margin: 1.2em 0; font: 500 .86em/1.85 var(--ui-font); color: #9c96aa; }
+.article-links a { white-space: nowrap; }
+.reader-step { border-top: 1px solid var(--line); }
+.step-detail { border: 1px solid var(--line); border-radius: 6px; padding: .65em 1em; background: #fff; margin: .7em 0; }
+.step-detail > summary { color: var(--accent); font: 630 .88em/1.7 var(--ui-font); }
+.reader-section a.reader-ref { font-family: var(--ui-font); font-size: .73em; display: inline; padding: .05em .36em; border-radius: 3px; border: 1px solid #d9d5ea; background-color: #f5f3fb; text-decoration: none; white-space: normal; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.reader-ref:hover { background-color: var(--wash); }
+.reader-section code { padding: .1em .28em; background: #efeef2; border-radius: 3px; font: .87em/1.6 "IBM Plex Mono", ui-monospace, monospace; overflow-wrap: anywhere; }
+.reader-section pre { max-width: 100%; overflow: auto; padding: 1em 1.2em; background: #f1f0f3; border-left: 2px solid #bdb5d1; tab-size: 4; }
+.reader-section pre code { padding: 0; background: none; overflow-wrap: normal; }
+.reader-section table { border-collapse: collapse; max-width: 100%; display: block; overflow-x: auto; }
+.reader-section th, .reader-section td { border: 1px solid var(--line); padding: .4em .7em; text-align: left; }
+.reader-section th { background: var(--wash); }
+.math { overflow-x: auto; max-width: 100%; }
+div.math, .math[data-display] { display: block; margin: 1em 0; padding: .3em; }
+.math-error { color: #934620; font-family: ui-monospace, monospace; }
+.graph-section { border-top: 1px solid var(--line); padding-top: 40px; }
+#inspector { position: fixed; inset: 0 0 0 auto; margin: 0; padding: 0; width: min(470px, 100%); height: 100dvh; max-height: 100%; max-width: 100%; border: 0; border-left: 1px solid var(--line); background: var(--paper); color: var(--ink); box-shadow: -10px 0 60px #16132920; overflow: auto; overscroll-behavior: contain; }
+#inspector::backdrop { background: #25213745; }
+.panel-top { position: sticky; top: 0; background: var(--paper); border-bottom: 1px solid var(--line); padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; z-index: 1; color: var(--accent); font-weight: 650; font-size: 14px; }
+.icon-button { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; background: white; color: var(--ink); font-size: 24px; line-height: 1; }
+.panel-content { padding: 24px; overflow-wrap: anywhere; }
+.panel-content h2 { margin: 0 0 18px; font: 650 28px/1.45 var(--reading-font); }
+.panel-content h3 { margin: 1.35em 0 .35em; font-size: 15px; }
+.panel-content :is(p, ul) { margin: .5em 0; }
+.panel-content ul { padding-left: 1.25em; }
+.panel-meta { color: var(--muted); font-size: 14px; }
+.panel-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.panel-actions button, .source-card button { border: 1px solid #cfc7e4; color: var(--accent); border-radius: 5px; background: var(--surface); padding: 5px 11px; }
+.source-card { margin: 12px 0; padding: 12px 15px; background: #fff; border: 1px solid var(--line); border-radius: 5px; }
+.source-card h4 { margin: 0 0 .3em; }
+@media (max-width: 760px) {
+  .masthead-inner { padding: 12px 16px; }
+  .wordmark { font-size: 20px; }
+  .wordmark svg { width: 27px; height: 27px; }
+  .view-nav { gap: 14px; font-size: 13px; }
+  .reader-shell { display: block; padding: 0 18px; }
+  .rail { border: 0; border-bottom: 1px solid var(--line); }
+  .toc { position: static; padding: 13px 0; max-height: 60dvh; }
+  .toc[open] > summary { margin-bottom: 10px; }
+  main { padding-top: 28px; }
+  #reader-article { font-size: 16px; }
+  .panel-content { padding: 20px; }
+}
+
+#reader-graph {
+  --rg-accent: var(--accent, #5144ad);
+  --rg-ink: var(--ink, #222237);
+  --rg-muted: var(--muted, #626373);
+  --rg-line: #d4d1dd;
+  color: var(--rg-ink);
+  min-width: 0;
+}
+#reader-graph [hidden] { display: none !important; }
+#reader-graph button,
+#reader-graph input {
+  font: inherit;
+  font-size: .875rem;
+  line-height: 1.45;
+}
+#reader-graph button {
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  padding: .4rem .7rem;
+  background: #fff;
+  color: var(--rg-ink);
+  cursor: pointer;
+}
+#reader-graph button:hover { border-color: var(--rg-accent); color: var(--rg-accent); }
+#reader-graph button[aria-pressed="true"] { background: var(--rg-accent); border-color: var(--rg-accent); color: #fff; }
+#reader-graph :is(button,input):focus-visible { outline: 2px solid var(--rg-accent); outline-offset: 2px; }
+#reader-graph .rg-toolbar,
+#reader-graph .rg-footer,
+#reader-graph .rg-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+#reader-graph .rg-toolbar { justify-content: space-between; margin-bottom: .8rem; }
+#reader-graph .rg-layers {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--rg-line);
+  border-radius: 8px;
+  background: #f2f1f6;
+}
+#reader-graph .rg-layers button { background: transparent; border-color: transparent; padding: .37rem .62rem; }
+#reader-graph .rg-layers button[aria-pressed="true"] { background: var(--rg-accent); }
+#reader-graph .rg-search { position: relative; width: 16rem; max-width: 100%; }
+#reader-graph .rg-search input {
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  box-sizing: border-box;
+  padding: .48rem .7rem;
+  width: 100%;
+  background: white;
+  color: var(--rg-ink);
+}
+#reader-graph .rg-results {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 4px);
+  width: 100%;
+  max-height: 16rem;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--rg-line);
+  border-radius: 7px;
+  box-sizing: border-box;
+  background: white;
+  box-shadow: 0 6px 16px #25233b15;
+}
+#reader-graph .rg-results button { display: block; width: 100%; text-align: start; border: 0; }
+#reader-graph .rg-results button:hover,
+#reader-graph .rg-results button:focus-visible { background: #f1eff9; }
+#reader-graph .rg-no-results { display: block; padding: .45rem; font-size: .875rem; color: var(--rg-muted); }
+#reader-graph .rg-canvas {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rg-line);
+  border-radius: 9px;
+  background-color: #f8f7f9;
+  background-image: radial-gradient(#dedce5 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+#reader-graph .rg-diagram {
+  display: block;
+  width: 100%;
+  height: clamp(20rem, 49vh, 34rem);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+#reader-graph .rg-diagram:active { cursor: grabbing; }
+#reader-graph .rg-node,
+#reader-graph .rg-edge { cursor: pointer; }
+#reader-graph .rg-card {
+  fill: #fff;
+  stroke: #bdb9cd;
+  stroke-width: 1.4px;
+}
+#reader-graph .rg-node[aria-pressed="true"] .rg-card { fill: #ece9fc; stroke: var(--rg-accent); stroke-width: 2; }
+#reader-graph .rg-node:hover .rg-card,
+#reader-graph .rg-node:focus-visible .rg-card { stroke: var(--rg-accent); stroke-width: 2.5; }
+#reader-graph .rg-node:focus-visible,
+#reader-graph .rg-edge:focus-visible { outline: none; }
+#reader-graph .rg-meta { font-size: 10px; fill: #61578a; }
+#reader-graph .rg-title { font-size: 13px; font-weight: 600; fill: var(--rg-ink); }
+#reader-graph .rg-line { fill: none; stroke: #77718e; stroke-width: 1.6; }
+#reader-graph .rg-arrow { fill: #6e6887; }
+#reader-graph .rg-inferred { stroke-dasharray: 5 4; }
+#reader-graph .rg-card.rg-inferred { stroke: #94653c; }
+#reader-graph .rg-hit { fill: none; stroke: transparent; stroke-width: 16; }
+#reader-graph .rg-edge:hover .rg-line,
+#reader-graph .rg-edge:focus-visible .rg-line { stroke: var(--rg-accent); stroke-width: 3; }
+#reader-graph .rg-edge-label {
+  font-size: 10px;
+  font-weight: 600;
+  fill: #615b74;
+  stroke: #f8f7f9;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+#reader-graph .rg-hover-label { opacity: 0; }
+#reader-graph .rg-edge:hover .rg-hover-label,
+#reader-graph .rg-edge:focus-visible .rg-hover-label { opacity: 1; }
+#reader-graph .rg-tools {
+  display: inline-flex;
+  position: absolute;
+  right: .55rem;
+  bottom: .55rem;
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  background: #fff;
+}
+#reader-graph .rg-tools button { padding: .28rem .55rem; border: 0; border-radius: 5px; min-width: 2rem; }
+#reader-graph .rg-tools button + button { border-left: 1px solid var(--rg-line); }
+#reader-graph .rg-footer { justify-content: space-between; margin: .45rem .1rem 0; font-size: .78rem; color: var(--rg-muted); }
+#reader-graph .rg-legend::before { content: ""; display: inline-block; width: 1.2rem; margin-right: .4rem; border-top: 1px dashed #94653c; vertical-align: middle; }
+#reader-graph .rg-inspector {
+  margin: .85rem 0 0;
+  padding: .85rem 1rem;
+  border-left: 3px solid var(--rg-accent);
+  background: #f3f1fa;
+  border-radius: 0 6px 6px 0;
+}
+#reader-graph .rg-detail-title { display: block; font-size: 1rem; }
+#reader-graph .rg-summary { margin: .28rem 0 .65rem; font-size: .9rem; line-height: 1.65; }
+#reader-graph .rg-actions button { padding: .28rem .62rem; font-size: .82rem; }
+@media (max-width: 620px) {
+  #reader-graph .rg-toolbar { align-items: stretch; }
+  #reader-graph .rg-search { flex: 1 1 100%; }
+  #reader-graph .rg-diagram { height: min(26rem, 56vh); }
+  #reader-graph .rg-tools button { min-height: 2.3rem; min-width: 2.3rem; }
+}
+#reader-graph .rg-pan-hint { color: var(--rg-muted); }
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#reading">跳至正文</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="wordmark" href="#overview" aria-label="LearnWeave · 返回总览">
+        <svg viewBox="48 40 320 320" width="32" height="32" aria-hidden="true">
+          <rect x="48" y="40" width="320" height="320" rx="82" fill="#5b4bdb"/>
+          <g fill="none" stroke-width="17" stroke-linecap="round"><path d="M112 108 C112 164 237 158 237 232" stroke="#67e8f9"/><path d="M304 108 C304 164 179 158 179 232" stroke="#fbbf24"/><path d="M208 94 V208" stroke="white" stroke-width="13"/></g>
+          <g fill="white"><circle cx="112" cy="108" r="13"/><circle cx="304" cy="108" r="13"/><circle cx="208" cy="94" r="14"/><path d="M102 237 C134 220 169 224 208 249 C247 224 282 220 314 237 V298 C278 282 244 286 208 310 C172 286 138 282 102 298Z"/></g>
+          <path d="M208 249V310" stroke="#5b4bdb" stroke-width="7"/>
+        </svg>
+        <span>Learn<b>Weave</b></span>
+      </a>
+      <nav class="view-nav" aria-label="阅读视图"><a href="#overview">阅读</a><a href="#graph">知识图谱 <span aria-hidden="true">↗</span></a></nav>
+    </div>
+  </header>
+  <div class="reader-shell">
+    <aside class="rail">
+      <details class="toc" open>
+        <summary>阅读目录</summary>
+        <nav aria-label="阅读目录">
+          <a href="#overview">总览</a>
+          <a href="#spine">知识主线</a>
+          <ol class="spine-toc"><li><a href="#step-stale_fill">1. 为什么删除以后还能读到旧值</a></li>
+<li><a href="#step-single_gateway">2. 这是什么范围内的问题</a></li>
+<li><a href="#step-epoch_permission">3. 从删除副本转向撤销资格</a></li>
+<li><a href="#step-epochgate">4. 把资格放进读写路径</a></li>
+<li><a href="#step-publish_guard">5. 为什么比较和发布必须在一起</a></li>
+<li><a href="#step-old_fill_rejected">6. 哪些证据支持了什么结果</a></li>
+<li><a href="#step-retry_cost">7. 并发换来了什么成本</a></li>
+<li><a href="#step-validate_at_commit">8. 哪部分可以带到别的问题里</a></li></ol>
+          <div class="toc-secondary">
+            <a href="#analysis">架构与设计决策</a>
+            <a href="#patterns">可迁移思想</a>
+            <a href="#sources">原文地图与证据</a>
+            <a href="#graph">知识图谱</a>
+          </div>
+        </nav>
+      </details>
+    </aside>
+    <main id="reading" tabindex="-1">
+      <article id="reader-article"><section id="overview" class="reader-section">
+
+<section class="reader-topic" id="overview-heading-epochgate撤销在途结果的回填资格"><h1>EpochGate：撤销在途结果的回填资格</h1><p>这份<strong>原创虚构材料</strong>的核心 Idea 是：读取取得了一个值，并不意味着它现在仍有资格进入缓存；写入改变代际，读取在发布结果时重新检查资格。<a href="#analysis-node-epoch_permission" data-node="epoch_permission" class="reader-ref" title="查看节点 · 取到值不等于有权发布" aria-label="查看节点 · 取到值不等于有权发布">节点</a> <a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#spine">理解主线</a> · <a href="#analysis">架构与设计决策</a> · <a href="#patterns">可迁移思想</a> · <a href="#sources">原文地图</a> · <a href="#graph">知识图谱</a></nav></section>
+<section class="reader-topic" id="overview-heading-为什么需要它"><h2>为什么需要它</h2><p>“写成功后删除缓存”有一个缺口：早先启动的读取可能已经拿到了旧值，却在删除之后才回填。后续新读就又命中了旧值。删除了现存副本，并没有撤销在途结果。<a href="#analysis-node-stale_fill" data-node="stale_fill" class="reader-ref" title="查看节点 · 删除后仍会旧值回填" aria-label="查看节点 · 删除后仍会旧值回填">节点</a> <a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a> <a href="#sources-source-s_race" data-source="s_race">来源</a></p>
+<p>讨论范围是单进程、单键、唯一写入口；存储原子读写且不存在提交状态未知的失败。<a href="#analysis-node-single_gateway" data-node="single_gateway" class="reader-ref" title="查看节点 · 单进程、唯一写入口" aria-label="查看节点 · 单进程、唯一写入口">节点</a> <a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#analysis-node-single_gateway">边界</a></p>
+</section>
+<section class="reader-topic" id="overview-heading-idea-如何变成架构"><h2>Idea 如何变成架构</h2><p>所有同键请求共享代际与短锁。读在锁内记录偶数代际，去锁外取值，回来再在锁内比较代际并发布。写在存储 I/O 前把代际改成奇数并清空缓存，完成后再推进为偶数。<a href="#analysis-node-epochgate" data-node="epochgate" class="reader-ref" title="查看节点 · 短锁包围状态，I/O 在锁外" aria-label="查看节点 · 短锁包围状态，I/O 在锁外">节点</a> <a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></p>
+<p>例如读 R 保存代际 0 并取到 A；写 W 将值改成 B，把代际推进到 2。R 回来时发现 <code>2 != 0</code>，丢弃 A 并重试。<a href="#sources-source-s_trace" data-source="s_trace">来源</a></p>
+</section>
+<section class="reader-topic" id="overview-heading-为什么采用这些设计"><h2>为什么采用这些设计</h2><p><strong>原文选择</strong>将比较和发布放在同一临界区：如果两者分离，写可能插在中间，旧值仍会被放入没有独立版本标签的缓存。另一方面，存储 I/O 放在锁外，以免慢 I/O 长时间占用状态锁。<a href="#analysis-node-publish_guard" data-node="publish_guard" class="reader-ref" title="查看节点 · 把比较与发布放进同一临界区" aria-label="查看节点 · 把比较与发布放进同一临界区">节点</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> <a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a> <a href="#analysis-node-publish_guard">深入设计推理</a></p>
+</section>
+<section class="reader-topic" id="overview-heading-获得什么付出什么"><h2>获得什么，付出什么</h2><p>在所列假设下，协议阻止旧回填成为写后新读的有效缓存命中。材料提供手工执行序列和局部不变式论证，<strong>没有运行实验，也没有性能测量</strong>。它可能丢弃并重做存储读；写频繁时没有完成时限，不提供跨进程一致性。<a href="#analysis-node-old_fill_rejected" data-node="old_fill_rejected" class="reader-ref" title="查看节点 · 旧代际不能重新成为有效命中" aria-label="查看节点 · 旧代际不能重新成为有效命中">节点</a> <a href="#analysis-node-retry_cost" data-node="retry_cost" class="reader-ref" title="查看节点 · 减少锁占用，承担丢弃和重试" aria-label="查看节点 · 减少锁占用，承担丢弃和重试">节点</a> <a href="#sources-source-s_invariant" data-source="s_invariant" class="reader-ref" title="查看依据 · lines 52–56; S5 一个局部不变式" aria-label="查看依据 · lines 52–56; S5 一个局部不变式">依据 7</a> <a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a> <a href="#analysis-node-old_fill_rejected">证据范围</a></p>
+</section>
+<section class="reader-topic" id="overview-heading-值得迁移什么"><h2>值得迁移什么</h2><p><strong>AI 归纳</strong>：把耗时计算的结果视为“有条件可提交”，在生效点复核前提。前提是变化可被检测、检查与发布可原子协调、结果可以安全丢弃；已产生不可撤销副作用时不能直接套用。<a href="#analysis-node-validate_at_commit" data-node="validate_at_commit" class="reader-ref" title="查看节点 · 在结果生效点复核前提" aria-label="查看节点 · 在结果生效点复核前提">节点</a> <a href="#patterns">可迁移模式及边界</a></p>
+<p>已检查原材料全部 64 行；无外部图片或附录缺口。此例用于展示技能产物，不代表真实系统验证。</p>
+</section>
+</section>
+<section id="spine" class="reader-section">
+
+<section class="reader-topic" id="spine-heading-epochgate从故障走到设计边界"><h2>EpochGate：从故障走到设计边界</h2><p>下面是分析者重建的学习顺序，不是对作者写作意图的事实陈述。它与 Graph 共用节点 ID；先回答为什么需要这套协议，再考虑具体实现和迁移。</p>
+</section>
+<section class="reader-step" id="step-stale_fill" data-context-node="stale_fill"><h3>1. 为什么删除以后还能读到旧值 <a href="#analysis-node-stale_fill" data-node="stale_fill" class="reader-ref" title="查看节点 · 删除后仍会旧值回填" aria-label="查看节点 · 删除后仍会旧值回填">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 从 S2 的具体故障开始，先建立必须解释的现象。</p><p>从 S2 的具体故障开始：旧读已经拿到 A，写 B 并删除缓存，旧读随后又填入 A。问题不在删除是否执行，而在删除没能影响在途结果。先掌握这个反例，无需阅读全部代码。<a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a> <a href="#sources-source-s_race" data-source="s_race">来源</a> · <a href="#expand-stale_fill-1">展开</a></p>
+<details class="step-detail" id="expand-stale_fill-1"><summary>展开设计与证据 · 问题发生在删除之后</summary><section class="reader-topic" data-context-node="stale_fill"><h3>问题发生在删除之后 <a href="#analysis-node-stale_fill" data-node="stale_fill" class="reader-ref" title="查看节点 · 删除后仍会旧值回填" aria-label="查看节点 · 删除后仍会旧值回填">节点</a></h3><p>基线中，R 先取 A，W 写 B 并删除缓存，R 随后才填入 A。删除作用于已有缓存，在途结果没有被撤销。这解释了为什么“再缩短 TTL”并不能满足目标保证：它只可能缩短错误值存活的时间。<a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a> <a href="#sources-source-s_race" data-source="s_race">来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-single_gateway" data-context-node="single_gateway"><h3>2. 这是什么范围内的问题 <a href="#analysis-node-single_gateway" data-node="single_gateway" class="reader-ref" title="查看节点 · 单进程、唯一写入口" aria-label="查看节点 · 单进程、唯一写入口">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 界定刚才的问题在哪个并发和存储模型下讨论，避免把目标扩大成分布式一致性。</p><p>界定刚才的问题在哪个并发和存储模型下讨论：同一进程内的请求共享状态，全部写入通过同一入口。绕过入口的写无法被局部代际感知。认识边界就够，不把目标扩大成分布式一致性。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#sources-source-s_scope" data-source="s_scope">来源</a> · <a href="#expand-single_gateway-1">展开</a></p>
+<details class="step-detail" id="expand-single_gateway-1"><summary>展开设计与证据 · 保证依赖什么边界</summary><section class="reader-topic" data-context-node="single_gateway"><h3>保证依赖什么边界 <a href="#analysis-node-single_gateway" data-node="single_gateway" class="reader-ref" title="查看节点 · 单进程、唯一写入口" aria-label="查看节点 · 单进程、唯一写入口">节点</a></h3><p>所有同键请求共享进程内状态，所有写经过同一服务，存储提供单键原子读写。代际不回绕，重启会消除缓存及在途任务，提交状态未知的失败被排除。与写重叠的读仍可能返回在写前选定的值；目标只禁止旧回填成为写后新读的缓存命中。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#sources-source-s_scope" data-source="s_scope">来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-epoch_permission" data-context-node="epoch_permission"><h3>3. 从删除副本转向撤销资格 <a href="#analysis-node-epoch_permission" data-node="epoch_permission" class="reader-ref" title="查看节点 · 取到值不等于有权发布" aria-label="查看节点 · 取到值不等于有权发布">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 在边界清楚后解释核心转变：删除副本之外，还要撤销在途结果的发布资格。</p><p>边界清楚后，再理解核心转变：结果有没有算完，与结果现在能不能进入缓存是两个问题。保存代际是记录资格，发布前复核是检查资格有没有被撤销。这是作者明确表达的 Idea。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a> <a href="#sources-source-s_state" data-source="s_state">来源</a> · <a href="#expand-epoch_permission-1">展开</a></p>
+<details class="step-detail" id="expand-epoch_permission-1"><summary>展开设计与证据 · Idea：结果有条件地获得发布资格</summary><section class="reader-topic" data-context-node="epoch_permission"><h3>Idea：结果有条件地获得发布资格 <a href="#analysis-node-epoch_permission" data-node="epoch_permission" class="reader-ref" title="查看节点 · 取到值不等于有权发布" aria-label="查看节点 · 取到值不等于有权发布">节点</a></h3><p>原文将稳定代际视为读取的资格。写改变代际，意味着旧资格失效；读取是否完成不决定结果是否有效。这个想法还不是架构，它只确定了需要保留什么信息、在什么时刻再次核验。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a> <a href="#sources-source-s_state" data-source="s_state">来源</a></p>
+</section></details></section>
+<section class="reader-step" id="step-epochgate" data-context-node="epochgate"><h3>4. 把资格放进读写路径 <a href="#analysis-node-epochgate" data-node="epochgate" class="reader-ref" title="查看节点 · 短锁包围状态，I/O 在锁外" aria-label="查看节点 · 短锁包围状态，I/O 在锁外">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 将资格思想放进读写路径，理解哪些动作在锁内、哪些在锁外。</p><p>接下来要回答谁维护资格。读写共享短锁与代际；写先撤销旧资格，读在锁外取值后再回来申请发布。沿一个读请求走完整条路径，应能够解释状态操作与 I/O 的边界。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a> <a href="#sources-source-s_read" data-source="s_read">来源</a> · <a href="#expand-epochgate-1">展开</a></p>
+<details class="step-detail" id="expand-epochgate-1"><summary>展开设计与证据 · 架构：共享状态协调两个 I/O 路径</summary><section class="reader-topic" data-context-node="epochgate"><h3>架构：共享状态协调两个 I/O 路径 <a href="#analysis-node-epochgate" data-node="epochgate" class="reader-ref" title="查看节点 · 短锁包围状态，I/O 在锁外" aria-label="查看节点 · 短锁包围状态，I/O 在锁外">节点</a></h3><p>入口是 <code>read(k)</code> 和 <code>write(k,v)</code>。读先在状态锁内检查是否正在写、是否有缓存；未命中则记住偶数代际 e，释放锁去存储取值，回来在同锁内检查 <code>epoch == e</code>，通过才发布。写先把偶数改为奇数并清缓存，再在锁外写存储，完成后在锁内推进为下一偶数。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></p>
+<p>例如 R 保存 0 并拿到 A；W 经由 1 完成写 B，再推进到 2。R 的检查失败，A 被丢弃。若没有新写打断，重试取得 B 并成功发布。这里的结构是“共享协调状态 + 锁外 I/O + 发布关口”，组件只有通过这条路径才有意义。<a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> <a href="#sources-source-s_trace" data-source="s_trace">来源</a></p>
+</section><section class="reader-topic" data-context-node="state_gate"><h4>协调点 <a href="#analysis-node-state_gate" data-node="state_gate" class="reader-ref" title="查看节点 · 代际状态与短锁" aria-label="查看节点 · 代际状态与短锁">节点</a></h4><p>状态锁保护代际、缓存检查与缓存发布。它没有覆盖慢存储调用，负责的是对状态变化建立共同的观察顺序。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a></p>
+</section><section class="reader-topic" data-context-node="cache_entry"><h4>缓存承担复用职责 <a href="#analysis-node-cache_entry" data-node="cache_entry" class="reader-ref" title="查看节点 · 稳定代际内的缓存值" aria-label="查看节点 · 稳定代际内的缓存值">节点</a></h4><p>缓存只存值，没有独立版本标签；正确性依赖写开始清空以及发布守卫。读在偶数状态下发现非空项即可使用，因此发布守卫的原子性会直接影响后续命中。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a> <a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a></p>
+</section><section class="reader-topic" data-context-node="store"><h4>存储承担值的持久读写 <a href="#analysis-node-store" data-node="store" class="reader-ref" title="查看节点 · 单键原子持久存储" aria-label="查看节点 · 单键原子持久存储">节点</a></h4><p>存储 I/O 位于状态锁之外。单键原子语义是输入假设，不是 EpochGate 自己创造的能力。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></p>
+</section></details></section>
+<section class="reader-step" id="step-publish_guard" data-context-node="publish_guard"><h3>5. 为什么比较和发布必须在一起 <a href="#analysis-node-publish_guard" data-node="publish_guard" class="reader-ref" title="查看节点 · 把比较与发布放进同一临界区" aria-label="查看节点 · 把比较与发布放进同一临界区">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 抓住架构中不能拆开的动作，解释为何只有版本字段还不够。</p><p>有版本字段还不够：若比较后允许写插入、之后才发布，检查就过期了。因为本例缓存不另存版本标签，后来的读会命中那个旧值。要理解这种交错，而不只是记住“加锁”。<a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> <a href="#sources-source-s_trace" data-source="s_trace">来源</a> · <a href="#expand-publish_guard-1">展开</a></p>
+<details class="step-detail" id="expand-publish_guard-1"><summary>展开设计与证据 · 关键决策：复核与发布不可分开</summary><section class="reader-topic" data-context-node="publish_guard"><h3>关键决策：复核与发布不可分开 <a href="#analysis-node-publish_guard" data-node="publish_guard" class="reader-ref" title="查看节点 · 把比较与发布放进同一临界区" aria-label="查看节点 · 把比较与发布放进同一临界区">节点</a></h3><p>问题是检查过的资格可能立刻失效。作者选择在同一把锁内比较代际并发布：R 检查为 0，若释放锁让 W 推进到 2，然后 R 才发布 A，没有版本标签的缓存就又可被新读命中。因此在本例结构中，“比较与发布是一个动作”才真正落实资格规则。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a></p>
+<p><strong>Problem → Constraint → Insight → Design → Mechanism → Outcome：</strong> 在途旧值可能晚到；I/O 不能长期持锁；结果需要保留资格；选择短锁内的原子复核发布；写推进代际使旧资格不能通过；在模型内阻断旧回填。代价是冲突读取会重做。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+<p><strong>替代设计：</strong> 作者讨论了把锁覆盖整个 I/O，可阻止同样交错但增加慢 I/O 对状态检查的阻塞；作者没有给出性能实验。作者还讨论了 TTL，指出其不提供本例不变式。没有把“作者没有采用”推断成“作者已经测试并证明更差”。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a> <a href="#sources-source-s_cost" data-source="s_cost">来源</a></p>
+</section><section class="reader-topic" data-context-node="read_recheck"><h4>读取机制 <a href="#analysis-node-read_recheck" data-node="read_recheck" class="reader-ref" title="查看节点 · 锁外读值、锁内复核" aria-label="查看节点 · 锁外读值、锁内复核">节点</a></h4><p>读取在锁外取值，保留 e，并在锁内比较。失败时丢弃值并从头重试，不能只重复发布动作。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a></p>
+</section><section class="reader-topic" data-context-node="write_fence"><h4>写入机制 <a href="#analysis-node-write_fence" data-node="write_fence" class="reader-ref" title="查看节点 · 写前撤销、写后开放" aria-label="查看节点 · 写前撤销、写后开放">节点</a></h4><p>写开始就撤销旧资格并清缓存；写完成后才开放新的稳定代际。奇数阶段使其他读等待，也让多个写不同时操纵代际。确定未提交的失败仍推进代际，保守丢弃旧读取。<a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></p>
+</section><section class="reader-topic" data-context-node="generation"><h4>理解代际 <a href="#analysis-node-generation" data-node="generation" class="reader-ref" title="查看节点 · 代际不是时间戳" aria-label="查看节点 · 代际不是时间戳">节点</a></h4><p>epoch 是逻辑身份，不是时钟。比较的是“从读取开始到发布，有没有经过写入阶段”，不是“结果是否足够新鲜”。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a></p>
+</section><section class="reader-topic" data-context-node="split_window"><h4>L3：拆开动作会发生什么 <a href="#analysis-node-split_window" data-node="split_window" class="reader-ref" title="查看节点 · 检查与发布之间的竞态窗口" aria-label="查看节点 · 检查与发布之间的竞态窗口">节点</a></h4><p>R 比较通过 → R 释放锁 → W 写 B、清缓存并完成 → R 写入 A。正是最后一步绕开了新的资格状态。若换成缓存项自行保存并校验版本的另一套协议，需要重新分析此反例，不能照搬本例的必要性结论。<a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> 后一句是对本例结构边界的分析者推断。</p>
+</section></details></section>
+<section class="reader-step" id="step-old_fill_rejected" data-context-node="old_fill_rejected"><h3>6. 哪些证据支持了什么结果 <a href="#analysis-node-old_fill_rejected" data-node="old_fill_rejected" class="reader-ref" title="查看节点 · 旧代际不能重新成为有效命中" aria-label="查看节点 · 旧代际不能重新成为有效命中">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 连接两类执行顺序与条件性结果，再按需下钻到证据。</p><p>机制清楚后，区分展示的执行序列与条件性不变式。它们支持所列模型下的旧回填隔离；没有支持性能提高、真实实现已经正确或分布式强一致。核心结论可停留在宏观层，想检查证明再深入 L3。<a href="#sources-source-s_invariant" data-source="s_invariant" class="reader-ref" title="查看依据 · lines 52–56; S5 一个局部不变式" aria-label="查看依据 · lines 52–56; S5 一个局部不变式">依据 7</a> <a href="#sources-source-s_invariant" data-source="s_invariant">来源</a> · <a href="#expand-old_fill_rejected-1">展开证据</a></p>
+<details class="step-detail" id="expand-old_fill_rejected-1"><summary>展开设计与证据 · 结果与证据的范围</summary><section class="reader-topic" data-context-node="old_fill_rejected"><h3>结果与证据的范围 <a href="#analysis-node-old_fill_rejected" data-node="old_fill_rejected" class="reader-ref" title="查看节点 · 旧代际不能重新成为有效命中" aria-label="查看节点 · 旧代际不能重新成为有效命中">节点</a></h3><p>作者主张：假设成立时，写之前取得旧值的读不能在写后恢复有效缓存。读先原子发布，后来的写会清掉它；写先改变代际，后来的旧读检查会失败。这是协议层面的条件性论证，不是已测试实现的报告。<a href="#sources-source-s_invariant" data-source="s_invariant" class="reader-ref" title="查看依据 · lines 52–56; S5 一个局部不变式" aria-label="查看依据 · lines 52–56; S5 一个局部不变式">依据 7</a> <a href="#sources-source-s_invariant" data-source="s_invariant">来源</a></p>
+</section><section class="reader-topic" data-context-node="race_trace"><h4>L3：一个反例足以否定基线保证 <a href="#analysis-node-race_trace" data-node="race_trace" class="reader-ref" title="查看节点 · 删除基线的四步反例" aria-label="查看节点 · 删除基线的四步反例">节点</a></h4><p>S2 给出了违反目标的完整交错，足以说明基线不提供该保证。它没有说明实际故障频率。<a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a></p>
+</section><section class="reader-topic" data-context-node="guarded_trace"><h4>L3：一个成功序列不等于全面验证 <a href="#analysis-node-guarded_trace" data-node="guarded_trace" class="reader-ref" title="查看节点 · 代际 0→1→2 的拒绝过程" aria-label="查看节点 · 代际 0→1→2 的拒绝过程">节点</a></h4><p>S4 的 0→1→2 序列说明该交错被阻断。它不能单独证明所有执行路径或真实锁实现都正确。<a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a></p>
+</section><section class="reader-topic" data-context-node="invariant_argument"><h4>L3：不变式为何更强，也为何仍有限 <a href="#analysis-node-invariant_argument" data-node="invariant_argument" class="reader-ref" title="查看节点 · 稳定代际中的有效缓存不变式" aria-label="查看节点 · 稳定代际中的有效缓存不变式">节点</a></h4><p>S5 在所列假设下把两类顺序统一起来：稳定代际中的非空缓存只能来自在该代际开始且通过原子发布检查的读。它支持旧回填隔离，却不检查语言内存模型、未知提交结果、代际回绕或分布式写入。这是核心证据，所以 importance=core；完整检查需要 detailed，但放在 L3，不阻挡宏观阅读。<a href="#sources-source-s_invariant" data-source="s_invariant" class="reader-ref" title="查看依据 · lines 52–56; S5 一个局部不变式" aria-label="查看依据 · lines 52–56; S5 一个局部不变式">依据 7</a> <a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a></p>
+</section></details></section>
+<section class="reader-step" id="step-retry_cost" data-context-node="retry_cost"><h3>7. 并发换来了什么成本 <a href="#analysis-node-retry_cost" data-node="retry_cost" class="reader-ref" title="查看节点 · 减少锁占用，承担丢弃和重试" aria-label="查看节点 · 减少锁占用，承担丢弃和重试">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 确认机制做到什么之后，评估重试、锁操作和未提供的进度保证。</p><p>确认保证后再评价设计：I/O 不长时间占用状态锁，却可能做了无用的读取并重试。高频写下的读完成时限仍未解决，原文也没有性能实验比较优劣。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a> <a href="#sources-source-s_cost" data-source="s_cost">来源</a> · <a href="#expand-retry_cost-1">展开</a></p>
+<details class="step-detail" id="expand-retry_cost-1"><summary>展开设计与证据 · 权衡：缩短锁持有时间，承担重复工作</summary><section class="reader-topic" data-context-node="retry_cost"><h3>权衡：缩短锁持有时间，承担重复工作 <a href="#analysis-node-retry_cost" data-node="retry_cost" class="reader-ref" title="查看节点 · 减少锁占用，承担丢弃和重试" aria-label="查看节点 · 减少锁占用，承担丢弃和重试">节点</a></h3><p>状态锁不被慢 I/O 长期占用，但每次未命中需要两次进入锁、记录代际，冲突时还要重做存储读取。是否更快取决于写频率、存储延迟与锁竞争；本文没有测量答案。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+</section><section class="reader-topic" data-context-node="short_sections"><h4>选择短临界区 <a href="#analysis-node-short_sections" data-node="short_sections" class="reader-ref" title="查看节点 · 不把锁带进慢 I/O" aria-label="查看节点 · 不把锁带进慢 I/O">节点</a></h4><p>作者选择仅保护元数据操作，避免持锁跨越整个 I/O。它改变的是阻塞与重试之间的安排，不能直接写成“性能提升”。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+</section><section class="reader-topic" data-context-node="io_constraint"><h4>选择由什么约束推动 <a href="#analysis-node-io_constraint" data-node="io_constraint" class="reader-ref" title="查看节点 · 状态锁不能跨存储 I/O" aria-label="查看节点 · 状态锁不能跨存储 I/O">节点</a></h4><p>S1 明确要求请求不能在等待存储期间一直持有状态锁。这限制了可选结构；不是由分析者代作者添加的目标。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a></p>
+</section><section class="reader-topic" data-context-node="delete_only"><h4>与删除基线的变化 <a href="#analysis-node-delete_only" data-node="delete_only" class="reader-ref" title="查看节点 · 基线：写成功后只删除" aria-label="查看节点 · 基线：写成功后只删除">节点</a></h4><p>基线只删除现存副本，新协议还记录并撤销在途结果的资格。比较的是同一旧回填保证；没有用不同负载的性能数字制造优势。<a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a> <a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a></p>
+</section><section class="reader-topic" data-context-node="progress_limit"><h4>安全性不代表进度保证 <a href="#analysis-node-progress_limit" data-node="progress_limit" class="reader-ref" title="查看节点 · 安全性不等于完成时限" aria-label="查看节点 · 安全性不等于完成时限">节点</a></h4><p>持续写入可能让读取一直重试；协议没有公平性、等待上界，也没有合并同代际的重复请求。阻止错误值与保证请求及时完成是两种不同结果。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+</section></details></section>
+<section class="reader-step" id="step-validate_at_commit" data-context-node="validate_at_commit"><h3>8. 哪部分可以带到别的问题里 <a href="#analysis-node-validate_at_commit" data-node="validate_at_commit" class="reader-ref" title="查看节点 · 在结果生效点复核前提" aria-label="查看节点 · 在结果生效点复核前提">节点</a></h3><p class="why-next"><strong>为什么接着学</strong> 最后抽象可迁移的生效前复核思想，连同适用条件一起保留。</p><p>最后抽象“生效前复核前提”。这是 AI 归纳，必须连同变化检测、原子协调和可丢弃结果等条件一起迁移；不是给所有并发问题套一个版本号。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> <a href="#patterns">模式及失效边界</a> · <a href="#expand-validate_at_commit-1">展开</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#overview">返回总览</a> · <a href="#graph">知识图谱</a></nav><details class="step-detail" id="expand-validate_at_commit-1"><summary>展开设计与证据 · 可迁移部分：生效前复核前提</summary><section class="reader-topic" data-context-node="validate_at_commit"><h3>可迁移部分：生效前复核前提 <a href="#analysis-node-validate_at_commit" data-node="validate_at_commit" class="reader-ref" title="查看节点 · 在结果生效点复核前提" aria-label="查看节点 · 在结果生效点复核前提">节点</a></h3><p>AI 从这份协议归纳出：工作可以先做，但结果对共享状态生效之前必须确认前提仍成立。适用于可检测变化、可原子提交、可安全丢弃结果的场景。如何迁移及何时失效见 <a href="#patterns">设计模式</a>。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#spine">返回主线</a> · <a href="#sources">查看来源地图</a> · <a href="#overview">返回总览</a></nav></section></details><details class="step-detail" id="expand-validate_at_commit-2"><summary>展开迁移条件 · 在生效点复核前提</summary><section class="reader-topic" data-context-node="validate_at_commit"><h3>在生效点复核前提 <a href="#analysis-node-validate_at_commit" data-node="validate_at_commit" class="reader-ref" title="查看节点 · 在结果生效点复核前提" aria-label="查看节点 · 在结果生效点复核前提">节点</a></h3><p><strong>归属：AI 推断。</strong> 原文给出了代际协议；下面是分析者的抽象，不声称作者讨论过所有迁移场景。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> <a href="#sources-source-s_read" data-source="s_read">协议来源</a></p>
+<p><strong>具体设计：</strong> 读取开始时记录代际 e；锁外取值；只有在同一原子临界区内确认当前代际仍为 e，才允许发布。写入改变代际，撤销之前发出的资格。<a href="#analysis-node-publish_guard" data-node="publish_guard" class="reader-ref" title="查看节点 · 把比较与发布放进同一临界区" aria-label="查看节点 · 把比较与发布放进同一临界区">节点</a></p>
+<p><strong>通用结构：</strong> 将“执行工作”和“允许结果生效”拆开。前者可以并发，后者通过可核验的前提控制。复核和发布必须采用适合具体系统的原子协调方式，不能只在两处各检查一次。</p>
+<p><strong>适用条件：</strong> 状态变化可被可靠标识；结果可以安全丢弃或重算；能够协调复核与发布；冲突成本可以接受。</p>
+<p><strong>迁移方向（尚未验证）：</strong> 编辑器后台分析保存文本版本；分析完成时，只把与当前文本版本一致的诊断发布到界面。这是结构映射，不是已实现或已基准测试的建议。必须额外确认版本变化与界面更新的原子协调。</p>
+<p><strong>失效边界：</strong> 外部变化绕过版本更新，复核就看不见；工作若已经发出不可撤销的支付或消息，丢弃结果不能撤销副作用；冲突过多时，安全重试也不能保证及时完成。</p>
+<p><strong>不保留为模式的部分：</strong> 奇偶数、具体锁接口和单键存储是本例的实现安排；迁移时需要重新检查，不把它们当成通用答案。未提出“这是一种更快的缓存”之类没有测量支持的模式。</p>
+<p><a href="#analysis-node-publish_guard">查看原决策</a> · <a href="#overview">返回总览</a></p>
+</section></details></section>
+</section>
+<section id="analysis" class="reader-section">
+
+<section class="reader-topic" id="analysis-heading-epochgate从回填资格到原子发布"><h2>EpochGate：从回填资格到原子发布</h2><p>以下区分作者明确给出的协议、材料中的手工/理论证据，以及分析者的迁移归纳。公式和实现细节只在解释设计必要性时展开。</p>
+</section>
+<section class="reader-topic" id="analysis-node-stale_fill" data-context-node="stale_fill"><h3>问题发生在删除之后 <a href="#analysis-node-stale_fill" data-node="stale_fill" class="reader-ref" title="查看节点 · 删除后仍会旧值回填" aria-label="查看节点 · 删除后仍会旧值回填">节点</a></h3><p>基线中，R 先取 A，W 写 B 并删除缓存，R 随后才填入 A。删除作用于已有缓存，在途结果没有被撤销。这解释了为什么“再缩短 TTL”并不能满足目标保证：它只可能缩短错误值存活的时间。<a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a> <a href="#sources-source-s_race" data-source="s_race">来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-single_gateway" data-context-node="single_gateway"><h3>保证依赖什么边界 <a href="#analysis-node-single_gateway" data-node="single_gateway" class="reader-ref" title="查看节点 · 单进程、唯一写入口" aria-label="查看节点 · 单进程、唯一写入口">节点</a></h3><p>所有同键请求共享进程内状态，所有写经过同一服务，存储提供单键原子读写。代际不回绕，重启会消除缓存及在途任务，提交状态未知的失败被排除。与写重叠的读仍可能返回在写前选定的值；目标只禁止旧回填成为写后新读的缓存命中。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#sources-source-s_scope" data-source="s_scope">来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-epoch_permission" data-context-node="epoch_permission"><h3>Idea：结果有条件地获得发布资格 <a href="#analysis-node-epoch_permission" data-node="epoch_permission" class="reader-ref" title="查看节点 · 取到值不等于有权发布" aria-label="查看节点 · 取到值不等于有权发布">节点</a></h3><p>原文将稳定代际视为读取的资格。写改变代际，意味着旧资格失效；读取是否完成不决定结果是否有效。这个想法还不是架构，它只确定了需要保留什么信息、在什么时刻再次核验。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a> <a href="#sources-source-s_state" data-source="s_state">来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-epochgate" data-context-node="epochgate"><h3>架构：共享状态协调两个 I/O 路径 <a href="#analysis-node-epochgate" data-node="epochgate" class="reader-ref" title="查看节点 · 短锁包围状态，I/O 在锁外" aria-label="查看节点 · 短锁包围状态，I/O 在锁外">节点</a></h3><p>入口是 <code>read(k)</code> 和 <code>write(k,v)</code>。读先在状态锁内检查是否正在写、是否有缓存；未命中则记住偶数代际 e，释放锁去存储取值，回来在同锁内检查 <code>epoch == e</code>，通过才发布。写先把偶数改为奇数并清缓存，再在锁外写存储，完成后在锁内推进为下一偶数。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></p>
+<p>例如 R 保存 0 并拿到 A；W 经由 1 完成写 B，再推进到 2。R 的检查失败，A 被丢弃。若没有新写打断，重试取得 B 并成功发布。这里的结构是“共享协调状态 + 锁外 I/O + 发布关口”，组件只有通过这条路径才有意义。<a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> <a href="#sources-source-s_trace" data-source="s_trace">来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-state_gate" data-context-node="state_gate"><h4>协调点 <a href="#analysis-node-state_gate" data-node="state_gate" class="reader-ref" title="查看节点 · 代际状态与短锁" aria-label="查看节点 · 代际状态与短锁">节点</a></h4><p>状态锁保护代际、缓存检查与缓存发布。它没有覆盖慢存储调用，负责的是对状态变化建立共同的观察顺序。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-cache_entry" data-context-node="cache_entry"><h4>缓存承担复用职责 <a href="#analysis-node-cache_entry" data-node="cache_entry" class="reader-ref" title="查看节点 · 稳定代际内的缓存值" aria-label="查看节点 · 稳定代际内的缓存值">节点</a></h4><p>缓存只存值，没有独立版本标签；正确性依赖写开始清空以及发布守卫。读在偶数状态下发现非空项即可使用，因此发布守卫的原子性会直接影响后续命中。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a> <a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-store" data-context-node="store"><h4>存储承担值的持久读写 <a href="#analysis-node-store" data-node="store" class="reader-ref" title="查看节点 · 单键原子持久存储" aria-label="查看节点 · 单键原子持久存储">节点</a></h4><p>存储 I/O 位于状态锁之外。单键原子语义是输入假设，不是 EpochGate 自己创造的能力。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-publish_guard" data-context-node="publish_guard"><h3>关键决策：复核与发布不可分开 <a href="#analysis-node-publish_guard" data-node="publish_guard" class="reader-ref" title="查看节点 · 把比较与发布放进同一临界区" aria-label="查看节点 · 把比较与发布放进同一临界区">节点</a></h3><p>问题是检查过的资格可能立刻失效。作者选择在同一把锁内比较代际并发布：R 检查为 0，若释放锁让 W 推进到 2，然后 R 才发布 A，没有版本标签的缓存就又可被新读命中。因此在本例结构中，“比较与发布是一个动作”才真正落实资格规则。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a></p>
+<p><strong>Problem → Constraint → Insight → Design → Mechanism → Outcome：</strong> 在途旧值可能晚到；I/O 不能长期持锁；结果需要保留资格；选择短锁内的原子复核发布；写推进代际使旧资格不能通过；在模型内阻断旧回填。代价是冲突读取会重做。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a> <a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+<p><strong>替代设计：</strong> 作者讨论了把锁覆盖整个 I/O，可阻止同样交错但增加慢 I/O 对状态检查的阻塞；作者没有给出性能实验。作者还讨论了 TTL，指出其不提供本例不变式。没有把“作者没有采用”推断成“作者已经测试并证明更差”。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a> <a href="#sources-source-s_cost" data-source="s_cost">来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-read_recheck" data-context-node="read_recheck"><h4>读取机制 <a href="#analysis-node-read_recheck" data-node="read_recheck" class="reader-ref" title="查看节点 · 锁外读值、锁内复核" aria-label="查看节点 · 锁外读值、锁内复核">节点</a></h4><p>读取在锁外取值，保留 e，并在锁内比较。失败时丢弃值并从头重试，不能只重复发布动作。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-write_fence" data-context-node="write_fence"><h4>写入机制 <a href="#analysis-node-write_fence" data-node="write_fence" class="reader-ref" title="查看节点 · 写前撤销、写后开放" aria-label="查看节点 · 写前撤销、写后开放">节点</a></h4><p>写开始就撤销旧资格并清缓存；写完成后才开放新的稳定代际。奇数阶段使其他读等待，也让多个写不同时操纵代际。确定未提交的失败仍推进代际，保守丢弃旧读取。<a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-generation" data-context-node="generation"><h4>理解代际 <a href="#analysis-node-generation" data-node="generation" class="reader-ref" title="查看节点 · 代际不是时间戳" aria-label="查看节点 · 代际不是时间戳">节点</a></h4><p>epoch 是逻辑身份，不是时钟。比较的是“从读取开始到发布，有没有经过写入阶段”，不是“结果是否足够新鲜”。<a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-split_window" data-context-node="split_window"><h4>L3：拆开动作会发生什么 <a href="#analysis-node-split_window" data-node="split_window" class="reader-ref" title="查看节点 · 检查与发布之间的竞态窗口" aria-label="查看节点 · 检查与发布之间的竞态窗口">节点</a></h4><p>R 比较通过 → R 释放锁 → W 写 B、清缓存并完成 → R 写入 A。正是最后一步绕开了新的资格状态。若换成缓存项自行保存并校验版本的另一套协议，需要重新分析此反例，不能照搬本例的必要性结论。<a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> 后一句是对本例结构边界的分析者推断。</p>
+</section>
+<section class="reader-topic" id="analysis-node-old_fill_rejected" data-context-node="old_fill_rejected"><h3>结果与证据的范围 <a href="#analysis-node-old_fill_rejected" data-node="old_fill_rejected" class="reader-ref" title="查看节点 · 旧代际不能重新成为有效命中" aria-label="查看节点 · 旧代际不能重新成为有效命中">节点</a></h3><p>作者主张：假设成立时，写之前取得旧值的读不能在写后恢复有效缓存。读先原子发布，后来的写会清掉它；写先改变代际，后来的旧读检查会失败。这是协议层面的条件性论证，不是已测试实现的报告。<a href="#sources-source-s_invariant" data-source="s_invariant" class="reader-ref" title="查看依据 · lines 52–56; S5 一个局部不变式" aria-label="查看依据 · lines 52–56; S5 一个局部不变式">依据 7</a> <a href="#sources-source-s_invariant" data-source="s_invariant">来源</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-race_trace" data-context-node="race_trace"><h4>L3：一个反例足以否定基线保证 <a href="#analysis-node-race_trace" data-node="race_trace" class="reader-ref" title="查看节点 · 删除基线的四步反例" aria-label="查看节点 · 删除基线的四步反例">节点</a></h4><p>S2 给出了违反目标的完整交错，足以说明基线不提供该保证。它没有说明实际故障频率。<a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-guarded_trace" data-context-node="guarded_trace"><h4>L3：一个成功序列不等于全面验证 <a href="#analysis-node-guarded_trace" data-node="guarded_trace" class="reader-ref" title="查看节点 · 代际 0→1→2 的拒绝过程" aria-label="查看节点 · 代际 0→1→2 的拒绝过程">节点</a></h4><p>S4 的 0→1→2 序列说明该交错被阻断。它不能单独证明所有执行路径或真实锁实现都正确。<a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-invariant_argument" data-context-node="invariant_argument"><h4>L3：不变式为何更强，也为何仍有限 <a href="#analysis-node-invariant_argument" data-node="invariant_argument" class="reader-ref" title="查看节点 · 稳定代际中的有效缓存不变式" aria-label="查看节点 · 稳定代际中的有效缓存不变式">节点</a></h4><p>S5 在所列假设下把两类顺序统一起来：稳定代际中的非空缓存只能来自在该代际开始且通过原子发布检查的读。它支持旧回填隔离，却不检查语言内存模型、未知提交结果、代际回绕或分布式写入。这是核心证据，所以 importance=core；完整检查需要 detailed，但放在 L3，不阻挡宏观阅读。<a href="#sources-source-s_invariant" data-source="s_invariant" class="reader-ref" title="查看依据 · lines 52–56; S5 一个局部不变式" aria-label="查看依据 · lines 52–56; S5 一个局部不变式">依据 7</a> <a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-retry_cost" data-context-node="retry_cost"><h3>权衡：缩短锁持有时间，承担重复工作 <a href="#analysis-node-retry_cost" data-node="retry_cost" class="reader-ref" title="查看节点 · 减少锁占用，承担丢弃和重试" aria-label="查看节点 · 减少锁占用，承担丢弃和重试">节点</a></h3><p>状态锁不被慢 I/O 长期占用，但每次未命中需要两次进入锁、记录代际，冲突时还要重做存储读取。是否更快取决于写频率、存储延迟与锁竞争；本文没有测量答案。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-short_sections" data-context-node="short_sections"><h4>选择短临界区 <a href="#analysis-node-short_sections" data-node="short_sections" class="reader-ref" title="查看节点 · 不把锁带进慢 I/O" aria-label="查看节点 · 不把锁带进慢 I/O">节点</a></h4><p>作者选择仅保护元数据操作，避免持锁跨越整个 I/O。它改变的是阻塞与重试之间的安排，不能直接写成“性能提升”。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-io_constraint" data-context-node="io_constraint"><h4>选择由什么约束推动 <a href="#analysis-node-io_constraint" data-node="io_constraint" class="reader-ref" title="查看节点 · 状态锁不能跨存储 I/O" aria-label="查看节点 · 状态锁不能跨存储 I/O">节点</a></h4><p>S1 明确要求请求不能在等待存储期间一直持有状态锁。这限制了可选结构；不是由分析者代作者添加的目标。<a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-delete_only" data-context-node="delete_only"><h4>与删除基线的变化 <a href="#analysis-node-delete_only" data-node="delete_only" class="reader-ref" title="查看节点 · 基线：写成功后只删除" aria-label="查看节点 · 基线：写成功后只删除">节点</a></h4><p>基线只删除现存副本，新协议还记录并撤销在途结果的资格。比较的是同一旧回填保证；没有用不同负载的性能数字制造优势。<a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a> <a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-progress_limit" data-context-node="progress_limit"><h4>安全性不代表进度保证 <a href="#analysis-node-progress_limit" data-node="progress_limit" class="reader-ref" title="查看节点 · 安全性不等于完成时限" aria-label="查看节点 · 安全性不等于完成时限">节点</a></h4><p>持续写入可能让读取一直重试；协议没有公平性、等待上界，也没有合并同代际的重复请求。阻止错误值与保证请求及时完成是两种不同结果。<a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></p>
+</section>
+<section class="reader-topic" id="analysis-node-validate_at_commit" data-context-node="validate_at_commit"><h3>可迁移部分：生效前复核前提 <a href="#analysis-node-validate_at_commit" data-node="validate_at_commit" class="reader-ref" title="查看节点 · 在结果生效点复核前提" aria-label="查看节点 · 在结果生效点复核前提">节点</a></h3><p>AI 从这份协议归纳出：工作可以先做，但结果对共享状态生效之前必须确认前提仍成立。适用于可检测变化、可原子提交、可安全丢弃结果的场景。如何迁移及何时失效见 <a href="#patterns">设计模式</a>。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a></p>
+<nav class="article-links" aria-label="相关章节"><a href="#spine">返回主线</a> · <a href="#sources">查看来源地图</a> · <a href="#overview">返回总览</a></nav></section>
+</section>
+<section id="patterns" class="reader-section">
+
+<section class="reader-topic" id="patterns-heading-从-epochgate-抽象出的设计思想"><h2>从 EpochGate 抽象出的设计思想</h2></section>
+<section class="reader-topic" id="patterns-node-validate_at_commit" data-context-node="validate_at_commit"><h3>在生效点复核前提 <a href="#analysis-node-validate_at_commit" data-node="validate_at_commit" class="reader-ref" title="查看节点 · 在结果生效点复核前提" aria-label="查看节点 · 在结果生效点复核前提">节点</a></h3><p><strong>归属：AI 推断。</strong> 原文给出了代际协议；下面是分析者的抽象，不声称作者讨论过所有迁移场景。<a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a> <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a> <a href="#sources-source-s_read" data-source="s_read">协议来源</a></p>
+<p><strong>具体设计：</strong> 读取开始时记录代际 e；锁外取值；只有在同一原子临界区内确认当前代际仍为 e，才允许发布。写入改变代际，撤销之前发出的资格。<a href="#analysis-node-publish_guard" data-node="publish_guard" class="reader-ref" title="查看节点 · 把比较与发布放进同一临界区" aria-label="查看节点 · 把比较与发布放进同一临界区">节点</a></p>
+<p><strong>通用结构：</strong> 将“执行工作”和“允许结果生效”拆开。前者可以并发，后者通过可核验的前提控制。复核和发布必须采用适合具体系统的原子协调方式，不能只在两处各检查一次。</p>
+<p><strong>适用条件：</strong> 状态变化可被可靠标识；结果可以安全丢弃或重算；能够协调复核与发布；冲突成本可以接受。</p>
+<p><strong>迁移方向（尚未验证）：</strong> 编辑器后台分析保存文本版本；分析完成时，只把与当前文本版本一致的诊断发布到界面。这是结构映射，不是已实现或已基准测试的建议。必须额外确认版本变化与界面更新的原子协调。</p>
+<p><strong>失效边界：</strong> 外部变化绕过版本更新，复核就看不见；工作若已经发出不可撤销的支付或消息，丢弃结果不能撤销副作用；冲突过多时，安全重试也不能保证及时完成。</p>
+<p><strong>不保留为模式的部分：</strong> 奇偶数、具体锁接口和单键存储是本例的实现安排；迁移时需要重新检查，不把它们当成通用答案。未提出“这是一种更快的缓存”之类没有测量支持的模式。</p>
+<p><a href="#analysis-node-publish_guard">查看原决策</a> · <a href="#overview">返回总览</a></p>
+</section>
+</section>
+<section id="sources" class="reader-section">
+
+<section class="reader-topic" id="sources-heading-epochgate原文地图与证据索引"><h2>EpochGate：原文地图与证据索引</h2><p>原件：<a href="../source.md" target="_blank" rel="noopener noreferrer">EpochGate 原创虚构材料</a>。JSON 中的 <code>examples/versioned-cache/source.md</code> 相对技能根目录；本文件使用相对链接以便整个技能移动后仍可阅读。</p>
+</section>
+<section class="reader-topic" id="sources-heading-原始组织"><h3>原始组织</h3><ul>
+<li>S1（5–11 行）界定服务接口、保证和前提。</li>
+<li>S2（13–22 行）给出删除基线的具体反例。</li>
+<li>S3（24–42 行）定义状态与读写协议，落实资格思想。</li>
+<li>S4（44–50 行）重放失败交错，并解释原子发布的作用。</li>
+<li>S5（52–56 行）用局部不变式支持条件性保证。</li>
+<li>S6（58–64 行）讨论成本、长锁替代方案及缺失的保证。</li>
+</ul>
+<p>这是来源组织；<a href="#spine">理解主线</a> 从故障现象开始，再引入边界与资格思想，没有机械复用章节顺序。</p>
+</section>
+<section class="reader-topic" id="sources-heading-实际阅读范围"><h3>实际阅读范围</h3><p>检查全部 64 行，包括 1–3 行的虚构材料声明，S3 的节标题、状态、读写规则和 S6 的全部限制。不存在未获取图表、附录或外部实验。原文证据仅为手工推演和协议论证；“完整阅读”不代表协议已被形式验证。</p>
+</section>
+<section class="reader-topic" id="sources-heading-来源索引"><h3>来源索引</h3></section>
+<section class="reader-topic" id="sources-source-s_scope"><h4>接口和边界 <a href="#sources-source-s_scope" data-source="s_scope" class="reader-ref" title="查看依据 · lines 5–11; S1 接口和边界" aria-label="查看依据 · lines 5–11; S1 接口和边界">依据 1</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_scope">原件</a> — lines 5–11，S1。primary；包括唯一写入口、存储语义、目标保证及失败假设。</p>
+</section>
+<section class="reader-topic" id="sources-source-s_race"><h4>基线反例 <a href="#sources-source-s_race" data-source="s_race" class="reader-ref" title="查看依据 · lines 13–22; S2 一段出错的执行" aria-label="查看依据 · lines 13–22; S2 一段出错的执行">依据 2</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_race">原件</a> — lines 13–22，S2。primary；四步序列说明删除之后仍可能回填旧值，不能推断发生率。</p>
+</section>
+<section class="reader-topic" id="sources-source-s_state"><h4>共享状态与资格思想 <a href="#sources-source-s_state" data-source="s_state" class="reader-ref" title="查看依据 · lines 26–30; S3.1 状态" aria-label="查看依据 · lines 26–30; S3.1 状态">依据 3</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_state">原件</a> — lines 26–30，S3.1。primary；代际、短锁、无独立版本标签的缓存值，以及有条件的回填资格。</p>
+</section>
+<section class="reader-topic" id="sources-source-s_read"><h4>读取协议 <a href="#sources-source-s_read" data-source="s_read" class="reader-ref" title="查看依据 · lines 32–36; S3.2 读取" aria-label="查看依据 · lines 32–36; S3.2 读取">依据 4</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_read">原件</a> — lines 32–36，S3.2。primary；检查缓存、记录代际、锁外取值、原子复核发布或重试。</p>
+</section>
+<section class="reader-topic" id="sources-source-s_write"><h4>写入协议 <a href="#sources-source-s_write" data-source="s_write" class="reader-ref" title="查看依据 · lines 38–42; S3.3 写入" aria-label="查看依据 · lines 38–42; S3.3 写入">依据 5</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_write">原件</a> — lines 38–42，S3.3。primary；奇数写入阶段、清缓存、写完成推进，以及确定未提交时的失败处理。</p>
+</section>
+<section class="reader-topic" id="sources-source-s_trace"><h4>执行序列与竞态窗口 <a href="#sources-source-s_trace" data-source="s_trace" class="reader-ref" title="查看依据 · lines 44–50; S4 重新执行" aria-label="查看依据 · lines 44–50; S4 重新执行">依据 6</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_trace">原件</a> — lines 44–50，S4。primary；代际 0→1→2 的例子，以及拆开检查和发布的反例。手工推演，不是运行记录。</p>
+</section>
+<section class="reader-topic" id="sources-source-s_invariant"><h4>条件性不变式 <a href="#sources-source-s_invariant" data-source="s_invariant" class="reader-ref" title="查看依据 · lines 52–56; S5 一个局部不变式" aria-label="查看依据 · lines 52–56; S5 一个局部不变式">依据 7</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_invariant">原件</a> — lines 52–56，S5。primary；支持单键旧回填隔离，不覆盖具体语言实现或分布式强一致。</p>
+</section>
+<section class="reader-topic" id="sources-source-s_cost"><h4>代价、替代与边界 <a href="#sources-source-s_cost" data-source="s_cost" class="reader-ref" title="查看依据 · lines 58–64; S6 代价和未覆盖情况" aria-label="查看依据 · lines 58–64; S6 代价和未覆盖情况">依据 8</a></h4><p><a href="../source.md" target="_blank" rel="noopener noreferrer" data-original-source="s_cost">原件</a> — lines 58–64，S6。primary；额外锁操作、重试、长锁方案、TTL 的不足，以及没有保证的情况。</p>
+<p><a href="#overview">返回总览</a></p>
+</section>
+</section></article>
+      <section class="graph-section" id="graph" aria-labelledby="graph-heading">
+        <h2 id="graph-heading">知识图谱</h2>
+        <div id="reader-graph"></div>
+      </section>
+    </main>
+  </div>
+  <dialog id="inspector" aria-labelledby="inspector-title">
+    <div class="panel-top"><span id="inspector-kind"></span><button type="button" class="icon-button" id="close-inspector" aria-label="关闭详情">×</button></div>
+    <div class="panel-content"><h2 id="inspector-title"></h2><div id="inspector-body"></div></div>
+  </dialog>
+  <script type="application/json" id="reader-data">{"format_version":1,"documents":{"overview.md":"# EpochGate：撤销在途结果的回填资格\n\n这份**原创虚构材料**的核心 Idea 是：读取取得了一个值，并不意味着它现在仍有资格进入缓存；写入改变代际，读取在发布结果时重新检查资格。[n:epoch_permission] [s:s_state]\n\n[理解主线](knowledge_spine.md) · [架构与设计决策](architecture_analysis.md) · [可迁移思想](design_patterns.md) · [原文地图](document_map.md) · [L1 知识图](knowledge_graph.mmd) · [节点数据](knowledge_nodes.json) · [关系数据](knowledge_graph.json)\n\n## 为什么需要它\n\n“写成功后删除缓存”有一个缺口：早先启动的读取可能已经拿到了旧值，却在删除之后才回填。后续新读就又命中了旧值。删除了现存副本，并没有撤销在途结果。[n:stale_fill] [s:s_race] [来源](document_map.md#source-s_race)\n\n讨论范围是单进程、单键、唯一写入口；存储原子读写且不存在提交状态未知的失败。[n:single_gateway] [s:s_scope] [边界](architecture_analysis.md#node-single_gateway)\n\n## Idea 如何变成架构\n\n所有同键请求共享代际与短锁。读在锁内记录偶数代际，去锁外取值，回来再在锁内比较代际并发布。写在存储 I/O 前把代际改成奇数并清空缓存，完成后再推进为偶数。[n:epochgate] [s:s_read] [s:s_write]\n\n例如读 R 保存代际 0 并取到 A；写 W 将值改成 B，把代际推进到 2。R 回来时发现 `2 != 0`，丢弃 A 并重试。[来源](document_map.md#source-s_trace)\n\n## 为什么采用这些设计\n\n**原文选择**将比较和发布放在同一临界区：如果两者分离，写可能插在中间，旧值仍会被放入没有独立版本标签的缓存。另一方面，存储 I/O 放在锁外，以免慢 I/O 长时间占用状态锁。[n:publish_guard] [s:s_trace] [s:s_cost] [深入设计推理](architecture_analysis.md#node-publish_guard)\n\n## 获得什么，付出什么\n\n在所列假设下，协议阻止旧回填成为写后新读的有效缓存命中。材料提供手工执行序列和局部不变式论证，**没有运行实验，也没有性能测量**。它可能丢弃并重做存储读；写频繁时没有完成时限，不提供跨进程一致性。[n:old_fill_rejected] [n:retry_cost] [s:s_invariant] [s:s_cost] [证据范围](architecture_analysis.md#node-old_fill_rejected)\n\n## 值得迁移什么\n\n**AI 归纳**：把耗时计算的结果视为“有条件可提交”，在生效点复核前提。前提是变化可被检测、检查与发布可原子协调、结果可以安全丢弃；已产生不可撤销副作用时不能直接套用。[n:validate_at_commit] [可迁移模式及边界](design_patterns.md)\n\n已检查原材料全部 64 行；无外部图片或附录缺口。此例用于展示技能产物，不代表真实系统验证。\n","document_map.md":"# EpochGate：原文地图与证据索引\n\n原件：[EpochGate 原创虚构材料](../source.md)。JSON 中的 `examples/versioned-cache/source.md` 相对技能根目录；本文件使用相对链接以便整个技能移动后仍可阅读。\n\n## 原始组织\n\n- S1（5–11 行）界定服务接口、保证和前提。\n- S2（13–22 行）给出删除基线的具体反例。\n- S3（24–42 行）定义状态与读写协议，落实资格思想。\n- S4（44–50 行）重放失败交错，并解释原子发布的作用。\n- S5（52–56 行）用局部不变式支持条件性保证。\n- S6（58–64 行）讨论成本、长锁替代方案及缺失的保证。\n\n这是来源组织；[理解主线](knowledge_spine.md) 从故障现象开始，再引入边界与资格思想，没有机械复用章节顺序。\n\n## 实际阅读范围\n\n检查全部 64 行，包括 1–3 行的虚构材料声明，S3 的节标题、状态、读写规则和 S6 的全部限制。不存在未获取图表、附录或外部实验。原文证据仅为手工推演和协议论证；“完整阅读”不代表协议已被形式验证。\n\n## 来源索引\n\n\u003ca id=\"source-s_scope\"\u003e\u003c/a\u003e\n\n### 接口和边界 [s:s_scope]\n\n[原件](../source.md) — lines 5–11，S1。primary；包括唯一写入口、存储语义、目标保证及失败假设。\n\n\u003ca id=\"source-s_race\"\u003e\u003c/a\u003e\n\n### 基线反例 [s:s_race]\n\n[原件](../source.md) — lines 13–22，S2。primary；四步序列说明删除之后仍可能回填旧值，不能推断发生率。\n\n\u003ca id=\"source-s_state\"\u003e\u003c/a\u003e\n\n### 共享状态与资格思想 [s:s_state]\n\n[原件](../source.md) — lines 26–30，S3.1。primary；代际、短锁、无独立版本标签的缓存值，以及有条件的回填资格。\n\n\u003ca id=\"source-s_read\"\u003e\u003c/a\u003e\n\n### 读取协议 [s:s_read]\n\n[原件](../source.md) — lines 32–36，S3.2。primary；检查缓存、记录代际、锁外取值、原子复核发布或重试。\n\n\u003ca id=\"source-s_write\"\u003e\u003c/a\u003e\n\n### 写入协议 [s:s_write]\n\n[原件](../source.md) — lines 38–42，S3.3。primary；奇数写入阶段、清缓存、写完成推进，以及确定未提交时的失败处理。\n\n\u003ca id=\"source-s_trace\"\u003e\u003c/a\u003e\n\n### 执行序列与竞态窗口 [s:s_trace]\n\n[原件](../source.md) — lines 44–50，S4。primary；代际 0→1→2 的例子，以及拆开检查和发布的反例。手工推演，不是运行记录。\n\n\u003ca id=\"source-s_invariant\"\u003e\u003c/a\u003e\n\n### 条件性不变式 [s:s_invariant]\n\n[原件](../source.md) — lines 52–56，S5。primary；支持单键旧回填隔离，不覆盖具体语言实现或分布式强一致。\n\n\u003ca id=\"source-s_cost\"\u003e\u003c/a\u003e\n\n### 代价、替代与边界 [s:s_cost]\n\n[原件](../source.md) — lines 58–64，S6。primary；额外锁操作、重试、长锁方案、TTL 的不足，以及没有保证的情况。\n\n[返回总览](overview.md)\n","knowledge_spine.md":"# EpochGate：从故障走到设计边界\n\n下面是分析者重建的学习顺序，不是对作者写作意图的事实陈述。它与 Graph 共用节点 ID；先回答为什么需要这套协议，再考虑具体实现和迁移。\n\n## 1. 为什么删除以后还能读到旧值 [n:stale_fill]\n\n从 S2 的具体故障开始：旧读已经拿到 A，写 B 并删除缓存，旧读随后又填入 A。问题不在删除是否执行，而在删除没能影响在途结果。先掌握这个反例，无需阅读全部代码。[s:s_race] [来源](document_map.md#source-s_race) · [展开](architecture_analysis.md#node-stale_fill)\n\n## 2. 这是什么范围内的问题 [n:single_gateway]\n\n界定刚才的问题在哪个并发和存储模型下讨论：同一进程内的请求共享状态，全部写入通过同一入口。绕过入口的写无法被局部代际感知。认识边界就够，不把目标扩大成分布式一致性。[s:s_scope] [来源](document_map.md#source-s_scope) · [展开](architecture_analysis.md#node-single_gateway)\n\n## 3. 从删除副本转向撤销资格 [n:epoch_permission]\n\n边界清楚后，再理解核心转变：结果有没有算完，与结果现在能不能进入缓存是两个问题。保存代际是记录资格，发布前复核是检查资格有没有被撤销。这是作者明确表达的 Idea。[s:s_state] [来源](document_map.md#source-s_state) · [展开](architecture_analysis.md#node-epoch_permission)\n\n## 4. 把资格放进读写路径 [n:epochgate]\n\n接下来要回答谁维护资格。读写共享短锁与代际；写先撤销旧资格，读在锁外取值后再回来申请发布。沿一个读请求走完整条路径，应能够解释状态操作与 I/O 的边界。[s:s_read] [s:s_write] [来源](document_map.md#source-s_read) · [展开](architecture_analysis.md#node-epochgate)\n\n## 5. 为什么比较和发布必须在一起 [n:publish_guard]\n\n有版本字段还不够：若比较后允许写插入、之后才发布，检查就过期了。因为本例缓存不另存版本标签，后来的读会命中那个旧值。要理解这种交错，而不只是记住“加锁”。[s:s_trace] [来源](document_map.md#source-s_trace) · [展开](architecture_analysis.md#node-publish_guard)\n\n## 6. 哪些证据支持了什么结果 [n:old_fill_rejected]\n\n机制清楚后，区分展示的执行序列与条件性不变式。它们支持所列模型下的旧回填隔离；没有支持性能提高、真实实现已经正确或分布式强一致。核心结论可停留在宏观层，想检查证明再深入 L3。[s:s_invariant] [来源](document_map.md#source-s_invariant) · [展开证据](architecture_analysis.md#node-old_fill_rejected)\n\n## 7. 并发换来了什么成本 [n:retry_cost]\n\n确认保证后再评价设计：I/O 不长时间占用状态锁，却可能做了无用的读取并重试。高频写下的读完成时限仍未解决，原文也没有性能实验比较优劣。[s:s_cost] [来源](document_map.md#source-s_cost) · [展开](architecture_analysis.md#node-retry_cost)\n\n## 8. 哪部分可以带到别的问题里 [n:validate_at_commit]\n\n最后抽象“生效前复核前提”。这是 AI 归纳，必须连同变化检测、原子协调和可丢弃结果等条件一起迁移；不是给所有并发问题套一个版本号。[s:s_read] [s:s_trace] [模式及失效边界](design_patterns.md) · [展开](architecture_analysis.md#node-validate_at_commit)\n\n[返回总览](overview.md) · [查看 L1 图谱](knowledge_graph.mmd)\n","architecture_analysis.md":"# EpochGate：从回填资格到原子发布\n\n以下区分作者明确给出的协议、材料中的手工/理论证据，以及分析者的迁移归纳。公式和实现细节只在解释设计必要性时展开。\n\n\u003ca id=\"node-stale_fill\"\u003e\u003c/a\u003e\n\n## 问题发生在删除之后 [n:stale_fill]\n\n基线中，R 先取 A，W 写 B 并删除缓存，R 随后才填入 A。删除作用于已有缓存，在途结果没有被撤销。这解释了为什么“再缩短 TTL”并不能满足目标保证：它只可能缩短错误值存活的时间。[s:s_race] [来源](document_map.md#source-s_race)\n\n\u003ca id=\"node-single_gateway\"\u003e\u003c/a\u003e\n\n## 保证依赖什么边界 [n:single_gateway]\n\n所有同键请求共享进程内状态，所有写经过同一服务，存储提供单键原子读写。代际不回绕，重启会消除缓存及在途任务，提交状态未知的失败被排除。与写重叠的读仍可能返回在写前选定的值；目标只禁止旧回填成为写后新读的缓存命中。[s:s_scope] [来源](document_map.md#source-s_scope)\n\n\u003ca id=\"node-epoch_permission\"\u003e\u003c/a\u003e\n\n## Idea：结果有条件地获得发布资格 [n:epoch_permission]\n\n原文将稳定代际视为读取的资格。写改变代际，意味着旧资格失效；读取是否完成不决定结果是否有效。这个想法还不是架构，它只确定了需要保留什么信息、在什么时刻再次核验。[s:s_state] [来源](document_map.md#source-s_state)\n\n\u003ca id=\"node-epochgate\"\u003e\u003c/a\u003e\n\n## 架构：共享状态协调两个 I/O 路径 [n:epochgate]\n\n入口是 `read(k)` 和 `write(k,v)`。读先在状态锁内检查是否正在写、是否有缓存；未命中则记住偶数代际 e，释放锁去存储取值，回来在同锁内检查 `epoch == e`，通过才发布。写先把偶数改为奇数并清缓存，再在锁外写存储，完成后在锁内推进为下一偶数。[s:s_read] [s:s_write]\n\n例如 R 保存 0 并拿到 A；W 经由 1 完成写 B，再推进到 2。R 的检查失败，A 被丢弃。若没有新写打断，重试取得 B 并成功发布。这里的结构是“共享协调状态 + 锁外 I/O + 发布关口”，组件只有通过这条路径才有意义。[s:s_trace] [来源](document_map.md#source-s_trace)\n\n\u003ca id=\"node-state_gate\"\u003e\u003c/a\u003e\n\n### 协调点 [n:state_gate]\n\n状态锁保护代际、缓存检查与缓存发布。它没有覆盖慢存储调用，负责的是对状态变化建立共同的观察顺序。[s:s_state]\n\n\u003ca id=\"node-cache_entry\"\u003e\u003c/a\u003e\n\n### 缓存承担复用职责 [n:cache_entry]\n\n缓存只存值，没有独立版本标签；正确性依赖写开始清空以及发布守卫。读在偶数状态下发现非空项即可使用，因此发布守卫的原子性会直接影响后续命中。[s:s_state] [s:s_read]\n\n\u003ca id=\"node-store\"\u003e\u003c/a\u003e\n\n### 存储承担值的持久读写 [n:store]\n\n存储 I/O 位于状态锁之外。单键原子语义是输入假设，不是 EpochGate 自己创造的能力。[s:s_scope] [s:s_write]\n\n\u003ca id=\"node-publish_guard\"\u003e\u003c/a\u003e\n\n## 关键决策：复核与发布不可分开 [n:publish_guard]\n\n问题是检查过的资格可能立刻失效。作者选择在同一把锁内比较代际并发布：R 检查为 0，若释放锁让 W 推进到 2，然后 R 才发布 A，没有版本标签的缓存就又可被新读命中。因此在本例结构中，“比较与发布是一个动作”才真正落实资格规则。[s:s_read] [s:s_trace]\n\n**Problem → Constraint → Insight → Design → Mechanism → Outcome：** 在途旧值可能晚到；I/O 不能长期持锁；结果需要保留资格；选择短锁内的原子复核发布；写推进代际使旧资格不能通过；在模型内阻断旧回填。代价是冲突读取会重做。[s:s_scope] [s:s_cost]\n\n**替代设计：** 作者讨论了把锁覆盖整个 I/O，可阻止同样交错但增加慢 I/O 对状态检查的阻塞；作者没有给出性能实验。作者还讨论了 TTL，指出其不提供本例不变式。没有把“作者没有采用”推断成“作者已经测试并证明更差”。[s:s_cost] [来源](document_map.md#source-s_cost)\n\n\u003ca id=\"node-read_recheck\"\u003e\u003c/a\u003e\n\n### 读取机制 [n:read_recheck]\n\n读取在锁外取值，保留 e，并在锁内比较。失败时丢弃值并从头重试，不能只重复发布动作。[s:s_read]\n\n\u003ca id=\"node-write_fence\"\u003e\u003c/a\u003e\n\n### 写入机制 [n:write_fence]\n\n写开始就撤销旧资格并清缓存；写完成后才开放新的稳定代际。奇数阶段使其他读等待，也让多个写不同时操纵代际。确定未提交的失败仍推进代际，保守丢弃旧读取。[s:s_write]\n\n\u003ca id=\"node-generation\"\u003e\u003c/a\u003e\n\n### 理解代际 [n:generation]\n\nepoch 是逻辑身份，不是时钟。比较的是“从读取开始到发布，有没有经过写入阶段”，不是“结果是否足够新鲜”。[s:s_state]\n\n\u003ca id=\"node-split_window\"\u003e\u003c/a\u003e\n\n### L3：拆开动作会发生什么 [n:split_window]\n\nR 比较通过 → R 释放锁 → W 写 B、清缓存并完成 → R 写入 A。正是最后一步绕开了新的资格状态。若换成缓存项自行保存并校验版本的另一套协议，需要重新分析此反例，不能照搬本例的必要性结论。[s:s_trace] 后一句是对本例结构边界的分析者推断。\n\n\u003ca id=\"node-old_fill_rejected\"\u003e\u003c/a\u003e\n\n## 结果与证据的范围 [n:old_fill_rejected]\n\n作者主张：假设成立时，写之前取得旧值的读不能在写后恢复有效缓存。读先原子发布，后来的写会清掉它；写先改变代际，后来的旧读检查会失败。这是协议层面的条件性论证，不是已测试实现的报告。[s:s_invariant] [来源](document_map.md#source-s_invariant)\n\n\u003ca id=\"node-race_trace\"\u003e\u003c/a\u003e\n\n### L3：一个反例足以否定基线保证 [n:race_trace]\n\nS2 给出了违反目标的完整交错，足以说明基线不提供该保证。它没有说明实际故障频率。[s:s_race]\n\n\u003ca id=\"node-guarded_trace\"\u003e\u003c/a\u003e\n\n### L3：一个成功序列不等于全面验证 [n:guarded_trace]\n\nS4 的 0→1→2 序列说明该交错被阻断。它不能单独证明所有执行路径或真实锁实现都正确。[s:s_trace]\n\n\u003ca id=\"node-invariant_argument\"\u003e\u003c/a\u003e\n\n### L3：不变式为何更强，也为何仍有限 [n:invariant_argument]\n\nS5 在所列假设下把两类顺序统一起来：稳定代际中的非空缓存只能来自在该代际开始且通过原子发布检查的读。它支持旧回填隔离，却不检查语言内存模型、未知提交结果、代际回绕或分布式写入。这是核心证据，所以 importance=core；完整检查需要 detailed，但放在 L3，不阻挡宏观阅读。[s:s_invariant] [s:s_scope]\n\n\u003ca id=\"node-retry_cost\"\u003e\u003c/a\u003e\n\n## 权衡：缩短锁持有时间，承担重复工作 [n:retry_cost]\n\n状态锁不被慢 I/O 长期占用，但每次未命中需要两次进入锁、记录代际，冲突时还要重做存储读取。是否更快取决于写频率、存储延迟与锁竞争；本文没有测量答案。[s:s_cost]\n\n\u003ca id=\"node-short_sections\"\u003e\u003c/a\u003e\n\n### 选择短临界区 [n:short_sections]\n\n作者选择仅保护元数据操作，避免持锁跨越整个 I/O。它改变的是阻塞与重试之间的安排，不能直接写成“性能提升”。[s:s_cost]\n\n\u003ca id=\"node-io_constraint\"\u003e\u003c/a\u003e\n\n### 选择由什么约束推动 [n:io_constraint]\n\nS1 明确要求请求不能在等待存储期间一直持有状态锁。这限制了可选结构；不是由分析者代作者添加的目标。[s:s_scope]\n\n\u003ca id=\"node-delete_only\"\u003e\u003c/a\u003e\n\n### 与删除基线的变化 [n:delete_only]\n\n基线只删除现存副本，新协议还记录并撤销在途结果的资格。比较的是同一旧回填保证；没有用不同负载的性能数字制造优势。[s:s_race] [s:s_read]\n\n\u003ca id=\"node-progress_limit\"\u003e\u003c/a\u003e\n\n### 安全性不代表进度保证 [n:progress_limit]\n\n持续写入可能让读取一直重试；协议没有公平性、等待上界，也没有合并同代际的重复请求。阻止错误值与保证请求及时完成是两种不同结果。[s:s_cost]\n\n\u003ca id=\"node-validate_at_commit\"\u003e\u003c/a\u003e\n\n## 可迁移部分：生效前复核前提 [n:validate_at_commit]\n\nAI 从这份协议归纳出：工作可以先做，但结果对共享状态生效之前必须确认前提仍成立。适用于可检测变化、可原子提交、可安全丢弃结果的场景。如何迁移及何时失效见 [设计模式](design_patterns.md)。[s:s_read] [s:s_trace]\n\n[返回主线](knowledge_spine.md) · [查看来源地图](document_map.md) · [返回总览](overview.md)\n","design_patterns.md":"# 从 EpochGate 抽象出的设计思想\n\n\u003ca id=\"node-validate_at_commit\"\u003e\u003c/a\u003e\n\n## 在生效点复核前提 [n:validate_at_commit]\n\n**归属：AI 推断。** 原文给出了代际协议；下面是分析者的抽象，不声称作者讨论过所有迁移场景。[s:s_read] [s:s_trace] [协议来源](document_map.md#source-s_read)\n\n**具体设计：** 读取开始时记录代际 e；锁外取值；只有在同一原子临界区内确认当前代际仍为 e，才允许发布。写入改变代际，撤销之前发出的资格。[n:publish_guard]\n\n**通用结构：** 将“执行工作”和“允许结果生效”拆开。前者可以并发，后者通过可核验的前提控制。复核和发布必须采用适合具体系统的原子协调方式，不能只在两处各检查一次。\n\n**适用条件：** 状态变化可被可靠标识；结果可以安全丢弃或重算；能够协调复核与发布；冲突成本可以接受。\n\n**迁移方向（尚未验证）：** 编辑器后台分析保存文本版本；分析完成时，只把与当前文本版本一致的诊断发布到界面。这是结构映射，不是已实现或已基准测试的建议。必须额外确认版本变化与界面更新的原子协调。\n\n**失效边界：** 外部变化绕过版本更新，复核就看不见；工作若已经发出不可撤销的支付或消息，丢弃结果不能撤销副作用；冲突过多时，安全重试也不能保证及时完成。\n\n**不保留为模式的部分：** 奇偶数、具体锁接口和单键存储是本例的实现安排；迁移时需要重新检查，不把它们当成通用答案。未提出“这是一种更快的缓存”之类没有测量支持的模式。\n\n[查看原决策](architecture_analysis.md#node-publish_guard) · [返回总览](overview.md)\n"},"nodes":{"schema_version":"1.0","document":{"id":"epochgate-paper","title":"EpochGate：检查回填资格的进程内缓存方案（虚构教学材料）","source_type":"paper","uri":"examples/versioned-cache/source.md","coverage":{"status":"complete","inspected_units":["lines 1–3：材料性质","S1（lines 5–11）","S2（lines 13–22）","S3.1（lines 26–30）","S3.2（lines 32–36）","S3.3（lines 38–42）","S4（lines 44–50）","S5（lines 52–56）","S6（lines 58–64）"],"gaps":[]}},"source_refs":[{"id":"s_scope","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 5–11; S1 接口和边界","note":"适用条件和目标；URI 相对技能根目录。"},{"id":"s_race","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 13–22; S2 一段出错的执行","note":"旧读取在写完成后回填的反例；URI 相对技能根目录。"},{"id":"s_state","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 26–30; S3.1 状态","note":"代际、缓存项、短锁与回填资格；URI 相对技能根目录。"},{"id":"s_read","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 32–36; S3.2 读取","note":"读路径和原子检查发布；URI 相对技能根目录。"},{"id":"s_write","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 38–42; S3.3 写入","note":"写路径和代际推进；URI 相对技能根目录。"},{"id":"s_trace","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 44–50; S4 重新执行","note":"手工执行序列及比较发布窗口；URI 相对技能根目录。"},{"id":"s_invariant","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 52–56; S5 一个局部不变式","note":"条件性不变式论证与局限；URI 相对技能根目录。"},{"id":"s_cost","origin":"primary","uri":"examples/versioned-cache/source.md","kind":"lines","locator":"lines 58–64; S6 代价和未覆盖情况","note":"成本、替代设计、缺失保证；URI 相对技能根目录。"}],"nodes":[{"id":"stale_fill","type":"problem","title":"删除后仍会旧值回填","summary":"写后删除缓存不能撤销在途读取；旧值可在写完成后重新成为缓存命中。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["s_race"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"single_gateway","type":"constraint","title":"单进程、唯一写入口","summary":"全部写请求经过共享状态协议；存储单键原子读写，未知提交结果、代际回绕和跨进程状态不在模型内。","importance":"core","learning_depth":"working","level":"L1","source_refs":["s_scope"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"},"details":{"assumptions":["所有写均经过本服务。","所有同键请求共享一把状态锁。","存储提供单键原子读写，且不会出现提交结果未知。","进程退出会清除在途任务，代际不回绕。"]}},{"id":"epoch_permission","type":"insight","title":"取到值不等于有权发布","summary":"用读取开始时的代际记录资格，在结果发布时重新确认资格仍有效；写入改变代际以撤销旧资格。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["s_state","s_write"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"epochgate","type":"architecture","title":"短锁包围状态，I/O 在锁外","summary":"读写共享代际状态与缓存；短锁串行化检查和发布，持久存储 I/O 放在锁外，冲突读取重试。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["s_state","s_read","s_write"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"},"details":{"interfaces":["read(k)：锁内检查缓存/记录代际，锁外读取存储，锁内复核后发布或重试。","write(k,v)：锁内转奇数并清缓存，锁外写存储，锁内转偶数再响应。"],"boundaries":["仅保证同进程、同键、唯一写入口下的旧回填隔离。"]}},{"id":"publish_guard","type":"design_decision","title":"把比较与发布放进同一临界区","summary":"发布前比较代际，并在同一把锁内写入缓存和选定返回值；分开两步会让写请求插入其间。","importance":"core","learning_depth":"working","level":"L1","source_refs":["s_read","s_trace"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"retry_cost","type":"tradeoff","title":"减少锁占用，承担丢弃和重试","summary":"I/O 不持有状态锁，但与写交错的读会浪费存储请求并重做；每次未命中还增加锁与代际检查。","importance":"core","learning_depth":"orientation","level":"L1","source_refs":["s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"old_fill_rejected","type":"outcome","title":"旧代际不能重新成为有效命中","summary":"在模型假设成立时，写前开始的读不能在写后发布旧代际；写前已发布的缓存也由写入清除。","importance":"core","learning_depth":"working","level":"L1","source_refs":["s_invariant","s_scope"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"validate_at_commit","type":"pattern","title":"在结果生效点复核前提","summary":"分析者抽象：耗时操作之前记录有效性条件，在结果进入共享状态前原子复核；条件失效时丢弃或重做。","importance":"supporting","learning_depth":"orientation","level":"L1","source_refs":["s_state","s_read","s_trace"],"attribution":"ai_inference","confidence":{"level":"medium","rationale":"这是对协议结构的归纳；材料只证明一个进程内缓存情形，迁移需另行论证。"},"details":{"applicability":["耗时工作可与状态变化并发，结果可以安全丢弃或重算。","存在可可靠记录的代际/有效性条件，复核与发布能够原子协调。"],"failure_modes":["外部写绕过代际更新时，资格检查无法发现变化。","工作已造成不可撤销的外部副作用时，丢弃结果不等于撤销副作用。","高冲突且没有重试预算时，可能无法保证完成。"]}},{"id":"generation","type":"concept","title":"代际不是时间戳","summary":"epoch 是单键逻辑版本；偶数可读，奇数表示写入中，比较的是身份而非经过的时间。","importance":"supporting","learning_depth":"working","level":"L2","source_refs":["s_state"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"state_gate","type":"component","title":"代际状态与短锁","summary":"共享状态锁保护 epoch、缓存有效性检查与发布，构成读写共同经过的状态协调点。","importance":"supporting","learning_depth":"working","level":"L2","source_refs":["s_state","s_read"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"cache_entry","type":"component","title":"稳定代际内的缓存值","summary":"缓存项只保存值；写开始清空它，发布守卫确保只有当前稳定代际的读取能够填入。","importance":"supporting","learning_depth":"working","level":"L2","source_refs":["s_state","s_read"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"store","type":"component","title":"单键原子持久存储","summary":"提供实际读写值的存储；在状态锁外调用，其原子读写语义属于协议假设。","importance":"supporting","learning_depth":"orientation","level":"L2","source_refs":["s_scope","s_read","s_write"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"read_recheck","type":"mechanism","title":"锁外读值、锁内复核","summary":"未命中时保存偶数代际 e，读取存储后检查当前 epoch 是否仍等于 e；相等才发布，否则重试。","importance":"core","learning_depth":"working","level":"L2","source_refs":["s_read"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"write_fence","type":"mechanism","title":"写前撤销、写后开放","summary":"写开始前推进为奇数并清缓存，完成后推进为下一偶数；等待中的写不能同时改变状态。","importance":"core","learning_depth":"working","level":"L2","source_refs":["s_write"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"short_sections","type":"design_decision","title":"不把锁带进慢 I/O","summary":"仅元数据操作在锁内，使其他请求可以进行状态检查；承担冲突结果丢弃而非长时间独占锁。","importance":"supporting","learning_depth":"working","level":"L2","source_refs":["s_state","s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"delete_only","type":"design_decision","title":"基线：写成功后只删除","summary":"S2 的基线只撤销已存在的缓存，没有记录或验证在途读取的资格。","importance":"supporting","learning_depth":"orientation","level":"L2","source_refs":["s_race"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"progress_limit","type":"tradeoff","title":"安全性不等于完成时限","summary":"检查阻止旧回填，但高频写可能导致反复重试；没有公平性、等待上界或同代际请求合并。","importance":"supporting","learning_depth":"working","level":"L2","source_refs":["s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"io_constraint","type":"constraint","title":"状态锁不能跨存储 I/O","summary":"任务约束要求短元数据临界区，避免一个慢存储调用阻止其他请求进行状态检查。","importance":"supporting","learning_depth":"orientation","level":"L2","source_refs":["s_scope","s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}},{"id":"race_trace","type":"evidence","title":"删除基线的四步反例","summary":"R 先取得 A，W 写 B 并删缓存，R 后发布 A，新读命中 A；一条执行即足以反驳基线的目标保证。","importance":"supporting","learning_depth":"detailed","level":"L3","source_refs":["s_race"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"原文给出可逐步检查的反例；这是手工推演，未运行真实代码。"},"details":{"evidence_kind":"worked_example","scope":"初始值 A、空缓存、单读单写交错的删除基线。","result":"写完成后新读可命中 A，违反旧回填隔离目标。","limitations":["单个反例不能描述实际发生频率。","没有实现或性能测量。"]}},{"id":"guarded_trace","type":"evidence","title":"代际 0→1→2 的拒绝过程","summary":"R 保存 0，W 推进到 2 后，R 因 2 不等于 0 丢弃 A；重试可以在稳定代际 2 发布 B。","importance":"supporting","learning_depth":"detailed","level":"L3","source_refs":["s_trace"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"推演状态由材料直接给出；只覆盖展示的交错。"},"details":{"evidence_kind":"worked_example","scope":"S2 同一交错，加上 S3 代际检查；后续假设没有新写打断重试。","result":"旧结果 A 的发布被拒绝；下一次稳定读取发布 B。","limitations":["不是压力测试。","不能由此推出所有实现路径正确或吞吐量更高。"]}},{"id":"invariant_argument","type":"evidence","title":"稳定代际中的有效缓存不变式","summary":"写改变代际并清除缓存；非空缓存只能由在当前偶数代际启动且通过原子复核的读发布，因此写前结果不能在写后恢复有效。","importance":"core","learning_depth":"detailed","level":"L3","source_refs":["s_invariant","s_scope"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"材料明确给出条件性协议论证；未形式化验证或检查具体语言实现。"},"details":{"evidence_kind":"theoretical","scope":"S1 假设与 S3 的原子临界区成立时，对单键旧回填隔离的协议论证。","result":"覆盖“读先发布后被写清除”和“写先改变代际而读检查失败”两类顺序。","limitations":["不证明真实语言内存模型与异常路径实现正确。","不覆盖跨进程、跨键事务和未知提交结果。","不提供重试完成时限。"]}},{"id":"split_window","type":"mechanism","title":"检查与发布之间的竞态窗口","summary":"若比较后释放锁，写可在真正发布前完成；旧结果即使曾检查通过，也可能在新代际下发布。","importance":"core","learning_depth":"detailed","level":"L3","source_refs":["s_trace"],"attribution":"author_claim","confidence":{"level":"high","rationale":"原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"}}]},"graph":{"schema_version":"1.0","document_id":"epochgate-paper","nodes_file":"knowledge_nodes.json","spine":[{"node_id":"stale_fill","why_next":"从 S2 的具体故障开始，先建立必须解释的现象。"},{"node_id":"single_gateway","why_next":"界定刚才的问题在哪个并发和存储模型下讨论，避免把目标扩大成分布式一致性。"},{"node_id":"epoch_permission","why_next":"在边界清楚后解释核心转变：删除副本之外，还要撤销在途结果的发布资格。"},{"node_id":"epochgate","why_next":"将资格思想放进读写路径，理解哪些动作在锁内、哪些在锁外。"},{"node_id":"publish_guard","why_next":"抓住架构中不能拆开的动作，解释为何只有版本字段还不够。"},{"node_id":"old_fill_rejected","why_next":"连接两类执行顺序与条件性结果，再按需下钻到证据。"},{"node_id":"retry_cost","why_next":"确认机制做到什么之后，评估重试、锁操作和未提供的进度保证。"},{"node_id":"validate_at_commit","why_next":"最后抽象可迁移的生效前复核思想，连同适用条件一起保留。"}],"views":{"L1":["stale_fill","single_gateway","epoch_permission","epochgate","publish_guard","retry_cost","old_fill_rejected","validate_at_commit"],"L2":["stale_fill","single_gateway","epoch_permission","epochgate","publish_guard","retry_cost","old_fill_rejected","validate_at_commit","generation","state_gate","cache_entry","store","read_recheck","write_fence","short_sections","delete_only","progress_limit","io_constraint"],"L3":["stale_fill","single_gateway","epoch_permission","epochgate","publish_guard","retry_cost","old_fill_rejected","validate_at_commit","generation","state_gate","cache_entry","store","read_recheck","write_fence","short_sections","delete_only","progress_limit","io_constraint","race_trace","guarded_trace","invariant_argument","split_window"]},"edges":[{"id":"r01","source_id":"stale_fill","target_id":"epoch_permission","relation":"motivates","rationale":"删除无法撤销在途结果，促使协议把回填资格作为需重查的状态。","evidence_refs":["s_race","s_state"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r02","source_id":"epochgate","target_id":"epoch_permission","relation":"implements","rationale":"共享代际、写入撤销资格和读发布复核，将资格思想落实为读写协议。","evidence_refs":["s_state","s_read","s_write"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r03","source_id":"epochgate","target_id":"single_gateway","relation":"depends_on","rationale":"绕过服务的写不会推进共享代际，局部协议无法检测它。","evidence_refs":["s_scope","s_invariant","s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r04","source_id":"publish_guard","target_id":"stale_fill","relation":"addresses","rationale":"在旧值真正进入共享缓存前核验资格，阻断删除后的旧回填。","evidence_refs":["s_read","s_trace"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r05","source_id":"publish_guard","target_id":"epoch_permission","relation":"implements","rationale":"把抽象的仍有资格转成同锁内 epoch 等值比较和发布。","evidence_refs":["s_state","s_read"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r06","source_id":"publish_guard","target_id":"old_fill_rejected","relation":"enables","rationale":"在写协议同样成立时，原子比较发布使旧代际结果不能恢复为有效缓存。","evidence_refs":["s_trace","s_invariant"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r07","source_id":"epochgate","target_id":"retry_cost","relation":"trades_off","rationale":"读写 I/O 在锁外执行，允许并发但可能产生代际不匹配及重试。","evidence_refs":["s_read","s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r08","source_id":"publish_guard","target_id":"validate_at_commit","relation":"generalizes_to","rationale":"从发布前检查代际归纳为结果生效前复核前提；推广仅在可原子发布且可丢弃结果时成立。","evidence_refs":["s_read","s_trace"],"attribution":"ai_inference","confidence":{"level":"medium","rationale":"关系由跨段归纳得出，迁移边界需另行检查。"}},{"id":"r09","source_id":"state_gate","target_id":"epochgate","relation":"part_of","rationale":"共享短锁与代际状态是读写协调部分。","evidence_refs":["s_state"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r10","source_id":"cache_entry","target_id":"epochgate","relation":"part_of","rationale":"缓存值保存通过当前稳定代际发布守卫的结果，写开始会清空它。","evidence_refs":["s_state","s_read"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r11","source_id":"store","target_id":"epochgate","relation":"part_of","rationale":"持久存储承担取值与写入；它处于锁外 I/O 路径。","evidence_refs":["s_read","s_write"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r12","source_id":"read_recheck","target_id":"epoch_permission","relation":"implements","rationale":"读路径复核捕获代际，把有条件的回填资格落实为可执行检查。","evidence_refs":["s_state","s_read"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r13","source_id":"read_recheck","target_id":"generation","relation":"depends_on","rationale":"比较 e 与当前 epoch 之前需要理解代际身份和奇偶状态。","evidence_refs":["s_state","s_read"],"attribution":"ai_inference","confidence":{"level":"medium","rationale":"关系由跨段归纳得出，迁移边界需另行检查。"}},{"id":"r14","source_id":"write_fence","target_id":"epoch_permission","relation":"implements","rationale":"写开始即改变代际使旧资格失效，结束后再开放新稳定代际。","evidence_refs":["s_state","s_write"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r15","source_id":"write_fence","target_id":"old_fill_rejected","relation":"enables","rationale":"写入先使旧代际无效并清缓存，使旧读不能重新通过后续发布检查。","evidence_refs":["s_write","s_invariant"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r16","source_id":"io_constraint","target_id":"short_sections","relation":"motivates","rationale":"不能持锁等待存储要求分离状态操作与 I/O。","evidence_refs":["s_scope","s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r17","source_id":"short_sections","target_id":"retry_cost","relation":"trades_off","rationale":"缩短元数据锁持有时间，以存储读取被丢弃和重做为代价。","evidence_refs":["s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r18","source_id":"delete_only","target_id":"publish_guard","relation":"contrasts_with","rationale":"基线删除现存项；发布守卫同时处理尚未进入缓存的结果。","evidence_refs":["s_race","s_read"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r19","source_id":"epochgate","target_id":"progress_limit","relation":"trades_off","rationale":"旧回填安全性与读完成时限是不同保证，本协议未解决高冲突下的持续重试。","evidence_refs":["s_cost"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r20","source_id":"race_trace","target_id":"stale_fill","relation":"supports","rationale":"一条具体交错足以说明写后删除无法确保目标；不支持发生率判断。","evidence_refs":["s_race"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r21","source_id":"guarded_trace","target_id":"old_fill_rejected","relation":"supports","rationale":"只支持展示的旧读晚发布交错被阻断，不能替代所有执行的证明。","evidence_refs":["s_trace"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r22","source_id":"invariant_argument","target_id":"old_fill_rejected","relation":"supports","rationale":"条件性不变式在所列假设与原子操作模型内支持旧回填隔离；不支持分布式或性能主张。","evidence_refs":["s_invariant","s_scope"],"attribution":"direct_evidence","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}},{"id":"r23","source_id":"split_window","target_id":"publish_guard","relation":"motivates","rationale":"比较与发布分离会重新产生写插入窗口，解释为什么需要同一临界区。","evidence_refs":["s_trace"],"attribution":"author_claim","confidence":{"level":"high","rationale":"引用位置直接说明该关系，关系范围限于协议模型。"}}]},"source_base":"../expected","source_links":{"s_scope":"../source.md","s_race":"../source.md","s_state":"../source.md","s_read":"../source.md","s_write":"../source.md","s_trace":"../source.md","s_invariant":"../source.md","s_cost":"../source.md"}}</script>
+  <script>(() => {
+  'use strict';
+
+  const types = {
+    problem: '问题', constraint: '约束', insight: '洞察', architecture: '架构',
+    design_decision: '设计决策', component: '组件', mechanism: '机制', tradeoff: '权衡',
+    evidence: '证据', concept: '概念', pattern: '可迁移模式', outcome: '结果'
+  };
+  const relations = {
+    motivates: '促使', addresses: '应对', implements: '落实', depends_on: '依赖',
+    enables: '使得', part_of: '属于', supports: '支持', contrasts_with: '对比',
+    generalizes_to: '可归纳为', trades_off: '带来权衡'
+  };
+  const levelNames = {L1: '宏观', L2: '设计机制', L3: '细节'};
+  const card = {width: 156, height: 74};
+
+  function element(tag, className, text) {
+    const result = document.createElement(tag);
+    if (className) result.className = className;
+    if (text !== undefined) result.textContent = text;
+    return result;
+  }
+
+  function svg(tag, properties, text) {
+    const result = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (const [key, value] of Object.entries(properties)) result.setAttribute(key, value);
+    if (text !== undefined) result.textContent = text;
+    return result;
+  }
+
+  function button(label, action, className) {
+    const result = element('button', className, label);
+    result.type = 'button';
+    result.addEventListener('click', () => action(result));
+    return result;
+  }
+
+  // Every actual edge connects vertices in the same or adjacent BFS columns.
+  // Disconnected components are laid out separately, without artificial edges.
+  function layout(ids, edges, vertical) {
+    const adjacency = new Map(ids.map(id => [id, new Set()]));
+    for (const edge of edges) {
+      adjacency.get(edge.source_id).add(edge.target_id);
+      adjacency.get(edge.target_id).add(edge.source_id);
+    }
+    const positions = new Map();
+    const visited = new Set();
+    const isolated = [];
+    let bottom = 0;
+    const columnGap = vertical ? card.height + 64 : card.width + 94;
+    const rowGap = vertical ? card.width + 34 : card.height + 36;
+    const position = (depth, offset) => vertical ? {x: offset, y: depth} : {x: depth, y: offset};
+    for (const start of ids) {
+      if (visited.has(start)) continue;
+      if (!adjacency.get(start).size) {
+        isolated.push(start);
+        continue;
+      }
+      let front = [start];
+      const columns = [];
+      visited.add(start);
+      while (front.length) {
+        columns.push(front);
+        const next = [];
+        for (const id of front) {
+          for (const other of adjacency.get(id)) {
+            if (!visited.has(other)) {
+              visited.add(other);
+              next.push(other);
+            }
+          }
+        }
+        front = next;
+      }
+      const rows = columns.reduce((height, column) => Math.max(height, column.length), 0);
+      columns.forEach((column, x) => column.forEach((id, y) => positions.set(id,
+        position(x * columnGap, bottom + (y + (rows - column.length) / 2) * rowGap))));
+      bottom += rows * rowGap + 12;
+    }
+    const count = Math.max(1, Math.ceil(Math.sqrt(isolated.length)));
+    isolated.forEach((id, index) => positions.set(id,
+      position(index % count * columnGap, bottom + Math.floor(index / count) * rowGap)));
+    return positions;
+  }
+
+  // Offset coinciding edges, including relations whose endpoints are reversed.
+  function edgeGeometry(start, end, lane, vertical) {
+    // Compute along the layout's depth axis, then transpose back to screen space.
+    const half = (vertical ? card.height : card.width) / 2;
+    if (vertical) {
+      start = {x: start.y, y: start.x};
+      end = {x: end.y, y: end.x};
+    }
+    const direction = Math.sign(end.x - start.x);
+    let ax, ay, bx, by, cx, cy, dx, dy;
+    if (direction) {
+      ax = start.x + direction * (half + 2);
+      bx = end.x - direction * (half + 3);
+      ay = start.y + lane;
+      by = end.y + lane;
+      cx = dx = (ax + bx) / 2;
+      cy = ay; dy = by;
+    } else {
+      ax = bx = start.x + half + 2;
+      ay = start.y + lane;
+      by = end.y + lane;
+      cx = dx = ax + 40 + Math.abs(end.y - start.y) * 0.07 + lane;
+      cy = ay; dy = by;
+    }
+    if (vertical) {
+      [ax, ay, bx, by, cx, cy, dx, dy] = [ay, ax, by, bx, cy, cx, dy, dx];
+    }
+    return {
+      path: 'M ' + ax + ' ' + ay + ' C ' + cx + ' ' + cy + ', ' + dx + ' ' + dy + ', ' + bx + ' ' + by,
+      x: (ax + 3 * cx + 3 * dx + bx) / 8,
+      y: (ay + 3 * cy + 3 * dy + by) / 8
+    };
+  }
+
+  function titleLines(title) {
+    const lines = [''];
+    let units = 0;
+    for (const ch of title.replace(/\s+/g, ' ').trim()) {
+      const width = ch.codePointAt(0) < 256 ? 0.56 : 1;
+      if (units + width > 10.0) {
+        if (lines.length === 2) {
+          lines[1] = lines[1].trimEnd() + '…';
+          break;
+        }
+        lines.push('');
+        units = 0;
+      }
+      lines[lines.length - 1] += ch;
+      units += width;
+    }
+    return lines;
+  }
+
+  window.initReaderGraph = function ({root, nodes, graph, openNode, openEdge, goToNarrative}) {
+    const byId = new Map(nodes.nodes.map(node => [node.id, node]));
+    let level = 'L1';
+    let vertical = root.getBoundingClientRect().width < 560;
+    let selected = null;
+    let neighborsOnly = false;
+    let box = {x: 0, y: 0, width: 1, height: 1};
+    let view = {...box};
+    let positions = new Map();
+    const nodeShapes = new Map();
+
+    const toolbar = element('div', 'rg-toolbar');
+    const layers = element('div', 'rg-layers');
+    layers.setAttribute('role', 'group');
+    layers.setAttribute('aria-label', '图谱层级');
+    const layerButtons = new Map();
+    for (const [code, name] of Object.entries(levelNames)) {
+      const control = button(code + ' ' + name, () => {
+        if (level === code) return;
+        level = code;
+        if (!graph.views[level].includes(selected)) {
+          selected = null;
+          neighborsOnly = false;
+        }
+        render();
+      });
+      layerButtons.set(code, control);
+      layers.append(control);
+    }
+    const searchBox = element('div', 'rg-search');
+    const search = element('input');
+    search.type = 'search';
+    search.placeholder = '搜索全部节点';
+    search.setAttribute('aria-label', '搜索全部层级的节点');
+    const results = element('div', 'rg-results');
+    results.hidden = true;
+    searchBox.append(search, results);
+    toolbar.append(layers, searchBox);
+
+    const canvas = element('div', 'rg-canvas');
+    const diagram = svg('svg', {class: 'rg-diagram', role: 'group', 'aria-label': '知识图谱，节点和关系可用键盘选择'});
+    const defs = svg('defs', {});
+    const marker = svg('marker', {id: 'reader-graph-arrow', viewBox: '0 0 8 8', markerWidth: 7,
+      markerHeight: 7, refX: 7.5, refY: 4, orient: 'auto', markerUnits: 'userSpaceOnUse'});
+    marker.append(svg('path', {d: 'M0 0 L8 4 L0 8 z', class: 'rg-arrow'}));
+    defs.append(marker);
+    const world = svg('g', {});
+    diagram.append(defs, world);
+
+    const tools = element('div', 'rg-tools');
+    const zoomOut = button('−', () => zoom(1.3));
+    const zoomIn = button('+', () => zoom(1 / 1.3));
+    zoomOut.setAttribute('aria-label', '缩小图谱');
+    zoomIn.setAttribute('aria-label', '放大图谱');
+    tools.append(zoomOut, zoomIn, button('适应画布', fit));
+    canvas.append(diagram, tools);
+
+    const footer = element('div', 'rg-footer');
+    const stats = element('span', 'rg-count');
+    stats.setAttribute('aria-live', 'polite');
+    const hint = element('span', 'rg-pan-hint', '拖动平移，点击节点阅读');
+    footer.append(stats, hint, element('span', 'rg-legend', '虚线表示 AI 推断'));
+    const inspector = element('div', 'rg-inspector');
+    root.replaceChildren(toolbar, canvas, footer, inspector);
+
+    function updateView() {
+      diagram.setAttribute('viewBox', [view.x, view.y, view.width, view.height].join(' '));
+    }
+
+    function fit(readable = false) {
+      const rect = diagram.getBoundingClientRect();
+      const ratio = (rect.width || 800) / (rect.height || 420);
+      const width = Math.max(box.width, box.height * ratio);
+      const height = width / ratio;
+      view = {x: box.x + (box.width - width) / 2, y: box.y + (box.height - height) / 2, width, height};
+      if (readable === true && rect.width && width > rect.width * 1.22) {
+        // Keep labels legible at first open. The Fit button still shows the full map.
+        const near = positions.get(selected) || positions.values().next().value;
+        view.width = rect.width * 1.22;
+        view.height = rect.height * 1.22;
+        view.x = near.x - view.width / 2;
+        view.y = near.y - view.height / 2;
+        if (vertical) view.y = near.y - card.height / 2 - 18;
+      }
+      updateView();
+    }
+
+    function svgPoint(clientX, clientY) {
+      const matrix = diagram.getScreenCTM();
+      if (!matrix) return {x: view.x + view.width / 2, y: view.y + view.height / 2};
+      return new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+    }
+
+    function zoom(factor, anchor = {x: view.x + view.width / 2, y: view.y + view.height / 2}) {
+      const current = view.width / (diagram.getBoundingClientRect().width || 800);
+      const next = Math.max(0.2, Math.min(Math.max(12, box.width / 150), current * factor));
+      factor = next / current;
+      view = {x: anchor.x + (view.x - anchor.x) * factor, y: anchor.y + (view.y - anchor.y) * factor,
+        width: view.width * factor, height: view.height * factor};
+      updateView();
+    }
+
+    function relationLabel(edge) {
+      return byId.get(edge.source_id).title + ' · ' + relations[edge.relation] + ' · ' + byId.get(edge.target_id).title;
+    }
+
+    function drawEdge(edge, lane, withLabel) {
+      const {path, x, y} = edgeGeometry(positions.get(edge.source_id), positions.get(edge.target_id), lane, vertical);
+      const inferred = edge.attribution === 'ai_inference';
+      const label = relationLabel(edge) + (inferred ? '（AI 推断）' : '');
+      const group = svg('g', {class: 'rg-edge', tabindex: 0, role: 'button', 'data-edge-id': edge.id,
+        'aria-label': label + '，查看关系和依据'});
+      const line = svg('path', {d: path, class: 'rg-line' + (inferred ? ' rg-inferred' : '')});
+      if (edge.relation !== 'contrasts_with') line.setAttribute('marker-end', 'url(#reader-graph-arrow)');
+      group.append(svg('title', {}, label), svg('path', {d: path, class: 'rg-hit'}), line);
+      const text = svg('text', {x, y: y - 4, class: 'rg-edge-label' + (withLabel ? '' : ' rg-hover-label'),
+        'text-anchor': 'middle'}, relations[edge.relation]);
+      group.append(text);
+      return group;
+    }
+
+    function drawNode(id) {
+      const node = byId.get(id);
+      const {x, y} = positions.get(id);
+      const group = svg('g', {class: 'rg-node', transform: 'translate(' + x + ',' + y + ')', tabindex: 0,
+        role: 'button', 'data-node-id': id, 'aria-label': node.title + '，' + types[node.type] + '，' + node.level,
+        'aria-pressed': String(id === selected)});
+      const inferred = node.attribution === 'ai_inference';
+      group.append(svg('title', {}, node.title), svg('rect', {x: -card.width / 2, y: -card.height / 2,
+        width: card.width, height: card.height, rx: 7, class: 'rg-card' + (inferred ? ' rg-inferred' : '')}));
+      const left = -card.width / 2 + 12;
+      const meta = types[node.type] + ' · ' + node.level + (inferred ? ' · 推断' : '');
+      group.append(svg('text', {x: left, y: -16, class: 'rg-meta'}, meta));
+      const lines = titleLines(node.title);
+      lines.forEach((line, index) => group.append(svg('text', {x: left, y: 5 + index * 17, class: 'rg-title'}, line)));
+      return group;
+    }
+
+    function showInspector() {
+      inspector.replaceChildren();
+      inspector.hidden = !selected;
+      if (!selected) return;
+      const node = byId.get(selected);
+      const title = element('strong', 'rg-detail-title', node.title);
+      const summary = element('p', 'rg-summary', node.summary);
+      const actions = element('div', 'rg-actions');
+      const neighborButton = button(neighborsOnly ? '退出相邻视图' : '只看相邻', () => {
+        neighborsOnly = !neighborsOnly;
+        render();
+        inspector.querySelector('.rg-neighbors').focus({preventScroll: true});
+      }, 'rg-neighbors');
+      neighborButton.setAttribute('aria-pressed', String(neighborsOnly));
+      actions.append(button('阅读讲解', trigger => goToNarrative(node.id, trigger)),
+        button('查看依据', trigger => openNode(node.id, trigger)), neighborButton);
+      inspector.append(title, summary, actions);
+    }
+
+    function select(id) {
+      const previous = selected;
+      selected = id;
+      if (neighborsOnly) {
+        render();
+      } else {
+        nodeShapes.get(previous)?.setAttribute('aria-pressed', 'false');
+        nodeShapes.get(id)?.setAttribute('aria-pressed', 'true');
+        showInspector();
+      }
+    }
+
+    function render() {
+      for (const [code, control] of layerButtons) control.setAttribute('aria-pressed', String(level === code));
+      const inLevel = new Set(graph.views[level]);
+      const levelEdges = graph.edges.filter(e => inLevel.has(e.source_id) && inLevel.has(e.target_id));
+      let ids = graph.views[level];
+      if (neighborsOnly && selected) {
+        const near = new Set([selected]);
+        for (const edge of levelEdges) {
+          if (edge.source_id === selected) near.add(edge.target_id);
+          if (edge.target_id === selected) near.add(edge.source_id);
+        }
+        ids = ids.filter(id => near.has(id));
+      }
+      const visible = new Set(ids);
+      const edges = levelEdges.filter(e => visible.has(e.source_id) && visible.has(e.target_id));
+      positions = layout(ids, edges, vertical);
+      const pairs = new Map();
+      for (const edge of edges) {
+        const key = [edge.source_id, edge.target_id].sort().join(' ');
+        if (!pairs.has(key)) pairs.set(key, []);
+        pairs.get(key).push(edge);
+      }
+      world.replaceChildren();
+      for (const siblings of pairs.values()) {
+        const gap = Math.min(20, (card.height - 16) / siblings.length);
+        siblings.forEach((edge, n) => world.append(drawEdge(edge, (n - (siblings.length - 1) / 2) * gap, edges.length < 14)));
+      }
+      nodeShapes.clear();
+      for (const id of ids) {
+        const shape = drawNode(id);
+        nodeShapes.set(id, shape);
+        world.append(shape);
+      }
+      stats.textContent = level + (neighborsOnly ? ' 相邻视图' : '') + ' · ' + ids.length + ' 个节点 · ' + edges.length + ' 条关系';
+      showInspector();
+      const bounds = world.getBBox();
+      box = {x: bounds.x - 18, y: bounds.y - 18, width: Math.max(1, bounds.width) + 36, height: Math.max(1, bounds.height) + 36};
+      fit(true);
+    }
+
+    function focusNode(id) {
+      if (!byId.has(id)) return;
+      if (!graph.views[level].includes(id)) level = byId.get(id).level;
+      selected = id;
+      neighborsOnly = false;
+      render();
+      const point = positions.get(id);
+      const rect = diagram.getBoundingClientRect();
+      const targetWidth = Math.min(view.width, (rect.width || 800) * 1.2);
+      const targetHeight = view.height * targetWidth / view.width;
+      view = {x: point.x - targetWidth / 2, y: point.y - targetHeight / 2, width: targetWidth, height: targetHeight};
+      updateView();
+      nodeShapes.get(id).focus({preventScroll: true});
+    }
+
+    function showResults() {
+      const query = search.value.trim().toLocaleLowerCase();
+      results.replaceChildren();
+      results.hidden = !query;
+      if (!query) return;
+      const matches = nodes.nodes.filter(node => (node.title + ' ' + node.id + ' ' + types[node.type]).toLocaleLowerCase().includes(query));
+      for (const node of matches) {
+        results.append(button(node.title + ' · ' + node.level, () => {
+          results.hidden = true;
+          search.value = '';
+          focusNode(node.id);
+        }));
+      }
+      if (!matches.length) results.append(element('span', 'rg-no-results', '没有匹配的节点'));
+    }
+
+    search.addEventListener('input', showResults);
+    search.addEventListener('focus', showResults);
+    search.addEventListener('keydown', event => {
+      if ((event.key === 'Enter' || event.key === 'ArrowDown') && !results.hidden) {
+        event.preventDefault();
+        const first = results.querySelector('button');
+        if (event.key === 'Enter') first?.click();
+        else first?.focus();
+      }
+    });
+    searchBox.addEventListener('focusout', event => {
+      if (!searchBox.contains(event.relatedTarget)) results.hidden = true;
+    });
+    searchBox.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        search.focus();
+        results.hidden = true;
+      }
+    });
+
+    function activate(target) {
+      const shape = target.closest('[data-node-id],[data-edge-id]');
+      if (!shape) return;
+      if (shape.hasAttribute('data-node-id')) select(shape.dataset.nodeId);
+      else openEdge(shape.dataset.edgeId, shape);
+    }
+    diagram.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activate(event.target);
+        if (event.target.closest('[data-node-id]')) inspector.querySelector('button')?.focus();
+      }
+    });
+
+    let drag = null;
+    let ignoreClick = false;
+    diagram.addEventListener('pointerdown', event => {
+      if (!event.isPrimary || event.button !== 0) return;
+      ignoreClick = false;
+      drag = {id: event.pointerId, x: event.clientX, y: event.clientY, view: {...view}};
+    });
+    diagram.addEventListener('pointermove', event => {
+      if (!drag || drag.id !== event.pointerId) return;
+      const dx = event.clientX - drag.x;
+      const dy = event.clientY - drag.y;
+      if (!ignoreClick && Math.hypot(dx, dy) < 5) return;
+      ignoreClick = true;
+      diagram.setPointerCapture(event.pointerId);
+      const scale = diagram.getScreenCTM()?.a || 1;
+      view.x = drag.view.x - dx / scale;
+      view.y = drag.view.y - dy / scale;
+      updateView();
+    });
+    const endDrag = () => { drag = null; };
+    diagram.addEventListener('pointerup', endDrag);
+    diagram.addEventListener('pointercancel', endDrag);
+    diagram.addEventListener('pointerleave', () => { if (!ignoreClick) endDrag(); });
+    diagram.addEventListener('click', event => { if (!ignoreClick) activate(event.target); });
+    diagram.addEventListener('wheel', event => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      zoom(event.deltaY < 0 ? 1 / 1.18 : 1.18, svgPoint(event.clientX, event.clientY));
+    }, {passive: false});
+
+    render();
+    new ResizeObserver(entries => {
+      const width = entries[0].contentRect.width;
+      if (!width || drag) return;
+      if (vertical !== (width < 560)) {
+        vertical = width < 560;
+        render();
+      } else {
+        fit(true);
+      }
+    }).observe(diagram);
+    return {focusNode};
+  };
+})();
+
+(() => {
+  'use strict';
+
+  const byId = id => document.getElementById(id);
+  const bundle = JSON.parse(byId('reader-data').textContent);
+  const nodes = new Map(bundle.nodes.nodes.map(node => [node.id, node]));
+  const sources = new Map(bundle.nodes.source_refs.map(source => [source.id, source]));
+  const edges = new Map(bundle.graph.edges.map(edge => [edge.id, edge]));
+  const origins = {
+    author_claim: '作者主张', direct_evidence: '直接证据',
+    ai_inference: 'AI 推断', external_background: '外部背景'
+  };
+  const confidence = {high: '高', medium: '中', low: '低'};
+  const labels = {
+    scope: '支持范围', result: '证据结论', limitations: '局限',
+    assumptions: '前提', alternatives: '替代设计', interfaces: '接口',
+    applicability: '适用条件', failure_modes: '失效条件', boundaries: '边界',
+    evidence_kind: '证据类型'
+  };
+  const evidenceKinds = {empirical: '实验', theoretical: '理论论证', worked_example: '例题推演', observation: '观察'};
+  const dialog = byId('inspector');
+  const body = byId('inspector-body');
+  let returnPoint = null;
+
+  function element(tag, text, className) {
+    const el = document.createElement(tag);
+    if (text !== undefined) el.textContent = text;
+    if (className) el.className = className;
+    return el;
+  }
+
+  function action(label, callback) {
+    const button = element('button', label);
+    button.type = 'button';
+    button.addEventListener('click', callback);
+    return button;
+  }
+
+  function present(kind, title, trigger) {
+    if (!dialog.open) {
+      returnPoint = {trigger: trigger || document.activeElement, x: window.scrollX, y: window.scrollY};
+    }
+    byId('inspector-kind').textContent = kind;
+    byId('inspector-title').textContent = title;
+    body.replaceChildren();
+    if (!dialog.open) dialog.showModal();
+    dialog.scrollTop = 0;
+    byId('close-inspector').focus({preventScroll: true});
+  }
+
+  byId('close-inspector').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    if (event.clientX < box.left || event.clientX > box.right ||
+        event.clientY < box.top || event.clientY > box.bottom) dialog.close();
+  });
+  dialog.addEventListener('close', () => {
+    if (!returnPoint || dialog.open) return;
+    returnPoint.trigger?.focus({preventScroll: true});
+    window.scrollTo(returnPoint.x, returnPoint.y);
+    returnPoint = null;
+  });
+
+  function navigate(id) {
+    const target = byId(id);
+    if (!target) return;
+    if (dialog.open) {
+      returnPoint = null;
+      dialog.close();
+    }
+    for (let parent = target.parentElement; parent; parent = parent.parentElement) {
+      if (parent.tagName === 'DETAILS') parent.open = true;
+    }
+    const hash = '#' + encodeURIComponent(id);
+    if (location.hash !== hash) location.hash = hash;
+    target.scrollIntoView();
+    if (!target.hasAttribute('tabindex')) target.tabIndex = -1;
+    target.focus({preventScroll: true});
+  }
+
+  function narrativeTarget(id) {
+    const target = ['step-', 'analysis-node-', 'patterns-node-'].map(prefix => prefix + id).find(key => byId(key));
+    if (target) return target;
+    const mention = byId('reader-article').querySelector('[data-node="' + id + '"]');
+    return mention?.closest('section[id]')?.id;
+  }
+
+  function goToNarrative(id, trigger) {
+    const target = narrativeTarget(id);
+    if (target) navigate(target);
+    else openNode(id, trigger);
+  }
+
+  function trustedOriginal(id) {
+    const href = document.querySelector('a[data-original-source="' + id + '"]')?.getAttribute('href') ||
+      bundle.source_links?.[id];
+    if (!href) return null;
+    try {
+      const url = new URL(href, location.href);
+      if (['file:', 'http:', 'https:'].includes(url.protocol)) return url.href;
+    } catch { /* A locator remains readable when its link cannot be opened. */ }
+    return null;
+  }
+
+  function sourceCard(source, showLocator = true) {
+    const card = element('section', undefined, 'source-card');
+    if (showLocator) card.append(element('h4', source.locator));
+    card.append(element('p', source.origin === 'primary' ? '主材料' : '外部材料', 'panel-meta'));
+    if (source.note) card.append(element('p', source.note));
+    const topic = byId('sources-source-' + source.id);
+    // Authored source descriptions can explain evidence beyond the JSON note.
+    if (topic) {
+      for (const p of topic.querySelectorAll('p')) {
+        const text = p.cloneNode(true);
+        text.querySelectorAll('a[data-original-source]').forEach(link => link.remove());
+        let description = text.textContent.trim().replace(/^[—–·\s]+/, '');
+        if (description.startsWith(source.locator)) {
+          description = description.slice(source.locator.length).replace(/^[。.,，：:;；—–\s]+/, '');
+        }
+        if (description && description !== source.note && !card.textContent.includes(description)) {
+          card.append(element('p', description));
+        }
+      }
+    }
+    const original = trustedOriginal(source.id);
+    if (original) {
+      const link = element('a', '打开原件 ↗');
+      link.href = original;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      card.append(link);
+    } else {
+      card.append(element('p', source.uri, 'panel-meta'));
+    }
+    return card;
+  }
+
+  function addSources(ids) {
+    body.append(element('h3', '来源与定位'));
+    for (const id of ids) body.append(sourceCard(sources.get(id)));
+  }
+
+  function provenance(record) {
+    body.append(element('p', origins[record.attribution] + ' · 提取把握' + confidence[record.confidence.level], 'panel-meta'));
+    body.append(element('p', record.confidence.rationale));
+  }
+
+  function valueContent(value) {
+    if (Array.isArray(value)) {
+      const list = element('ul');
+      for (const item of value) {
+        const li = element('li');
+        li.append(valueContent(item));
+        list.append(li);
+      }
+      return list;
+    }
+    if (value && typeof value === 'object') {
+      const list = element('dl');
+      for (const [key, detail] of Object.entries(value)) {
+        const dd = element('dd');
+        dd.append(valueContent(detail));
+        list.append(element('dt', labels[key] || key), dd);
+      }
+      return list;
+    }
+    return document.createTextNode(String(value ?? ''));
+  }
+
+  function evidenceDetails(record) {
+    for (const [key, value] of Object.entries(record.details || {})) {
+      if (Array.isArray(value) && !value.length) continue;
+      body.append(element('h3', labels[key] || key));
+      body.append(valueContent(key === 'evidence_kind' ? (evidenceKinds[value] || value) : value));
+    }
+  }
+
+  function openNode(id, trigger) {
+    const node = nodes.get(id);
+    if (!node) return;
+    present('节点与依据', node.title, trigger);
+    body.append(element('p', node.summary));
+    provenance(node);
+    evidenceDetails(node);
+    const support = bundle.graph.edges.filter(edge => edge.relation === 'supports' && edge.target_id === id);
+    if (support.length) {
+      body.append(element('h3', '支持这个结论的证据'));
+      for (const edge of support) {
+        const card = element('div', undefined, 'source-card');
+        card.append(element('p', edge.rationale), action(nodes.get(edge.source_id).title, () => openNode(edge.source_id)));
+        body.append(card);
+      }
+    }
+    addSources(node.source_refs);
+    const actions = element('div', undefined, 'panel-actions');
+    if (narrativeTarget(id)) actions.append(action('阅读讲解', () => goToNarrative(id)));
+    actions.append(action('在图中定位', () => { navigate('graph'); graphUI.focusNode(id); }));
+    body.append(actions);
+  }
+
+  function openEdge(id, trigger) {
+    const edge = edges.get(id);
+    if (!edge) return;
+    const arrow = edge.relation === 'contrasts_with' ? ' ↔ ' : ' → ';
+    present('关系与依据', nodes.get(edge.source_id).title + arrow + nodes.get(edge.target_id).title, trigger);
+    body.append(element('h3', '为什么相连'), element('p', edge.rationale));
+    provenance(edge);
+    if (edge.relation === 'supports') {
+      const evidence = nodes.get(edge.source_id);
+      evidenceDetails(evidence);
+    }
+    addSources(edge.evidence_refs);
+  }
+
+  function openSource(id, trigger) {
+    const source = sources.get(id);
+    if (!source) return;
+    present('来源与依据', source.locator, trigger);
+    // A section or paragraph may reference more than one claim. Keep provenance attached to its claim.
+    const local = trigger.closest('p, li, h2, h3, h4');
+    const context = trigger.closest('[data-context-node]')?.dataset.contextNode;
+    const candidates = new Set([context, ...Array.from(local?.querySelectorAll('[data-node]') || [], el => el.dataset.node)]);
+    const claims = [...candidates].map(key => nodes.get(key)).filter(node => node?.source_refs.includes(id));
+    for (const claim of claims) {
+      body.append(element('h3', claim.title), element('p', claim.summary));
+      provenance(claim);
+      if (claim.type === 'evidence') evidenceDetails(claim);
+    }
+    body.append(sourceCard(source, false));
+    if (!claims.length) {
+      const related = [...nodes.values()].filter(node => node.source_refs.includes(id));
+      if (related.length) {
+        body.append(element('h3', '引用此处的节点'));
+        const actions = element('div', undefined, 'panel-actions');
+        for (const node of related) actions.append(action(node.title + ' · ' + origins[node.attribution], () => openNode(node.id)));
+        body.append(actions);
+      }
+    }
+  }
+
+  const graphUI = window.initReaderGraph({root: byId('reader-graph'), nodes: bundle.nodes, graph: bundle.graph,
+    openNode, openEdge, goToNarrative});
+
+  byId('reader-article').addEventListener('click', event => {
+    const link = event.target.closest('a');
+    if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    if (link.dataset.source && sources.has(link.dataset.source)) {
+      event.preventDefault();
+      openSource(link.dataset.source, link);
+    } else if (link.dataset.node && nodes.has(link.dataset.node)) {
+      event.preventDefault();
+      openNode(link.dataset.node, link);
+    }
+  });
+
+  for (const math of document.querySelectorAll('#reader-article .math')) {
+    const raw = math.textContent.trim();
+    const displayMode = math.dataset.display === 'true' || math.tagName === 'DIV';
+    // The article renderer normalizes both inline and display delimiters to two characters per side.
+    const tex = raw.slice(2, -2).trim();
+    try {
+      window.katex.render(tex, math, {output: 'mathml', displayMode, trust: false, throwOnError: true});
+    } catch {
+      math.textContent = raw;
+      math.classList.add('math-error');
+      math.title = '公式未能排版，显示原式';
+    }
+  }
+
+  function revealHashTarget() {
+    const target = byId(location.hash.slice(1));
+    if (!target) return;
+    let detail = target.closest('details');
+    let opened = false;
+    while (detail) {
+      if (!detail.open) { detail.open = true; opened = true; }
+      detail = detail.parentElement?.closest('details');
+    }
+    if (opened) target.scrollIntoView();
+  }
+  window.addEventListener('hashchange', revealHashTarget);
+  byId('reader-article').addEventListener('click', event => {
+    const hash = event.target.closest('a')?.hash;
+    if (!event.defaultPrevented && hash && hash === location.hash) revealHashTarget();
+  });
+  revealHashTarget();
+
+  const toc = document.querySelector('.toc');
+  const mobile = window.matchMedia('(max-width: 760px)');
+  function adjustToc() { toc.open = !mobile.matches; }
+  adjustToc();
+  mobile.addEventListener('change', adjustToc);
+  toc.addEventListener('click', event => {
+    if (mobile.matches && event.target.closest('a[href^="#"]')) toc.open = false;
+  });
+
+  const tocLinks = [...toc.querySelectorAll('a[href^="#"]')];
+  const sections = tocLinks.map(link => byId(link.hash.slice(1)));
+  const viewLinks = [...document.querySelectorAll('.view-nav a')];
+  let scheduled = false;
+  function markCurrent() {
+    scheduled = false;
+    let active = 0;
+    sections.forEach((section, index) => {
+      if (section && section.getBoundingClientRect().top <= Math.min(180, innerHeight * .22)) active = index;
+    });
+    tocLinks.forEach((link, index) => {
+      if (index === active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+    const graphActive = tocLinks[active].hash === '#graph';
+    viewLinks.forEach(link => {
+      if ((link.hash === '#graph') === graphActive) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
+  function onScroll() {
+    if (!scheduled) { scheduled = true; requestAnimationFrame(markCurrent); }
+  }
+  window.addEventListener('scroll', onScroll, {passive: true});
+  window.addEventListener('resize', onScroll);
+  markCurrent();
+})();
+</script>
+</body>
+</html>

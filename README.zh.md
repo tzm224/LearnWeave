@@ -11,13 +11,28 @@
 本仓库包含两套可以分别安装的技能：
 
 - [slide-study](skills/slide-study/SKILL.md)：按课件原页序串讲，生成离线学习网页。
-- [architecture-first-reader](skills/architecture-first-reader/SKILL.md)：面向论文、博客及课件，从核心 Idea、架构与设计推理建立知识主线和分层图谱，交付 Markdown、JSON 与 Mermaid。
+- [architecture-first-reader](skills/architecture-first-reader/SKILL.md) 把一篇论文、技术博客或一份课件整理成单个离线 HTML，带你读懂作者为什么这样设计。
 
-**第一版下载：** [slide-study v1.0.0 ZIP](https://github.com/tzm224/LearnWeave/archive/refs/tags/v1.0.0.zip) 对应 `v1.0.0` 标签和固定提交 `be044cc`；解压后取 `skills/slide-study/` 即可。这个链接始终指向该版本的快照。本次新增技能保留原 `skills/slide-study/` 文件。
+**第一版下载：** [slide-study v1.0.0 ZIP](https://github.com/tzm224/LearnWeave/archive/refs/tags/v1.0.0.zip) 对应 `v1.0.0` 标签和固定提交 `be044cc`；解压后取 `skills/slide-study/` 即可。
 
-## architecture-first-reader 快速开始
+## 用 architecture-first-reader 读懂设计
 
-克隆本仓库后，在仓库根目录运行以下命令安装新技能。已有同名安装时保留它，由你决定如何更新：
+读完一篇论文，你可能记住了方法的名字，却还讲不清作者为什么要多做这一步。把材料交给这个 skill，打开生成的 `index.html`，先看作者要解决什么问题，再沿着问题读懂关键设计、证据和代价。
+
+写入新值后明明清空了缓存，为什么下一次请求还能读到旧值？顺着一次读写交错往下看，你会发现，较早开始的读取可能在删除之后才把旧值填回来。有了这个例子，再看“为什么比较版本和写回缓存必须在同一把锁里”，就知道这把锁防住的是哪种情况。
+
+- **控制阅读深度。** 沿主线连续读，遇到关键一步可以原处展开反例、证明或实现细节。
+- **查清结论的依据。** 点击“依据”查看原文位置和支持范围，分清作者的主张、直接证据和 AI 的推断。关闭后接着读。
+- **沿概念探索。** 在图谱里搜索一个节点，从宏观图切到机制或细节，点一条关系看两个概念为什么相连，也可以跳回对应讲解。
+
+可以先试读两份原创教学示例。在 GitHub 打开文件后，选择 **Download raw file**，再用浏览器打开下载的 HTML。
+
+- [缓存协议示例](skills/architecture-first-reader/examples/versioned-cache/reader/index.html) 的第 5 步可以展开比较和回填之间的竞态。
+- [可合并摘要示例](skills/architecture-first-reader/examples/mergeable-summary/reader/index.html) 从一次两块数据的合并讲到树形证明，再说明浮点舍入如何限制结论。
+
+### 安装与使用
+
+克隆仓库并复制完整的技能目录。以下命令会保留已有的同名安装。
 
 ```bash
 git clone https://github.com/tzm224/LearnWeave.git
@@ -32,15 +47,14 @@ else
 fi
 ```
 
-安装后可以请求：
+安装后，附上材料，就可以这样提问。
 
 ```text
-使用 $architecture-first-reader 分析这份材料。
-先解释核心问题、Idea、整体架构和关键设计选择，再说明证据、权衡与可迁移思想。
-默认从宏观开始，给出知识主线与 L1/L2/L3 分层图谱，细节按需深入。
+用 $architecture-first-reader 带我读这篇论文。我想弄懂作者为什么这样设计。
+先讲主线，用一个具体例子走过关键步骤，再让我点开看证据和适用条件。
 ```
 
-查看 [系统设计示例](skills/architecture-first-reader/examples/versioned-cache/expected/overview.md) 和 [理论算法示例](skills/architecture-first-reader/examples/mergeable-summary/expected/overview.md)。两份都是明确标注的合成材料。新技能包含 22 项自动化测试；尚未完成真实论文验收，Mermaid 阅读器中的视觉渲染尚未实测。结构校验和图谱生成只需 Python 3.10+ 标准库；材料读取使用 Agent 当前可用工具。
+成品位于 `output/architecture-first-reader/<材料名>/index.html`。单独保存或转发这个文件就能离线阅读。以后想继续追问，还可以从 HTML 恢复分析稿并沿用原有节点。查看原件需要对应文件或网址仍可访问。构建使用 Python 3.10+ 和技能自带资源。旧版目录转换和恢复命令见[技能说明](skills/architecture-first-reader/SKILL.md)。
 
 以下介绍 `slide-study` 的功能、安装与使用。
 

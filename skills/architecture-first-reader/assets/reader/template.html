@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>__TITLE__ · LearnWeave</title>
+  <style>__STYLE__</style>
+</head>
+<body>
+  <a class="skip-link" href="#reading">跳至正文</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="wordmark" href="#overview" aria-label="LearnWeave · 返回总览">
+        <svg viewBox="48 40 320 320" width="32" height="32" aria-hidden="true">
+          <rect x="48" y="40" width="320" height="320" rx="82" fill="#5b4bdb"/>
+          <g fill="none" stroke-width="17" stroke-linecap="round"><path d="M112 108 C112 164 237 158 237 232" stroke="#67e8f9"/><path d="M304 108 C304 164 179 158 179 232" stroke="#fbbf24"/><path d="M208 94 V208" stroke="white" stroke-width="13"/></g>
+          <g fill="white"><circle cx="112" cy="108" r="13"/><circle cx="304" cy="108" r="13"/><circle cx="208" cy="94" r="14"/><path d="M102 237 C134 220 169 224 208 249 C247 224 282 220 314 237 V298 C278 282 244 286 208 310 C172 286 138 282 102 298Z"/></g>
+          <path d="M208 249V310" stroke="#5b4bdb" stroke-width="7"/>
+        </svg>
+        <span>Learn<b>Weave</b></span>
+      </a>
+      <nav class="view-nav" aria-label="阅读视图"><a href="#overview">阅读</a><a href="#graph">知识图谱 <span aria-hidden="true">↗</span></a></nav>
+    </div>
+  </header>
+  <div class="reader-shell">
+    <aside class="rail">
+      <details class="toc" open>
+        <summary>阅读目录</summary>
+        <nav aria-label="阅读目录">
+          <a href="#overview">总览</a>
+          <a href="#spine">知识主线</a>
+          <ol class="spine-toc">__NAV__</ol>
+          <div class="toc-secondary">
+            <a href="#analysis">架构与设计决策</a>
+            <a href="#patterns">可迁移思想</a>
+            <a href="#sources">原文地图与证据</a>
+            <a href="#graph">知识图谱</a>
+          </div>
+        </nav>
+      </details>
+    </aside>
+    <main id="reading" tabindex="-1">
+      <article id="reader-article">__ARTICLE__</article>
+      <section class="graph-section" id="graph" aria-labelledby="graph-heading">
+        <h2 id="graph-heading">知识图谱</h2>
+        <div id="reader-graph"></div>
+      </section>
+    </main>
+  </div>
+  <dialog id="inspector" aria-labelledby="inspector-title">
+    <div class="panel-top"><span id="inspector-kind"></span><button type="button" class="icon-button" id="close-inspector" aria-label="关闭详情">×</button></div>
+    <div class="panel-content"><h2 id="inspector-title"></h2><div id="inspector-body"></div></div>
+  </dialog>
+  <script type="application/json" id="reader-data">__PAYLOAD__</script>
+  <script>__SCRIPT__</script>
+</body>
+</html>
