@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Architecture-first shared definitions",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "attribution": {
+      "type": "string",
+      "enum": [
+        "author_claim",
+        "direct_evidence",
+        "ai_inference",
+        "external_background"
+      ]
+    },
+    "confidence": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "rationale": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "required": [
+        "level",
+        "rationale"
+      ],
+      "additionalProperties": false
+    },
+    "source_ref": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "external"
+          ]
+        },
+        "uri": {
+          "$ref": "#/$defs/text"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "page",
+            "slide",
+            "lines",
+            "section",
+            "figure",
+            "table",
+            "equation",
+            "url_fragment"
+          ]
+        },
+        "locator": {
+          "$ref": "#/$defs/text"
+        },
+        "note": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "required": [
+        "id",
+        "origin",
+        "uri",
+        "kind",
+        "locator"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

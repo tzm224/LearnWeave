@@ -1,0 +1,461 @@
+{
+  "schema_version": "1.0",
+  "document_id": "epochgate-paper",
+  "nodes_file": "knowledge_nodes.json",
+  "spine": [
+    {
+      "node_id": "stale_fill",
+      "why_next": "从 S2 的具体故障开始，先建立必须解释的现象。"
+    },
+    {
+      "node_id": "single_gateway",
+      "why_next": "界定刚才的问题在哪个并发和存储模型下讨论，避免把目标扩大成分布式一致性。"
+    },
+    {
+      "node_id": "epoch_permission",
+      "why_next": "在边界清楚后解释核心转变：删除副本之外，还要撤销在途结果的发布资格。"
+    },
+    {
+      "node_id": "epochgate",
+      "why_next": "将资格思想放进读写路径，理解哪些动作在锁内、哪些在锁外。"
+    },
+    {
+      "node_id": "publish_guard",
+      "why_next": "抓住架构中不能拆开的动作，解释为何只有版本字段还不够。"
+    },
+    {
+      "node_id": "old_fill_rejected",
+      "why_next": "连接两类执行顺序与条件性结果，再按需下钻到证据。"
+    },
+    {
+      "node_id": "retry_cost",
+      "why_next": "确认机制做到什么之后，评估重试、锁操作和未提供的进度保证。"
+    },
+    {
+      "node_id": "validate_at_commit",
+      "why_next": "最后抽象可迁移的生效前复核思想，连同适用条件一起保留。"
+    }
+  ],
+  "views": {
+    "L1": [
+      "stale_fill",
+      "single_gateway",
+      "epoch_permission",
+      "epochgate",
+      "publish_guard",
+      "retry_cost",
+      "old_fill_rejected",
+      "validate_at_commit"
+    ],
+    "L2": [
+      "stale_fill",
+      "single_gateway",
+      "epoch_permission",
+      "epochgate",
+      "publish_guard",
+      "retry_cost",
+      "old_fill_rejected",
+      "validate_at_commit",
+      "generation",
+      "state_gate",
+      "cache_entry",
+      "store",
+      "read_recheck",
+      "write_fence",
+      "short_sections",
+      "delete_only",
+      "progress_limit",
+      "io_constraint"
+    ],
+    "L3": [
+      "stale_fill",
+      "single_gateway",
+      "epoch_permission",
+      "epochgate",
+      "publish_guard",
+      "retry_cost",
+      "old_fill_rejected",
+      "validate_at_commit",
+      "generation",
+      "state_gate",
+      "cache_entry",
+      "store",
+      "read_recheck",
+      "write_fence",
+      "short_sections",
+      "delete_only",
+      "progress_limit",
+      "io_constraint",
+      "race_trace",
+      "guarded_trace",
+      "invariant_argument",
+      "split_window"
+    ]
+  },
+  "edges": [
+    {
+      "id": "r01",
+      "source_id": "stale_fill",
+      "target_id": "epoch_permission",
+      "relation": "motivates",
+      "rationale": "删除无法撤销在途结果，促使协议把回填资格作为需重查的状态。",
+      "evidence_refs": [
+        "s_race",
+        "s_state"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r02",
+      "source_id": "epochgate",
+      "target_id": "epoch_permission",
+      "relation": "implements",
+      "rationale": "共享代际、写入撤销资格和读发布复核，将资格思想落实为读写协议。",
+      "evidence_refs": [
+        "s_state",
+        "s_read",
+        "s_write"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r03",
+      "source_id": "epochgate",
+      "target_id": "single_gateway",
+      "relation": "depends_on",
+      "rationale": "绕过服务的写不会推进共享代际，局部协议无法检测它。",
+      "evidence_refs": [
+        "s_scope",
+        "s_invariant",
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r04",
+      "source_id": "publish_guard",
+      "target_id": "stale_fill",
+      "relation": "addresses",
+      "rationale": "在旧值真正进入共享缓存前核验资格，阻断删除后的旧回填。",
+      "evidence_refs": [
+        "s_read",
+        "s_trace"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r05",
+      "source_id": "publish_guard",
+      "target_id": "epoch_permission",
+      "relation": "implements",
+      "rationale": "把抽象的仍有资格转成同锁内 epoch 等值比较和发布。",
+      "evidence_refs": [
+        "s_state",
+        "s_read"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r06",
+      "source_id": "publish_guard",
+      "target_id": "old_fill_rejected",
+      "relation": "enables",
+      "rationale": "在写协议同样成立时，原子比较发布使旧代际结果不能恢复为有效缓存。",
+      "evidence_refs": [
+        "s_trace",
+        "s_invariant"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r07",
+      "source_id": "epochgate",
+      "target_id": "retry_cost",
+      "relation": "trades_off",
+      "rationale": "读写 I/O 在锁外执行，允许并发但可能产生代际不匹配及重试。",
+      "evidence_refs": [
+        "s_read",
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r08",
+      "source_id": "publish_guard",
+      "target_id": "validate_at_commit",
+      "relation": "generalizes_to",
+      "rationale": "从发布前检查代际归纳为结果生效前复核前提；推广仅在可原子发布且可丢弃结果时成立。",
+      "evidence_refs": [
+        "s_read",
+        "s_trace"
+      ],
+      "attribution": "ai_inference",
+      "confidence": {
+        "level": "medium",
+        "rationale": "关系由跨段归纳得出，迁移边界需另行检查。"
+      }
+    },
+    {
+      "id": "r09",
+      "source_id": "state_gate",
+      "target_id": "epochgate",
+      "relation": "part_of",
+      "rationale": "共享短锁与代际状态是读写协调部分。",
+      "evidence_refs": [
+        "s_state"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r10",
+      "source_id": "cache_entry",
+      "target_id": "epochgate",
+      "relation": "part_of",
+      "rationale": "缓存值保存通过当前稳定代际发布守卫的结果，写开始会清空它。",
+      "evidence_refs": [
+        "s_state",
+        "s_read"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r11",
+      "source_id": "store",
+      "target_id": "epochgate",
+      "relation": "part_of",
+      "rationale": "持久存储承担取值与写入；它处于锁外 I/O 路径。",
+      "evidence_refs": [
+        "s_read",
+        "s_write"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r12",
+      "source_id": "read_recheck",
+      "target_id": "epoch_permission",
+      "relation": "implements",
+      "rationale": "读路径复核捕获代际，把有条件的回填资格落实为可执行检查。",
+      "evidence_refs": [
+        "s_state",
+        "s_read"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r13",
+      "source_id": "read_recheck",
+      "target_id": "generation",
+      "relation": "depends_on",
+      "rationale": "比较 e 与当前 epoch 之前需要理解代际身份和奇偶状态。",
+      "evidence_refs": [
+        "s_state",
+        "s_read"
+      ],
+      "attribution": "ai_inference",
+      "confidence": {
+        "level": "medium",
+        "rationale": "关系由跨段归纳得出，迁移边界需另行检查。"
+      }
+    },
+    {
+      "id": "r14",
+      "source_id": "write_fence",
+      "target_id": "epoch_permission",
+      "relation": "implements",
+      "rationale": "写开始即改变代际使旧资格失效，结束后再开放新稳定代际。",
+      "evidence_refs": [
+        "s_state",
+        "s_write"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r15",
+      "source_id": "write_fence",
+      "target_id": "old_fill_rejected",
+      "relation": "enables",
+      "rationale": "写入先使旧代际无效并清缓存，使旧读不能重新通过后续发布检查。",
+      "evidence_refs": [
+        "s_write",
+        "s_invariant"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r16",
+      "source_id": "io_constraint",
+      "target_id": "short_sections",
+      "relation": "motivates",
+      "rationale": "不能持锁等待存储要求分离状态操作与 I/O。",
+      "evidence_refs": [
+        "s_scope",
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r17",
+      "source_id": "short_sections",
+      "target_id": "retry_cost",
+      "relation": "trades_off",
+      "rationale": "缩短元数据锁持有时间，以存储读取被丢弃和重做为代价。",
+      "evidence_refs": [
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r18",
+      "source_id": "delete_only",
+      "target_id": "publish_guard",
+      "relation": "contrasts_with",
+      "rationale": "基线删除现存项；发布守卫同时处理尚未进入缓存的结果。",
+      "evidence_refs": [
+        "s_race",
+        "s_read"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r19",
+      "source_id": "epochgate",
+      "target_id": "progress_limit",
+      "relation": "trades_off",
+      "rationale": "旧回填安全性与读完成时限是不同保证，本协议未解决高冲突下的持续重试。",
+      "evidence_refs": [
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r20",
+      "source_id": "race_trace",
+      "target_id": "stale_fill",
+      "relation": "supports",
+      "rationale": "一条具体交错足以说明写后删除无法确保目标；不支持发生率判断。",
+      "evidence_refs": [
+        "s_race"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r21",
+      "source_id": "guarded_trace",
+      "target_id": "old_fill_rejected",
+      "relation": "supports",
+      "rationale": "只支持展示的旧读晚发布交错被阻断，不能替代所有执行的证明。",
+      "evidence_refs": [
+        "s_trace"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r22",
+      "source_id": "invariant_argument",
+      "target_id": "old_fill_rejected",
+      "relation": "supports",
+      "rationale": "条件性不变式在所列假设与原子操作模型内支持旧回填隔离；不支持分布式或性能主张。",
+      "evidence_refs": [
+        "s_invariant",
+        "s_scope"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    },
+    {
+      "id": "r23",
+      "source_id": "split_window",
+      "target_id": "publish_guard",
+      "relation": "motivates",
+      "rationale": "比较与发布分离会重新产生写插入窗口，解释为什么需要同一临界区。",
+      "evidence_refs": [
+        "s_trace"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "引用位置直接说明该关系，关系范围限于协议模型。"
+      }
+    }
+  ]
+}

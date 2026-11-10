@@ -1,0 +1,30 @@
+flowchart LR
+  %% View: L1; only explicit edges with both endpoints visible.
+  %% Dashed nodes/edges denote AI inference. Contrasts have no arrow.
+  %% Source locations and edge rationales are in the canonical JSON files.
+  %% node problem; sources: setting
+  n_70726f626c656d["分块指数和需要安全表示与可合并性 · problem · L1"]
+  %% node insight; sources: representation, rescaling
+  n_696e7369676874["局部参考值可以在合并时重新对齐 · insight · L1"]
+  %% node architecture; sources: representation, merge, costs
+  n_617263686974656374757265["局部摘要到树归约再到对数结果 · architecture · L1"]
+  %% node real_result; sources: proof, contract
+  n_7265616c5f726573756c74["实数模型下任意合并树得到同一结果 · outcome · L1"]
+  %% node tradeoff; sources: costs
+  n_74726164656f6666["常数摘要带来可归约性但丢失逐项信息 · tradeoff · L1"]
+  %% node fp_limits; sources: limits
+  n_66705f6c696d697473["浮点运行仍有误差与输入边界 · constraint · L1"]
+  %% node pattern; sources: representation, merge, proof
+  n_7061747465726e["可变参考值下保持规范摘要 · pattern · L1 · AI inference"]
+  %% edge e_problem_idea; sources: setting, rescaling
+  n_70726f626c656d -->|"motivates"| n_696e7369676874
+  %% edge e_idea_problem; sources: representation, rescaling, limits
+  n_696e7369676874 -->|"addresses"| n_70726f626c656d
+  %% edge e_arch_idea; sources: merge, rescaling
+  n_617263686974656374757265 -->|"implements"| n_696e7369676874
+  %% edge e_arch_result; sources: merge, proof
+  n_617263686974656374757265 -->|"enables"| n_7265616c5f726573756c74
+  %% edge e_arch_tradeoff; sources: costs
+  n_617263686974656374757265 -->|"trades_off"| n_74726164656f6666
+  classDef inferred stroke-dasharray:5 5;
+  class n_7061747465726e inferred;

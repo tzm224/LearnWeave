@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Architecture-first knowledge graph",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "document_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    },
+    "nodes_file": {
+      "const": "knowledge_nodes.json"
+    },
+    "spine": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "node_id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "why_next": {
+            "$ref": "common.schema.json#/$defs/text"
+          }
+        },
+        "required": [
+          "node_id",
+          "why_next"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "views": {
+      "type": "object",
+      "properties": {
+        "L1": {
+          "$ref": "common.schema.json#/$defs/ids"
+        },
+        "L2": {
+          "$ref": "common.schema.json#/$defs/ids"
+        },
+        "L3": {
+          "$ref": "common.schema.json#/$defs/ids"
+        }
+      },
+      "required": [
+        "L1",
+        "L2",
+        "L3"
+      ],
+      "additionalProperties": false
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "source_id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "target_id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "motivates",
+              "addresses",
+              "implements",
+              "depends_on",
+              "enables",
+              "part_of",
+              "supports",
+              "contrasts_with",
+              "generalizes_to",
+              "trades_off"
+            ]
+          },
+          "rationale": {
+            "$ref": "common.schema.json#/$defs/text"
+          },
+          "evidence_refs": {
+            "$ref": "common.schema.json#/$defs/ids"
+          },
+          "attribution": {
+            "$ref": "common.schema.json#/$defs/attribution"
+          },
+          "confidence": {
+            "$ref": "common.schema.json#/$defs/confidence"
+          }
+        },
+        "required": [
+          "id",
+          "source_id",
+          "target_id",
+          "relation",
+          "rationale",
+          "evidence_refs",
+          "attribution",
+          "confidence"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "schema_version",
+    "document_id",
+    "nodes_file",
+    "spine",
+    "views",
+    "edges"
+  ],
+  "additionalProperties": false
+}

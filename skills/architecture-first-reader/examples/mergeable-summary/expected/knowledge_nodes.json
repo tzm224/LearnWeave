@@ -1,0 +1,376 @@
+{
+  "schema_version": "1.0",
+  "document": {
+    "id": "shifted_exp_summary",
+    "title": "A Mergeable Summary for Shifted Exponential Sums（合成技术说明）",
+    "source_type": "markdown",
+    "uri": "examples/mergeable-summary/source.md",
+    "coverage": {
+      "status": "complete",
+      "inspected_units": [
+        "原文件 lines 1-31：标题、材料性质、第 1-4 节全部正文与公式；没有图片、附件或附录。"
+      ],
+      "gaps": []
+    }
+  },
+  "source_refs": [
+    {
+      "id": "nature",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "line 3",
+      "note": "原创合成技术说明，用于阅读流程评估；非已发表论文或实测实现。 URI 相对技能根目录。"
+    },
+    {
+      "id": "setting",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 1, line 7",
+      "note": "目标、直接求指数的溢出问题及全局最大值协调。 URI 相对技能根目录。"
+    },
+    {
+      "id": "contract",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 1, line 9",
+      "note": "非空块、常数大小摘要、任意二叉合并树和实数算术目标。 URI 相对技能根目录。"
+    },
+    {
+      "id": "representation",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 2, line 13",
+      "note": "局部最大值、移位和及其表示不变量。 URI 相对技能根目录。"
+    },
+    {
+      "id": "merge",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 2, lines 15-19",
+      "note": "合并规则与根部输出。 URI 相对技能根目录。"
+    },
+    {
+      "id": "proof",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 3, line 23",
+      "note": "规范摘要保持与树归纳证明。 URI 相对技能根目录。"
+    },
+    {
+      "id": "rescaling",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 3, line 25",
+      "note": "非正指数、共同参考值与错误合并反例。 URI 相对技能根目录。"
+    },
+    {
+      "id": "costs",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 4, line 29",
+      "note": "两标量、常数次合并、无性能测量及无法直接输出 softmax 概率。 URI 相对技能根目录。"
+    },
+    {
+      "id": "limits",
+      "origin": "primary",
+      "uri": "examples/mergeable-summary/source.md",
+      "kind": "lines",
+      "locator": "section 4, line 31",
+      "note": "浮点误差、输入排除和未建立的保证。 URI 相对技能根目录。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "problem",
+      "type": "problem",
+      "title": "分块指数和需要安全表示与可合并性",
+      "summary": "目标是计算非空有限实数序列的 log(sum(exp(x_i)))。直接指数可能溢出，而先找全局最大值再求全局移位和，需要协调所有块。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "setting"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      }
+    },
+    {
+      "id": "contract",
+      "type": "constraint",
+      "title": "非空分块与精确实数目标",
+      "summary": "输入已经分成非空块；摘要须为常数大小且合并阶段不保留原块，允许任意二叉树。恒等式与结合性仅针对精确实数算术，NaN、无穷及空块不在定义域。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "contract",
+        "limits"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      },
+      "details": {
+        "assumptions": [
+          "非空有限序列，元素为有限实数。",
+          "原始分块不重复计算元素；合并保留元素重数。",
+          "正确性证明采用精确实数算术。",
+          "未为空块规定单位元。"
+        ]
+      }
+    },
+    {
+      "id": "insight",
+      "type": "insight",
+      "title": "局部参考值可以在合并时重新对齐",
+      "summary": "局部摘要不必知道最终全局最大值：先保留局部最大值与相对指数和，每次合并把它们换到共同参考值后再相加。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L1",
+      "source_refs": [
+        "representation",
+        "rescaling"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      }
+    },
+    {
+      "id": "architecture",
+      "type": "architecture",
+      "title": "局部摘要到树归约再到对数结果",
+      "summary": "块内生成 (m_A,s_A)，内部树节点只接受两个摘要并返回同形摘要，根部输出 m+log(s)。这是算法数据流与不变量组织；原文没有提供 GPU 或分布式系统实现。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L1",
+      "source_refs": [
+        "representation",
+        "merge",
+        "costs"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      },
+      "details": {
+        "interfaces": [
+          "summarize(A) -> (max(A), sum(exp(x-max(A))))",
+          "merge((m_A,s_A),(m_B,s_B)) -> (m,s)",
+          "finish((m,s)) -> m+log(s)"
+        ],
+        "state_change": "每次合并更新最大值并重标定两个局部和，摘要大小始终为两个标量。"
+      }
+    },
+    {
+      "id": "summary",
+      "type": "component",
+      "title": "两个标量保留数值和参考值",
+      "summary": "m_A=max(A)，s_A=sum(exp(x_i-m_A))；exp(m_A)*s_A 表示该块的原指数和，但实现不必真正计算这个可能溢出的乘积。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "representation"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      }
+    },
+    {
+      "id": "rescale",
+      "type": "design_decision",
+      "title": "先按共同最大值重标定再相加",
+      "summary": "取 m=max(m_A,m_B)，然后 s=s_A*exp(m_A-m)+s_B*exp(m_B-m)。两项指数均非正；省略重标定而直接加 s 会在最大值不同时出错。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "merge",
+        "rescaling"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      },
+      "details": {
+        "alternatives": [
+          "原文讨论：先协调全局最大值再求全局移位和。",
+          "原文否定：选取最大值但直接相加两个局部 s。"
+        ],
+        "tradeoff": "需要每次合并执行有界的标量和指数运算；没有测量相较全局两遍方案的运行时间。"
+      }
+    },
+    {
+      "id": "invariant",
+      "type": "mechanism",
+      "title": "合并保持规范摘要",
+      "summary": "合并后的 m 是两块整体最大值，且 exp(m)*s 等于两块原指数和之和，因此结果等于直接为合并后的元素计算的规范摘要。这里合并保留重复元素的重数。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "proof"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文给出代数恒等式与最大值性质，能直接核对。"
+      }
+    },
+    {
+      "id": "real_result",
+      "type": "outcome",
+      "title": "实数模型下任意合并树得到同一结果",
+      "summary": "由每次合并保持规范摘要，对树归纳得到完整 log-sum-exp；结合性与树形无关只在精确实数模型中成立。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "proof",
+        "contract"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      }
+    },
+    {
+      "id": "proof",
+      "type": "evidence",
+      "title": "乘回参考值并作树归纳",
+      "summary": "exp(m)*s=exp(m_A)*s_A+exp(m_B)*s_B；配合最大值性质，证明合并得到规范摘要，再由树归纳得到最终结果。",
+      "importance": "core",
+      "learning_depth": "detailed",
+      "level": "L3",
+      "source_refs": [
+        "proof"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文包含可逐步核对的代数证明和归纳论证。"
+      },
+      "details": {
+        "evidence_kind": "theoretical",
+        "scope": "非空有限实数分块，精确实数算术；合并保留元素重数。",
+        "result": "规范摘要在合并中保持，从而根结果正确且合并在该模型下具有结合性。",
+        "limitations": [
+          "不是浮点舍入误差分析。",
+          "不证明任意树形得到相同浮点位模式。",
+          "不提供性能结果。"
+        ]
+      }
+    },
+    {
+      "id": "counterexample",
+      "type": "evidence",
+      "title": "不同参考值不能直接加局部和",
+      "summary": "[0] 与 [log(2)] 的局部 s 都为 1；共同最大值为 log(2) 时正确 s 为 1/2+1=1.5，直接相加所得 2 错误。",
+      "importance": "supporting",
+      "learning_depth": "detailed",
+      "level": "L3",
+      "source_refs": [
+        "rescaling"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文显式给出这个输入及正确和错误的摘要。"
+      },
+      "details": {
+        "evidence_kind": "worked_example",
+        "scope": "两个单元素块；精确实数算术。",
+        "result": "该输入否定直接相加局部 s 的规则，说明必须处理参考值差异。",
+        "limitations": [
+          "一个反例足以否定直接相加规则，但自身不是正确合并公式的一般证明。",
+          "不衡量浮点精度或执行速度。"
+        ]
+      }
+    },
+    {
+      "id": "tradeoff",
+      "type": "tradeoff",
+      "title": "常数摘要带来可归约性但丢失逐项信息",
+      "summary": "每块只输出两个标量，每次合并进行有界运算，可先局部计算再树形归约。摘要用于总体 log-sum-exp；若要各项 softmax 概率仍需保留或重访输入。原文未测量相较协调两遍实现的加速。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "costs"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      }
+    },
+    {
+      "id": "fp_limits",
+      "type": "constraint",
+      "title": "浮点运行仍有误差与输入边界",
+      "summary": "重标定可能使微小贡献下溢，舍入破坏精确结合性；顺序折叠和平衡树可能不同。没有误差界或精度优劣保证，空块也没有单位元。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "limits"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所列位置明确给出此定义、目标或限制。"
+      }
+    },
+    {
+      "id": "pattern",
+      "type": "pattern",
+      "title": "可变参考值下保持规范摘要",
+      "summary": "把参考值与相对量一起保存，在合并边界统一参考值，并用不变量证明摘要闭合。可复用的是这种推理结构；迁移到其他问题需要重新证明，不能继承本说明的结论。",
+      "importance": "supporting",
+      "learning_depth": "working",
+      "level": "L1",
+      "source_refs": [
+        "representation",
+        "merge",
+        "proof"
+      ],
+      "attribution": "ai_inference",
+      "confidence": {
+        "level": "medium",
+        "rationale": "抽象直接对应材料的表示、重标定与不变量证明；候选新场景并未在原文验证。"
+      },
+      "details": {
+        "applicability": [
+          "每块目标量可由常数大小摘要表示。",
+          "参考值转换有可计算且正确的变换规则。",
+          "合并后仍落在同一规范摘要表示中。"
+        ],
+        "failure_modes": [
+          "仅保存相对量而丢弃参考值，无法正确对齐。",
+          "新问题的摘要不闭合或需要恢复逐项数据。",
+          "要求浮点逐位一致，却只证明了实数结合性。"
+        ],
+        "candidate_transfer": "分析者候选：计算带正权重的指数总和时，尝试令 s_A=sum(w_i*exp(x_i-m_A))；须另行证明加权不变量、规定权重范围并检查数值行为。"
+      }
+    }
+  ]
+}

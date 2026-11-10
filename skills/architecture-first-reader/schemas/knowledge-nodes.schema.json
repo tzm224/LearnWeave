@@ -1,0 +1,289 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Architecture-first knowledge nodes",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "document": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "common.schema.json#/$defs/id"
+        },
+        "title": {
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "paper",
+            "blog",
+            "markdown",
+            "pdf",
+            "pptx",
+            "ppt"
+          ]
+        },
+        "uri": {
+          "$ref": "common.schema.json#/$defs/text"
+        },
+        "coverage": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "complete",
+                "partial"
+              ]
+            },
+            "inspected_units": {
+              "type": "array",
+              "items": {
+                "$ref": "common.schema.json#/$defs/text"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "gaps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "location": {
+                    "$ref": "common.schema.json#/$defs/text"
+                  },
+                  "reason": {
+                    "$ref": "common.schema.json#/$defs/text"
+                  },
+                  "impact": {
+                    "$ref": "common.schema.json#/$defs/text"
+                  }
+                },
+                "required": [
+                  "location",
+                  "reason",
+                  "impact"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "status",
+            "inspected_units",
+            "gaps"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "source_type",
+        "uri",
+        "coverage"
+      ],
+      "additionalProperties": false
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/source_ref"
+      },
+      "minItems": 1
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "common.schema.json#/$defs/id"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "problem",
+              "constraint",
+              "insight",
+              "architecture",
+              "design_decision",
+              "component",
+              "mechanism",
+              "tradeoff",
+              "evidence",
+              "concept",
+              "pattern",
+              "outcome"
+            ]
+          },
+          "title": {
+            "$ref": "common.schema.json#/$defs/text"
+          },
+          "summary": {
+            "$ref": "common.schema.json#/$defs/text"
+          },
+          "importance": {
+            "type": "string",
+            "enum": [
+              "core",
+              "supporting",
+              "peripheral"
+            ]
+          },
+          "learning_depth": {
+            "type": "string",
+            "enum": [
+              "orientation",
+              "working",
+              "detailed"
+            ]
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "L1",
+              "L2",
+              "L3"
+            ]
+          },
+          "source_refs": {
+            "$ref": "common.schema.json#/$defs/ids"
+          },
+          "attribution": {
+            "$ref": "common.schema.json#/$defs/attribution"
+          },
+          "confidence": {
+            "$ref": "common.schema.json#/$defs/confidence"
+          },
+          "details": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "title",
+          "summary",
+          "importance",
+          "learning_depth",
+          "level",
+          "source_refs",
+          "attribution",
+          "confidence"
+        ],
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "evidence"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "details"
+              ],
+              "properties": {
+                "details": {
+                  "type": "object",
+                  "properties": {
+                    "evidence_kind": {
+                      "type": "string",
+                      "enum": [
+                        "empirical",
+                        "theoretical",
+                        "worked_example",
+                        "observation"
+                      ]
+                    },
+                    "scope": {
+                      "$ref": "common.schema.json#/$defs/text"
+                    },
+                    "result": {
+                      "$ref": "common.schema.json#/$defs/text"
+                    },
+                    "limitations": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "common.schema.json#/$defs/text"
+                      },
+                      "minItems": 0
+                    }
+                  },
+                  "required": [
+                    "evidence_kind",
+                    "scope",
+                    "result",
+                    "limitations"
+                  ],
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "pattern"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "required": [
+                "details"
+              ],
+              "properties": {
+                "details": {
+                  "type": "object",
+                  "properties": {
+                    "applicability": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "common.schema.json#/$defs/text"
+                      },
+                      "minItems": 1
+                    },
+                    "failure_modes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "common.schema.json#/$defs/text"
+                      },
+                      "minItems": 1
+                    }
+                  },
+                  "required": [
+                    "applicability",
+                    "failure_modes"
+                  ],
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "document",
+    "source_refs",
+    "nodes"
+  ],
+  "additionalProperties": false
+}
