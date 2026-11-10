@@ -1,0 +1,39 @@
+flowchart LR
+  %% View: L1; only explicit edges with both endpoints visible.
+  %% Dashed nodes/edges denote AI inference. Contrasts have no arrow.
+  %% Source locations and edge rationales are in the canonical JSON files.
+  %% node stale_fill; sources: s_race
+  n_7374616c655f66696c6c["删除后仍会旧值回填 · problem · L1"]
+  %% node single_gateway; sources: s_scope
+  n_73696e676c655f67617465776179["单进程、唯一写入口 · constraint · L1"]
+  %% node epoch_permission; sources: s_state, s_write
+  n_65706f63685f7065726d697373696f6e["取到值不等于有权发布 · insight · L1"]
+  %% node epochgate; sources: s_state, s_read, s_write
+  n_65706f636867617465["短锁包围状态，I/O 在锁外 · architecture · L1"]
+  %% node publish_guard; sources: s_read, s_trace
+  n_7075626c6973685f6775617264["把比较与发布放进同一临界区 · design_decision · L1"]
+  %% node retry_cost; sources: s_cost
+  n_72657472795f636f7374["减少锁占用，承担丢弃和重试 · tradeoff · L1"]
+  %% node old_fill_rejected; sources: s_invariant, s_scope
+  n_6f6c645f66696c6c5f72656a6563746564["旧代际不能重新成为有效命中 · outcome · L1"]
+  %% node validate_at_commit; sources: s_state, s_read, s_trace
+  n_76616c69646174655f61745f636f6d6d6974["在结果生效点复核前提 · pattern · L1 · AI inference"]
+  %% edge r01; sources: s_race, s_state
+  n_7374616c655f66696c6c -->|"motivates"| n_65706f63685f7065726d697373696f6e
+  %% edge r02; sources: s_state, s_read, s_write
+  n_65706f636867617465 -->|"implements"| n_65706f63685f7065726d697373696f6e
+  %% edge r03; sources: s_scope, s_invariant, s_cost
+  n_65706f636867617465 -->|"depends_on"| n_73696e676c655f67617465776179
+  %% edge r04; sources: s_read, s_trace
+  n_7075626c6973685f6775617264 -->|"addresses"| n_7374616c655f66696c6c
+  %% edge r05; sources: s_state, s_read
+  n_7075626c6973685f6775617264 -->|"implements"| n_65706f63685f7065726d697373696f6e
+  %% edge r06; sources: s_trace, s_invariant
+  n_7075626c6973685f6775617264 -->|"enables"| n_6f6c645f66696c6c5f72656a6563746564
+  %% edge r07; sources: s_read, s_cost
+  n_65706f636867617465 -->|"trades_off"| n_72657472795f636f7374
+  %% edge r08; sources: s_read, s_trace
+  n_7075626c6973685f6775617264 -->|"generalizes_to / AI inference"| n_76616c69646174655f61745f636f6d6d6974
+  classDef inferred stroke-dasharray:5 5;
+  class n_76616c69646174655f61745f636f6d6d6974 inferred;
+  linkStyle 7 stroke-dasharray:5 5;

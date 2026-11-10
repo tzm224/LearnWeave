@@ -1,0 +1,536 @@
+{
+  "schema_version": "1.0",
+  "document": {
+    "id": "epochgate-paper",
+    "title": "EpochGate：检查回填资格的进程内缓存方案（虚构教学材料）",
+    "source_type": "paper",
+    "uri": "examples/versioned-cache/source.md",
+    "coverage": {
+      "status": "complete",
+      "inspected_units": [
+        "lines 1–3：材料性质",
+        "S1（lines 5–11）",
+        "S2（lines 13–22）",
+        "S3.1（lines 26–30）",
+        "S3.2（lines 32–36）",
+        "S3.3（lines 38–42）",
+        "S4（lines 44–50）",
+        "S5（lines 52–56）",
+        "S6（lines 58–64）"
+      ],
+      "gaps": []
+    }
+  },
+  "source_refs": [
+    {
+      "id": "s_scope",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 5–11; S1 接口和边界",
+      "note": "适用条件和目标；URI 相对技能根目录。"
+    },
+    {
+      "id": "s_race",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 13–22; S2 一段出错的执行",
+      "note": "旧读取在写完成后回填的反例；URI 相对技能根目录。"
+    },
+    {
+      "id": "s_state",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 26–30; S3.1 状态",
+      "note": "代际、缓存项、短锁与回填资格；URI 相对技能根目录。"
+    },
+    {
+      "id": "s_read",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 32–36; S3.2 读取",
+      "note": "读路径和原子检查发布；URI 相对技能根目录。"
+    },
+    {
+      "id": "s_write",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 38–42; S3.3 写入",
+      "note": "写路径和代际推进；URI 相对技能根目录。"
+    },
+    {
+      "id": "s_trace",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 44–50; S4 重新执行",
+      "note": "手工执行序列及比较发布窗口；URI 相对技能根目录。"
+    },
+    {
+      "id": "s_invariant",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 52–56; S5 一个局部不变式",
+      "note": "条件性不变式论证与局限；URI 相对技能根目录。"
+    },
+    {
+      "id": "s_cost",
+      "origin": "primary",
+      "uri": "examples/versioned-cache/source.md",
+      "kind": "lines",
+      "locator": "lines 58–64; S6 代价和未覆盖情况",
+      "note": "成本、替代设计、缺失保证；URI 相对技能根目录。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "stale_fill",
+      "type": "problem",
+      "title": "删除后仍会旧值回填",
+      "summary": "写后删除缓存不能撤销在途读取；旧值可在写完成后重新成为缓存命中。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "s_race"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "single_gateway",
+      "type": "constraint",
+      "title": "单进程、唯一写入口",
+      "summary": "全部写请求经过共享状态协议；存储单键原子读写，未知提交结果、代际回绕和跨进程状态不在模型内。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L1",
+      "source_refs": [
+        "s_scope"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      },
+      "details": {
+        "assumptions": [
+          "所有写均经过本服务。",
+          "所有同键请求共享一把状态锁。",
+          "存储提供单键原子读写，且不会出现提交结果未知。",
+          "进程退出会清除在途任务，代际不回绕。"
+        ]
+      }
+    },
+    {
+      "id": "epoch_permission",
+      "type": "insight",
+      "title": "取到值不等于有权发布",
+      "summary": "用读取开始时的代际记录资格，在结果发布时重新确认资格仍有效；写入改变代际以撤销旧资格。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "s_state",
+        "s_write"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "epochgate",
+      "type": "architecture",
+      "title": "短锁包围状态，I/O 在锁外",
+      "summary": "读写共享代际状态与缓存；短锁串行化检查和发布，持久存储 I/O 放在锁外，冲突读取重试。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "s_state",
+        "s_read",
+        "s_write"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      },
+      "details": {
+        "interfaces": [
+          "read(k)：锁内检查缓存/记录代际，锁外读取存储，锁内复核后发布或重试。",
+          "write(k,v)：锁内转奇数并清缓存，锁外写存储，锁内转偶数再响应。"
+        ],
+        "boundaries": [
+          "仅保证同进程、同键、唯一写入口下的旧回填隔离。"
+        ]
+      }
+    },
+    {
+      "id": "publish_guard",
+      "type": "design_decision",
+      "title": "把比较与发布放进同一临界区",
+      "summary": "发布前比较代际，并在同一把锁内写入缓存和选定返回值；分开两步会让写请求插入其间。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L1",
+      "source_refs": [
+        "s_read",
+        "s_trace"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "retry_cost",
+      "type": "tradeoff",
+      "title": "减少锁占用，承担丢弃和重试",
+      "summary": "I/O 不持有状态锁，但与写交错的读会浪费存储请求并重做；每次未命中还增加锁与代际检查。",
+      "importance": "core",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "old_fill_rejected",
+      "type": "outcome",
+      "title": "旧代际不能重新成为有效命中",
+      "summary": "在模型假设成立时，写前开始的读不能在写后发布旧代际；写前已发布的缓存也由写入清除。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L1",
+      "source_refs": [
+        "s_invariant",
+        "s_scope"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "validate_at_commit",
+      "type": "pattern",
+      "title": "在结果生效点复核前提",
+      "summary": "分析者抽象：耗时操作之前记录有效性条件，在结果进入共享状态前原子复核；条件失效时丢弃或重做。",
+      "importance": "supporting",
+      "learning_depth": "orientation",
+      "level": "L1",
+      "source_refs": [
+        "s_state",
+        "s_read",
+        "s_trace"
+      ],
+      "attribution": "ai_inference",
+      "confidence": {
+        "level": "medium",
+        "rationale": "这是对协议结构的归纳；材料只证明一个进程内缓存情形，迁移需另行论证。"
+      },
+      "details": {
+        "applicability": [
+          "耗时工作可与状态变化并发，结果可以安全丢弃或重算。",
+          "存在可可靠记录的代际/有效性条件，复核与发布能够原子协调。"
+        ],
+        "failure_modes": [
+          "外部写绕过代际更新时，资格检查无法发现变化。",
+          "工作已造成不可撤销的外部副作用时，丢弃结果不等于撤销副作用。",
+          "高冲突且没有重试预算时，可能无法保证完成。"
+        ]
+      }
+    },
+    {
+      "id": "generation",
+      "type": "concept",
+      "title": "代际不是时间戳",
+      "summary": "epoch 是单键逻辑版本；偶数可读，奇数表示写入中，比较的是身份而非经过的时间。",
+      "importance": "supporting",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "s_state"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "state_gate",
+      "type": "component",
+      "title": "代际状态与短锁",
+      "summary": "共享状态锁保护 epoch、缓存有效性检查与发布，构成读写共同经过的状态协调点。",
+      "importance": "supporting",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "s_state",
+        "s_read"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "cache_entry",
+      "type": "component",
+      "title": "稳定代际内的缓存值",
+      "summary": "缓存项只保存值；写开始清空它，发布守卫确保只有当前稳定代际的读取能够填入。",
+      "importance": "supporting",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "s_state",
+        "s_read"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "store",
+      "type": "component",
+      "title": "单键原子持久存储",
+      "summary": "提供实际读写值的存储；在状态锁外调用，其原子读写语义属于协议假设。",
+      "importance": "supporting",
+      "learning_depth": "orientation",
+      "level": "L2",
+      "source_refs": [
+        "s_scope",
+        "s_read",
+        "s_write"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "read_recheck",
+      "type": "mechanism",
+      "title": "锁外读值、锁内复核",
+      "summary": "未命中时保存偶数代际 e，读取存储后检查当前 epoch 是否仍等于 e；相等才发布，否则重试。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "s_read"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "write_fence",
+      "type": "mechanism",
+      "title": "写前撤销、写后开放",
+      "summary": "写开始前推进为奇数并清缓存，完成后推进为下一偶数；等待中的写不能同时改变状态。",
+      "importance": "core",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "s_write"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "short_sections",
+      "type": "design_decision",
+      "title": "不把锁带进慢 I/O",
+      "summary": "仅元数据操作在锁内，使其他请求可以进行状态检查；承担冲突结果丢弃而非长时间独占锁。",
+      "importance": "supporting",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "s_state",
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "delete_only",
+      "type": "design_decision",
+      "title": "基线：写成功后只删除",
+      "summary": "S2 的基线只撤销已存在的缓存，没有记录或验证在途读取的资格。",
+      "importance": "supporting",
+      "learning_depth": "orientation",
+      "level": "L2",
+      "source_refs": [
+        "s_race"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "progress_limit",
+      "type": "tradeoff",
+      "title": "安全性不等于完成时限",
+      "summary": "检查阻止旧回填，但高频写可能导致反复重试；没有公平性、等待上界或同代际请求合并。",
+      "importance": "supporting",
+      "learning_depth": "working",
+      "level": "L2",
+      "source_refs": [
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "io_constraint",
+      "type": "constraint",
+      "title": "状态锁不能跨存储 I/O",
+      "summary": "任务约束要求短元数据临界区，避免一个慢存储调用阻止其他请求进行状态检查。",
+      "importance": "supporting",
+      "learning_depth": "orientation",
+      "level": "L2",
+      "source_refs": [
+        "s_scope",
+        "s_cost"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    },
+    {
+      "id": "race_trace",
+      "type": "evidence",
+      "title": "删除基线的四步反例",
+      "summary": "R 先取得 A，W 写 B 并删缓存，R 后发布 A，新读命中 A；一条执行即足以反驳基线的目标保证。",
+      "importance": "supporting",
+      "learning_depth": "detailed",
+      "level": "L3",
+      "source_refs": [
+        "s_race"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文给出可逐步检查的反例；这是手工推演，未运行真实代码。"
+      },
+      "details": {
+        "evidence_kind": "worked_example",
+        "scope": "初始值 A、空缓存、单读单写交错的删除基线。",
+        "result": "写完成后新读可命中 A，违反旧回填隔离目标。",
+        "limitations": [
+          "单个反例不能描述实际发生频率。",
+          "没有实现或性能测量。"
+        ]
+      }
+    },
+    {
+      "id": "guarded_trace",
+      "type": "evidence",
+      "title": "代际 0→1→2 的拒绝过程",
+      "summary": "R 保存 0，W 推进到 2 后，R 因 2 不等于 0 丢弃 A；重试可以在稳定代际 2 发布 B。",
+      "importance": "supporting",
+      "learning_depth": "detailed",
+      "level": "L3",
+      "source_refs": [
+        "s_trace"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "推演状态由材料直接给出；只覆盖展示的交错。"
+      },
+      "details": {
+        "evidence_kind": "worked_example",
+        "scope": "S2 同一交错，加上 S3 代际检查；后续假设没有新写打断重试。",
+        "result": "旧结果 A 的发布被拒绝；下一次稳定读取发布 B。",
+        "limitations": [
+          "不是压力测试。",
+          "不能由此推出所有实现路径正确或吞吐量更高。"
+        ]
+      }
+    },
+    {
+      "id": "invariant_argument",
+      "type": "evidence",
+      "title": "稳定代际中的有效缓存不变式",
+      "summary": "写改变代际并清除缓存；非空缓存只能由在当前偶数代际启动且通过原子复核的读发布，因此写前结果不能在写后恢复有效。",
+      "importance": "core",
+      "learning_depth": "detailed",
+      "level": "L3",
+      "source_refs": [
+        "s_invariant",
+        "s_scope"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "材料明确给出条件性协议论证；未形式化验证或检查具体语言实现。"
+      },
+      "details": {
+        "evidence_kind": "theoretical",
+        "scope": "S1 假设与 S3 的原子临界区成立时，对单键旧回填隔离的协议论证。",
+        "result": "覆盖“读先发布后被写清除”和“写先改变代际而读检查失败”两类顺序。",
+        "limitations": [
+          "不证明真实语言内存模型与异常路径实现正确。",
+          "不覆盖跨进程、跨键事务和未知提交结果。",
+          "不提供重试完成时限。"
+        ]
+      }
+    },
+    {
+      "id": "split_window",
+      "type": "mechanism",
+      "title": "检查与发布之间的竞态窗口",
+      "summary": "若比较后释放锁，写可在真正发布前完成；旧结果即使曾检查通过，也可能在新代际下发布。",
+      "importance": "core",
+      "learning_depth": "detailed",
+      "level": "L3",
+      "source_refs": [
+        "s_trace"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文在所引位置明确陈述；可信度描述提取把握，不保证实现正确。"
+      }
+    }
+  ]
+}

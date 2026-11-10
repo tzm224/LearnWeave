@@ -1,0 +1,355 @@
+{
+  "schema_version": "1.0",
+  "document_id": "shifted_exp_summary",
+  "nodes_file": "knowledge_nodes.json",
+  "spine": [
+    {
+      "node_id": "problem",
+      "why_next": "先确定需要计算什么，以及直接指数与全局移位方案面临什么限制。"
+    },
+    {
+      "node_id": "contract",
+      "why_next": "问题还没有限定答案的形态：接着明确非空块、常数摘要与实数算术目标。"
+    },
+    {
+      "node_id": "insight",
+      "why_next": "既然块内不能依赖最终全局最大值，就要解释如何推迟统一参考值。"
+    },
+    {
+      "node_id": "architecture",
+      "why_next": "知道参考值可后续对齐后，需要看摘要怎样沿树传递并产生最终输出。"
+    },
+    {
+      "node_id": "rescale",
+      "why_next": "结构中最关键的缺口是两个不同参考值的摘要究竟怎样合并。"
+    },
+    {
+      "node_id": "real_result",
+      "why_next": "合并公式有了，接着问它为何能支持任意树，而不只是一个例子。"
+    },
+    {
+      "node_id": "tradeoff",
+      "why_next": "正确性成立后，再确认这种组织获得什么能力、舍弃哪些逐项信息。"
+    },
+    {
+      "node_id": "fp_limits",
+      "why_next": "常数摘要与实数证明都不能回答浮点误差，需要划清实际运行边界。"
+    },
+    {
+      "node_id": "pattern",
+      "why_next": "在能力与限制明确后，才能抽象可迁移结构而不移植未经验证的保证。"
+    }
+  ],
+  "views": {
+    "L1": [
+      "problem",
+      "insight",
+      "architecture",
+      "real_result",
+      "tradeoff",
+      "fp_limits",
+      "pattern"
+    ],
+    "L2": [
+      "problem",
+      "contract",
+      "insight",
+      "architecture",
+      "summary",
+      "rescale",
+      "invariant",
+      "real_result",
+      "tradeoff",
+      "fp_limits",
+      "pattern"
+    ],
+    "L3": [
+      "problem",
+      "contract",
+      "insight",
+      "architecture",
+      "summary",
+      "rescale",
+      "invariant",
+      "real_result",
+      "proof",
+      "counterexample",
+      "tradeoff",
+      "fp_limits",
+      "pattern"
+    ]
+  },
+  "edges": [
+    {
+      "id": "e_problem_idea",
+      "source_id": "problem",
+      "target_id": "insight",
+      "relation": "motivates",
+      "rationale": "全局最大值协调问题引出先局部摘要、后统一参考值的方向。",
+      "evidence_refs": [
+        "setting",
+        "rescaling"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_constraint_idea",
+      "source_id": "contract",
+      "target_id": "insight",
+      "relation": "motivates",
+      "rationale": "常数摘要、无需保留原块且可任意二叉合并的目标要求局部信息足够转换参考值。",
+      "evidence_refs": [
+        "contract",
+        "representation",
+        "rescaling"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_idea_problem",
+      "source_id": "insight",
+      "target_id": "problem",
+      "relation": "addresses",
+      "rationale": "局部摘要不需预知全局最大值；非正指数参数缓解直接正指数的溢出问题，仍有其他浮点风险。",
+      "evidence_refs": [
+        "representation",
+        "rescaling",
+        "limits"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_arch_idea",
+      "source_id": "architecture",
+      "target_id": "insight",
+      "relation": "implements",
+      "rationale": "树内每次合并把不同局部参考值转换到共同参考值。",
+      "evidence_refs": [
+        "merge",
+        "rescaling"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_arch_contract",
+      "source_id": "architecture",
+      "target_id": "contract",
+      "relation": "depends_on",
+      "rationale": "所定义的每个摘要与树合并均以非空有限实数块为前提。",
+      "evidence_refs": [
+        "contract",
+        "limits"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_summary_arch",
+      "source_id": "summary",
+      "target_id": "architecture",
+      "relation": "part_of",
+      "rationale": "两标量摘要是块内输出与合并接口。",
+      "evidence_refs": [
+        "representation",
+        "merge"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_rescale_arch",
+      "source_id": "rescale",
+      "target_id": "architecture",
+      "relation": "part_of",
+      "rationale": "内部树节点执行这一合并步骤并返回同形摘要。",
+      "evidence_refs": [
+        "merge"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_rescale_idea",
+      "source_id": "rescale",
+      "target_id": "insight",
+      "relation": "implements",
+      "rationale": "按最大值差乘指数具体实现参考值对齐。",
+      "evidence_refs": [
+        "merge",
+        "rescaling"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_rescale_invariant",
+      "source_id": "rescale",
+      "target_id": "invariant",
+      "relation": "enables",
+      "rationale": "重标定乘回共同 exp(m) 后恢复两块原指数和。",
+      "evidence_refs": [
+        "merge",
+        "proof"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "关系直接对应所列证明或反例的支持范围。"
+      }
+    },
+    {
+      "id": "e_invariant_result",
+      "source_id": "invariant",
+      "target_id": "real_result",
+      "relation": "enables",
+      "rationale": "规范摘要在每层保持，因此树归纳给出根的正确性及实数结合性。",
+      "evidence_refs": [
+        "proof"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "关系直接对应所列证明或反例的支持范围。"
+      }
+    },
+    {
+      "id": "e_proof_result",
+      "source_id": "proof",
+      "target_id": "real_result",
+      "relation": "supports",
+      "rationale": "代数等式和树归纳支持精确实数结果，不支持浮点逐位一致。",
+      "evidence_refs": [
+        "proof",
+        "limits"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "关系直接对应所列证明或反例的支持范围。"
+      }
+    },
+    {
+      "id": "e_proof_invariant",
+      "source_id": "proof",
+      "target_id": "invariant",
+      "relation": "supports",
+      "rationale": "证明同时核对最大值和指数和两项规范摘要性质。",
+      "evidence_refs": [
+        "proof"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "关系直接对应所列证明或反例的支持范围。"
+      }
+    },
+    {
+      "id": "e_counter_rescale",
+      "source_id": "counterexample",
+      "target_id": "rescale",
+      "relation": "supports",
+      "rationale": "反例否定省略参考值转换的直接加法；一般合并正确性仍依靠独立代数证明。",
+      "evidence_refs": [
+        "rescaling"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "关系直接对应所列证明或反例的支持范围。"
+      }
+    },
+    {
+      "id": "e_result_contract",
+      "source_id": "real_result",
+      "target_id": "contract",
+      "relation": "depends_on",
+      "rationale": "任意树等价结论仅针对非空有限实数输入和精确实数算术。",
+      "evidence_refs": [
+        "contract",
+        "proof",
+        "limits"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_arch_result",
+      "source_id": "architecture",
+      "target_id": "real_result",
+      "relation": "enables",
+      "rationale": "局部摘要、保持规范表示的合并与根部对数解码组成完整计算路径；该联系有树归纳依据。",
+      "evidence_refs": [
+        "merge",
+        "proof"
+      ],
+      "attribution": "direct_evidence",
+      "confidence": {
+        "level": "high",
+        "rationale": "关系直接对应所列证明或反例的支持范围。"
+      }
+    },
+    {
+      "id": "e_arch_tradeoff",
+      "source_id": "architecture",
+      "target_id": "tradeoff",
+      "relation": "trades_off",
+      "rationale": "两标量接口获得局部归约能力，却不能直接产出每个输入对应的 softmax 概率。",
+      "evidence_refs": [
+        "costs"
+      ],
+      "attribution": "author_claim",
+      "confidence": {
+        "level": "high",
+        "rationale": "原文明确描述该联系。"
+      }
+    },
+    {
+      "id": "e_rescale_pattern",
+      "source_id": "rescale",
+      "target_id": "pattern",
+      "relation": "generalizes_to",
+      "rationale": "把具体重标定步骤抽象为在合并边界对齐参考值并保持摘要不变量。",
+      "evidence_refs": [
+        "representation",
+        "merge",
+        "proof"
+      ],
+      "attribution": "ai_inference",
+      "confidence": {
+        "level": "medium",
+        "rationale": "这是依据所列机制形成的分析抽象，原文未验证迁移结论。"
+      }
+    }
+  ]
+}

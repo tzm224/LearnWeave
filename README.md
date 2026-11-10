@@ -1,105 +1,144 @@
-# Slide Study · 课件串讲与知识图
+# Slide Study · Guided Notes and Knowledge Graphs
 
-**中文** | [English](README.en.md)
+[中文](README.zh.md) | **English**
 
-把一份课件变成可以沿页学习、也可以沿概念探索的离线学习网页。
+This repository contains two skills that can be installed separately:
 
-`slide-study` 是一个 Codex skill。它先理解全篇，再按原页序解释“讲了什么、为什么在这里讲、如何承接前后”，最后建立带来源页与关联理由的知识图。适合已有学科基础、首次学习这门课的读者。
+- [slide-study](skills/slide-study/SKILL.md): explains a deck in its original page order and builds an offline study website.
+- [architecture-first-reader](skills/architecture-first-reader/SKILL.md): reconstructs core ideas, architecture, and design reasoning from papers, technical articles, and slides, delivering a shared knowledge spine and layered graph as Markdown, JSON, and Mermaid.
 
-## 能做什么
+**Original version:** [Download the first slide-study ZIP](https://github.com/tzm224/slide-study/archive/be044cc7270dcbec32566afee762e729d26bbca2.zip), pinned to commit `be044cc`. Extract and use `skills/slide-study/`. The link continues to refer to that commit's snapshot. This addition preserves the existing `skills/slide-study/` files.
 
-- **逐页串讲**：先给课程总览与阅读主线，再解释每页的机制、例子、推导和应记住的内容。封面简写，关键内容展开，渐进演示页说明新增部分。
-- **有依据的知识图**：合并同义概念，组织前置依赖、推导、应用、对比、问题与解决方案、证据支持等关系。每条关系说明理由，并可回到原页。
-- **区分解释依据**：分别标注课件内容（`source`）、补充解释（`supplement`）、推断（`inference`）和不确定内容（`uncertain`）。
-- **原页与讲义对照**：桌面并排、窄屏上下排列；支持图片放大、搜索、目录、页码跳转和上一页／下一页。
-- **交互探索**：知识图支持缩放、平移、搜索和邻接高亮；讲义、概念与来源页双向跳转。
-- **完整交付**：一次覆盖整份课件，保留原件，交付独立网页目录、ZIP 和可编辑的课程数据。
+## architecture-first-reader quick start
 
-## 输入与输出
+Clone this repository and run the following from its root to install the new skill. An existing installation is preserved so you can choose how to update it:
 
-支持 **PPTX、课件 PDF**，以及经本机 LibreOffice 转换的旧版 **PPT**。一次处理一份课件；PPTX 按实际演示顺序关联页面与讲者备注。
+```bash
+git clone https://github.com/tzm224/slide-study.git
+cd slide-study
 
-生成的目录包含：
+skill_install_dir="${CODEX_HOME:-$HOME/.codex}/skills"
+mkdir -p "$skill_install_dir"
+if [ -e "$skill_install_dir/architecture-first-reader" ]; then
+  printf '%s\n' 'architecture-first-reader already exists; back up or move the old version before installing.'
+else
+  cp -R skills/architecture-first-reader "$skill_install_dir/architecture-first-reader"
+fi
+```
+
+Then ask:
+
+```text
+Use $architecture-first-reader to analyze this material in English.
+Explain the problem, core idea, architecture, and key design decisions, then the evidence,
+trade-offs, and transferable ideas. Start with the big picture and provide a knowledge
+spine and L1/L2/L3 graph, with details available as needed.
+```
+
+See the [system design example](skills/architecture-first-reader/examples/versioned-cache/expected/overview.md) and [theory/algorithm example](skills/architecture-first-reader/examples/mergeable-summary/expected/overview.md). Both are explicitly labeled synthetic materials. The new skill includes 22 automated tests; it has not yet completed acceptance testing on a real paper or visual rendering checks in a Mermaid viewer. Its validation and graph generation tools require only the Python 3.10+ standard library; source reading uses the agent's available tools.
+
+The functionality, installation, and usage of `slide-study` follow below.
+
+Turn a slide deck into an offline study website you can explore page by page or concept by concept.
+
+`slide-study` is a Codex skill. It first reads the entire deck, then explains each page in its original order: what it teaches, why it appears at that point, and how it connects to the surrounding material. It also builds a knowledge graph with source pages and explanations for every relationship. It is designed for readers who know the subject's foundations but are studying this course for the first time.
+
+## What it does
+
+- **Guided notes for every page**: Start with a course overview and reading path, then explain mechanisms, examples, derivations, and takeaways. Keep cover pages brief, expand key ideas, and identify what changes across progressive slides.
+- **Evidence-backed knowledge graph**: Merge synonymous concepts and connect prerequisites, derivations, applications, comparisons, problems and solutions, and supporting evidence. Every relationship includes a reason and links back to source pages.
+- **Visible provenance**: Distinguish source material (`source`), supplementary explanations (`supplement`), reconstructed reasoning (`inference`), and unresolved content (`uncertain`).
+- **Slides alongside explanations**: Use a side-by-side desktop layout and a stacked narrow-screen layout, with image zoom, search, a table of contents, page jumps, and previous/next navigation.
+- **Interactive exploration**: Zoom, pan, search, and highlight neighboring concepts in the graph; navigate both ways between notes, concepts, and source pages.
+- **A complete deliverable**: Cover the entire deck in one delivery, preserve the original file, and produce a standalone website folder, a ZIP archive, and editable course data.
+
+## Inputs and outputs
+
+Supports **PPTX and lecture PDF files**, plus legacy **PPT files** converted locally with LibreOffice. Each run handles one deck. PPTX pages and speaker notes are matched using the actual presentation order.
+
+The generated folder contains:
 
 ```text
 my-course/
-├── index.html       # 学习入口
-├── lesson.json      # 可编辑的逐页讲义、概念与关系
-├── source.json      # 原页信息与来源记录
-├── pages/           # 原页图像
-└── assets/          # 本地脚本、样式、公式字体
+├── index.html       # Study entry point
+├── lesson.json      # Editable notes, concepts, and relationships
+├── source.json      # Original page information and provenance
+├── pages/           # Original page images
+└── assets/          # Local scripts, styles, and math fonts
 my-course.zip
 ```
 
-解压 ZIP 后打开 `index.html` 即可阅读。成品无需账户、服务器、模型 API 或 CDN，课程数据直接嵌入网页；生成过程需要 AI 阅读课件、撰写讲义并审查内容。脚本负责提取、渲染、校验与打包。
+Extract the ZIP and open `index.html` to study. The finished website needs no account, server, model API, or CDN; course data is embedded directly in the page. Creating a course requires an AI agent to read the deck, write the notes, and review the content. The scripts handle extraction, rendering, validation, and packaging.
 
-**README 可切换中英文；学习网页界面目前为中文，讲解默认中文。** 可以在任务中指定讲解语言，网页界面没有语言切换按钮。
+**This README is available in Chinese and English. The study website's interface is currently Chinese, and explanations default to Chinese.** You can request another language for the explanations; the website has no interface language switch.
 
-## 安装
+## Installation
 
-先克隆仓库，再把完整技能目录复制到本机 skills 目录。以下命令不会覆盖已有的 `slide-study`：
+Clone the repository and copy the complete skill folder into your local skills directory. These commands will not overwrite an existing `slide-study` installation:
 
 ```bash
-git clone https://github.com/tzm224/skill.git
-cd skill
+git clone https://github.com/tzm224/slide-study.git
+cd slide-study
 
 skill_install_dir="${CODEX_HOME:-$HOME/.codex}/skills"
 mkdir -p "$skill_install_dir"
 if [ -e "$skill_install_dir/slide-study" ]; then
-  printf '%s\n' 'slide-study 已存在；请先备份或移走旧版本，再安装。'
+  printf '%s\n' 'slide-study already exists; back up or move the old version before installing.'
 else
   cp -R skills/slide-study "$skill_install_dir/slide-study"
 fi
 ```
 
-默认安装位置为 `~/.codex/skills/slide-study`；设置了 `CODEX_HOME` 时使用其下的 `skills/slide-study`。按[运行环境说明](skills/slide-study/references/setup.md)准备依赖后，在支持技能的 Codex 环境中调用。
+The default location is `~/.codex/skills/slide-study`. If `CODEX_HOME` is set, the destination is its `skills/slide-study` subdirectory. Prepare the dependencies using the [environment guide](skills/slide-study/references/setup.md), then invoke the skill in a Codex environment that supports skills.
 
-## 使用
+## Usage
 
-把课件提供给 Codex，并指定技能，例如：
+Provide your deck to Codex and name the skill, for example:
 
 ```text
-使用 $slide-study 处理这份 lecture.pdf。
-请先理解全篇，再按原页序讲解每页内容、作用和前后衔接，
-补齐必要的背景、例子与推导，建立可回溯来源页的知识图，
-一次交付完整的本地离线学习网页和 ZIP。默认用中文讲解。
+Use $slide-study to process this lecture.pdf.
+Read the entire deck first, then explain every page in its original order:
+its content, its role, and its connections to the preceding and following pages.
+Add the background, examples, and derivations needed to understand it.
+Build a knowledge graph with source-page references, and deliver the complete
+offline study website and ZIP in one go. Write the explanations in English.
 ```
 
-也可以说明自己的基础、想重点理解的章节、讲解语言或输出位置。长课件会在内部按章节处理，再统一术语、衔接与跨章关系。
+You can also specify your background, chapters to emphasize, explanation language, or output location. Long decks are processed internally by chapter, then reconciled for consistent terminology, transitions, and cross-chapter relationships.
 
-## 生成环境
+## Generation environment
 
-| 用途 | 依赖 |
+| Purpose | Dependencies |
 | --- | --- |
-| Python 脚本 | Python 3.10+、`pypdf`、`Pillow`；版本见 [requirements.txt](skills/slide-study/requirements.txt) |
-| PDF 页面渲染 | Poppler 的 `pdftoppm` |
-| 公式校验与网页打包 | Node.js；使用随包 KaTeX，无需 `npm install` |
-| PPTX 渲染 | 已安装的 Codex Presentations 渲染器；不可用时使用 LibreOffice `soffice` + Poppler |
-| 旧版 PPT 转换 | LibreOffice `soffice` |
-| 成品阅读 | 现代浏览器，无需上述生成工具 |
+| Python scripts | Python 3.10+, `pypdf`, and `Pillow`; versions are listed in [requirements.txt](skills/slide-study/requirements.txt) |
+| PDF page rendering | Poppler's `pdftoppm` |
+| Formula validation and website packaging | Node.js; uses the bundled KaTeX files, with no `npm install` needed |
+| PPTX rendering | An installed Codex Presentations renderer, or LibreOffice `soffice` + Poppler as a fallback |
+| Legacy PPT conversion | LibreOffice `soffice` |
+| Reading the finished website | A modern browser; none of the generation tools above are needed |
 
-依赖安装、工具路径配置和脚本命令见[运行环境说明](skills/slide-study/references/setup.md)。
+See the [environment guide](skills/slide-study/references/setup.md) for dependency installation, executable paths, and script commands.
 
-## 质量与限制
+## Quality and limitations
 
-页面覆盖、图片资源、概念双向引用、来源与公式由脚本校验；教学机制、推导与关系依据仍需对照原页审查。扫描 PDF 需要视觉阅读；静态页面不能完整保留动画或视频；转换器可能替换字体或改变布局。无法辨认的内容应标明具体页码。
+Scripts validate page coverage, image assets, reciprocal concept references, source information, and formulas. Teaching explanations, derivations, and relationship evidence still need review against the original pages. Scanned PDFs require visual reading. Static pages cannot preserve full animation or video behavior, and converters may substitute fonts or change layouts. Unreadable content should be identified by its specific page number.
 
-开发时使用过 47 页与 134 页真实课件，以及包含非平凡页序、隐藏页和备注的 PPTX 材料进行验证；另有 17 项自动化测试。浏览器交互已通过本机 HTTP 预览检查，但当时浏览器工具禁止 `file://`，因此未实测双击本地文件与断网打开。未来生成任务应在允许的环境中验证，并如实报告未完成的检查。
+Development checks used real 47-page and 134-page decks, plus a PPTX fixture with reordered slides, hidden slides, and speaker notes. The package also includes 17 automated tests. Browser interactions were checked through a local HTTP preview, but the browser tool prohibited `file://` at the time, so opening the website directly from disk and with the network disconnected was not tested. Future generation tasks should verify this in a permitted environment and report any checks they could not complete.
 
-## 仓库结构
+## Repository layout
 
 ```text
 skills/slide-study/
-├── SKILL.md          # 技能入口与工作流程
-├── agents/           # Codex 界面元数据
-├── references/       # 教学标准、内容契约与环境说明
-├── scripts/          # 预处理、校验、构建与测试
-├── assets/           # 网页模板与本地 KaTeX 资源
+├── SKILL.md          # Skill entry point and workflow
+├── agents/           # Codex interface metadata
+├── references/       # Teaching standards, content contract, and setup
+├── scripts/          # Preprocessing, validation, building, and tests
+├── assets/           # Website template and local KaTeX resources
 └── requirements.txt
 ```
 
-- [技能说明](skills/slide-study/SKILL.md)
-- [教学标准](skills/slide-study/references/teaching.md)
-- [内容契约](skills/slide-study/references/content-model.md)
+- [Skill instructions](skills/slide-study/SKILL.md)
+- [Teaching standards](skills/slide-study/references/teaching.md)
+- [Content contract](skills/slide-study/references/content-model.md)
 
-公式渲染使用随包保存的 **KaTeX 0.19.1**，其第三方许可见 [KaTeX LICENSE](skills/slide-study/assets/vendor/katex/LICENSE)，来源见 [provenance.json](skills/slide-study/assets/vendor/katex/provenance.json)。该许可适用于 KaTeX，不代表整个仓库的许可。
+Math rendering uses the bundled **KaTeX 0.19.1**. Its third-party license is included in [KaTeX LICENSE](skills/slide-study/assets/vendor/katex/LICENSE), with source details in [provenance.json](skills/slide-study/assets/vendor/katex/provenance.json). That license applies to KaTeX and is not a license for the entire repository.
