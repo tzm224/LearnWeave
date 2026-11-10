@@ -11,13 +11,28 @@
 This repository contains two skills that can be installed separately:
 
 - [slide-study](skills/slide-study/SKILL.md): explains a deck in its original page order and builds an offline study website.
-- [architecture-first-reader](skills/architecture-first-reader/SKILL.md): reconstructs core ideas, architecture, and design reasoning from papers, technical articles, and slides, delivering a shared knowledge spine and layered graph as Markdown, JSON, and Mermaid.
+- [architecture-first-reader](skills/architecture-first-reader/SKILL.md) turns a paper, technical article, or slide deck into a single offline HTML file that explains why the author chose a particular design.
 
-**Original version:** [Download slide-study v1.0.0 ZIP](https://github.com/tzm224/LearnWeave/archive/refs/tags/v1.0.0.zip), tagged `v1.0.0` at commit `be044cc`. Extract and use `skills/slide-study/`. The link continues to refer to that release's snapshot. This addition preserves the existing `skills/slide-study/` files.
+**Original version:** [Download slide-study v1.0.0 ZIP](https://github.com/tzm224/LearnWeave/archive/refs/tags/v1.0.0.zip), tagged `v1.0.0` at commit `be044cc`. Extract and use `skills/slide-study/`.
 
-## architecture-first-reader quick start
+## Read a design with architecture-first-reader
 
-Clone this repository and run the following from its root to install the new skill. An existing installation is preserved so you can choose how to update it:
+Sometimes you finish a paper knowing the name of the method but still wonder why the author needed a particular step. Give the material to this skill and open the resulting `index.html`. Start with the problem, then follow the design choices, the evidence behind them, and the costs they introduce.
+
+The cache example opens with a puzzle. A writer has saved the new value and cleared the cache. How can the next request still read the old value? Follow one reader and one writer and you can see an earlier read refill the cache after it was cleared. That sequence explains why the version check and the cache update need to happen under the same lock.
+
+- **Choose how far to go.** Read straight through or expand a counterexample, proof, or implementation detail where it comes up.
+- **Inspect the evidence.** Click a reference to see the source location, what it supports, and whether the explanation is an author claim, direct evidence, or an AI inference. Close it to return to your place.
+- **Follow a concept.** Search the graph, switch from the overview to mechanisms or details, and select an edge to see why two ideas connect. Jump back to the passage when you want the full explanation.
+
+Try either synthetic example before installing. On GitHub, open the file, select **Download raw file**, then open the downloaded HTML in your browser.
+
+- [Cache protocol](skills/architecture-first-reader/examples/versioned-cache/reader/index.html) walks through the race between a version check and a cache update in step 5.
+- [Mergeable summaries](skills/architecture-first-reader/examples/mergeable-summary/reader/index.html) follows a two-block merge through its proof and explains how floating-point rounding limits the result.
+
+### Install and use the skill
+
+Clone the repository and copy the skill directory. These commands keep any existing installation in place.
 
 ```bash
 git clone https://github.com/tzm224/LearnWeave.git
@@ -32,16 +47,15 @@ else
 fi
 ```
 
-Then ask:
+Attach the material and ask Codex a reading question like this one.
 
 ```text
-Use $architecture-first-reader to analyze this material in English.
-Explain the problem, core idea, architecture, and key design decisions, then the evidence,
-trade-offs, and transferable ideas. Start with the big picture and provide a knowledge
-spine and L1/L2/L3 graph, with details available as needed.
+Use $architecture-first-reader to walk me through this paper in English.
+I want to understand why the authors chose this design. Follow one concrete example
+through the key steps and let me open the evidence and assumptions as I read.
 ```
 
-See the [system design example](skills/architecture-first-reader/examples/versioned-cache/expected/overview.md) and [theory/algorithm example](skills/architecture-first-reader/examples/mergeable-summary/expected/overview.md). Both are explicitly labeled synthetic materials. The new skill includes 22 automated tests; it has not yet completed acceptance testing on a real paper or visual rendering checks in a Mermaid viewer. Its validation and graph generation tools require only the Python 3.10+ standard library; source reading uses the agent's available tools.
+Each analysis produces `output/architecture-first-reader/<material>/index.html`. Save or share that file to read it offline. You can later recover the editable analysis from the HTML and follow up on the same nodes. Opening an original source requires access to its file or URL. Building a reader uses Python 3.10+ and the bundled resources. See the [build and recovery instructions](skills/architecture-first-reader/SKILL.md) to convert an older analysis or resume editing.
 
 The functionality, installation, and usage of `slide-study` follow below.
 

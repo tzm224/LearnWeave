@@ -1,0 +1,154 @@
+#reader-graph {
+  --rg-accent: var(--accent, #5144ad);
+  --rg-ink: var(--ink, #222237);
+  --rg-muted: var(--muted, #626373);
+  --rg-line: #d4d1dd;
+  color: var(--rg-ink);
+  min-width: 0;
+}
+#reader-graph [hidden] { display: none !important; }
+#reader-graph button,
+#reader-graph input {
+  font: inherit;
+  font-size: .875rem;
+  line-height: 1.45;
+}
+#reader-graph button {
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  padding: .4rem .7rem;
+  background: #fff;
+  color: var(--rg-ink);
+  cursor: pointer;
+}
+#reader-graph button:hover { border-color: var(--rg-accent); color: var(--rg-accent); }
+#reader-graph button[aria-pressed="true"] { background: var(--rg-accent); border-color: var(--rg-accent); color: #fff; }
+#reader-graph :is(button,input):focus-visible { outline: 2px solid var(--rg-accent); outline-offset: 2px; }
+#reader-graph .rg-toolbar,
+#reader-graph .rg-footer,
+#reader-graph .rg-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+#reader-graph .rg-toolbar { justify-content: space-between; margin-bottom: .8rem; }
+#reader-graph .rg-layers {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--rg-line);
+  border-radius: 8px;
+  background: #f2f1f6;
+}
+#reader-graph .rg-layers button { background: transparent; border-color: transparent; padding: .37rem .62rem; }
+#reader-graph .rg-layers button[aria-pressed="true"] { background: var(--rg-accent); }
+#reader-graph .rg-search { position: relative; width: 16rem; max-width: 100%; }
+#reader-graph .rg-search input {
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  box-sizing: border-box;
+  padding: .48rem .7rem;
+  width: 100%;
+  background: white;
+  color: var(--rg-ink);
+}
+#reader-graph .rg-results {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 4px);
+  width: 100%;
+  max-height: 16rem;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--rg-line);
+  border-radius: 7px;
+  box-sizing: border-box;
+  background: white;
+  box-shadow: 0 6px 16px #25233b15;
+}
+#reader-graph .rg-results button { display: block; width: 100%; text-align: start; border: 0; }
+#reader-graph .rg-results button:hover,
+#reader-graph .rg-results button:focus-visible { background: #f1eff9; }
+#reader-graph .rg-no-results { display: block; padding: .45rem; font-size: .875rem; color: var(--rg-muted); }
+#reader-graph .rg-canvas {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rg-line);
+  border-radius: 9px;
+  background-color: #f8f7f9;
+  background-image: radial-gradient(#dedce5 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+#reader-graph .rg-diagram {
+  display: block;
+  width: 100%;
+  height: clamp(20rem, 49vh, 34rem);
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+#reader-graph .rg-diagram:active { cursor: grabbing; }
+#reader-graph .rg-node,
+#reader-graph .rg-edge { cursor: pointer; }
+#reader-graph .rg-card {
+  fill: #fff;
+  stroke: #bdb9cd;
+  stroke-width: 1.4px;
+}
+#reader-graph .rg-node[aria-pressed="true"] .rg-card { fill: #ece9fc; stroke: var(--rg-accent); stroke-width: 2; }
+#reader-graph .rg-node:hover .rg-card,
+#reader-graph .rg-node:focus-visible .rg-card { stroke: var(--rg-accent); stroke-width: 2.5; }
+#reader-graph .rg-node:focus-visible,
+#reader-graph .rg-edge:focus-visible { outline: none; }
+#reader-graph .rg-meta { font-size: 10px; fill: #61578a; }
+#reader-graph .rg-title { font-size: 13px; font-weight: 600; fill: var(--rg-ink); }
+#reader-graph .rg-line { fill: none; stroke: #77718e; stroke-width: 1.6; }
+#reader-graph .rg-arrow { fill: #6e6887; }
+#reader-graph .rg-inferred { stroke-dasharray: 5 4; }
+#reader-graph .rg-card.rg-inferred { stroke: #94653c; }
+#reader-graph .rg-hit { fill: none; stroke: transparent; stroke-width: 16; }
+#reader-graph .rg-edge:hover .rg-line,
+#reader-graph .rg-edge:focus-visible .rg-line { stroke: var(--rg-accent); stroke-width: 3; }
+#reader-graph .rg-edge-label {
+  font-size: 10px;
+  font-weight: 600;
+  fill: #615b74;
+  stroke: #f8f7f9;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+#reader-graph .rg-hover-label { opacity: 0; }
+#reader-graph .rg-edge:hover .rg-hover-label,
+#reader-graph .rg-edge:focus-visible .rg-hover-label { opacity: 1; }
+#reader-graph .rg-tools {
+  display: inline-flex;
+  position: absolute;
+  right: .55rem;
+  bottom: .55rem;
+  border: 1px solid var(--rg-line);
+  border-radius: 6px;
+  background: #fff;
+}
+#reader-graph .rg-tools button { padding: .28rem .55rem; border: 0; border-radius: 5px; min-width: 2rem; }
+#reader-graph .rg-tools button + button { border-left: 1px solid var(--rg-line); }
+#reader-graph .rg-footer { justify-content: space-between; margin: .45rem .1rem 0; font-size: .78rem; color: var(--rg-muted); }
+#reader-graph .rg-legend::before { content: ""; display: inline-block; width: 1.2rem; margin-right: .4rem; border-top: 1px dashed #94653c; vertical-align: middle; }
+#reader-graph .rg-inspector {
+  margin: .85rem 0 0;
+  padding: .85rem 1rem;
+  border-left: 3px solid var(--rg-accent);
+  background: #f3f1fa;
+  border-radius: 0 6px 6px 0;
+}
+#reader-graph .rg-detail-title { display: block; font-size: 1rem; }
+#reader-graph .rg-summary { margin: .28rem 0 .65rem; font-size: .9rem; line-height: 1.65; }
+#reader-graph .rg-actions button { padding: .28rem .62rem; font-size: .82rem; }
+@media (max-width: 620px) {
+  #reader-graph .rg-toolbar { align-items: stretch; }
+  #reader-graph .rg-search { flex: 1 1 100%; }
+  #reader-graph .rg-diagram { height: min(26rem, 56vh); }
+  #reader-graph .rg-tools button { min-height: 2.3rem; min-width: 2.3rem; }
+}
+#reader-graph .rg-pan-hint { color: var(--rg-muted); }

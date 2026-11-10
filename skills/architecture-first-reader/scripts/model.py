@@ -10,11 +10,12 @@ from typing import Any
 from schema_check import SchemaChecker
 
 SCHEMA_DIR = Path(__file__).resolve().parent.parent / 'schemas'
-OUTPUT_FILES = (
+MARKDOWN_FILES = (
     'overview.md', 'document_map.md', 'knowledge_spine.md',
     'architecture_analysis.md', 'design_patterns.md',
-    'knowledge_nodes.json', 'knowledge_graph.json', 'knowledge_graph.mmd',
 )
+DRAFT_FILES = (*MARKDOWN_FILES, 'knowledge_nodes.json', 'knowledge_graph.json')
+OUTPUT_FILES = (*DRAFT_FILES, 'knowledge_graph.mmd')  # Original eight-file format
 
 
 def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -37,8 +38,12 @@ def _finite_float(value: str) -> float:
     return parsed
 
 
+def parse_json(content: str) -> Any:
+    return json.loads(content, object_pairs_hook=_unique_object, parse_constant=_bad_constant, parse_float=_finite_float)
+
+
 def read_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding='utf-8'), object_pairs_hook=_unique_object, parse_constant=_bad_constant, parse_float=_finite_float)
+    return parse_json(path.read_text(encoding='utf-8'))
 
 
 def read_bundle(directory: Path) -> tuple[dict, dict]:
