@@ -1,6 +1,12 @@
-# Slide Study · Guided Notes and Knowledge Graphs
+<p align="center">
+  <img src="assets/learnweave-logo.png" alt="LearnWeave logo" width="840">
+</p>
+
+# LearnWeave · From Material to Understanding
 
 [中文](README.zh.md) | **English**
+
+**LearnWeave turns knowledge materials into systems people can understand and learn.** It transforms slide decks, papers, and technical articles into guided explanations, learning paths, and traceable knowledge structures.
 
 This repository contains two skills that can be installed separately:
 
@@ -14,8 +20,8 @@ This repository contains two skills that can be installed separately:
 Clone this repository and run the following from its root to install the new skill. An existing installation is preserved so you can choose how to update it:
 
 ```bash
-git clone https://github.com/tzm224/slide-study.git
-cd slide-study
+git clone https://github.com/tzm224/LearnWeave.git
+cd LearnWeave
 
 skill_install_dir="${CODEX_HOME:-$HOME/.codex}/skills"
 mkdir -p "$skill_install_dir"
@@ -77,8 +83,8 @@ Extract the ZIP and open `index.html` to study. The finished website needs no ac
 Clone the repository and copy the complete skill folder into your local skills directory. These commands will not overwrite an existing `slide-study` installation:
 
 ```bash
-git clone https://github.com/tzm224/slide-study.git
-cd slide-study
+git clone https://github.com/tzm224/LearnWeave.git
+cd LearnWeave
 
 skill_install_dir="${CODEX_HOME:-$HOME/.codex}/skills"
 mkdir -p "$skill_install_dir"
